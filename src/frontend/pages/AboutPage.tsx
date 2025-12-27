@@ -330,9 +330,9 @@ export function AboutPage() {
   const traditions = data ? Object.keys(data.byTradition).sort() : [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col h-screen bg-background overflow-hidden">
       {/* Header */}
-      <div className="border-b border-border bg-surface sticky top-0 z-10">
+      <div className="border-b border-border bg-surface shrink-0">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <a
@@ -363,120 +363,122 @@ export function AboutPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-20 text-error">{error}</div>
-        ) : data ? (
-          <>
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <div className="text-3xl font-bold text-primary">
-                  {data.totalPhilosophers}
-                </div>
-                <div className="text-sm text-text-muted">
-                  Philosophers & Theologians
-                </div>
-              </div>
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <div className="text-3xl font-bold text-primary">
-                  {traditions.length}
-                </div>
-                <div className="text-sm text-text-muted">Traditions</div>
-              </div>
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <div className="text-3xl font-bold text-primary">
-                  {data.totalIndexedTexts ||
-                    data.philosophers.reduce(
-                      (sum, p) => sum + p.textSourceCount,
-                      0
-                    )}
-                </div>
-                <div className="text-sm text-text-muted">Primary Texts</div>
-              </div>
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <div className="text-3xl font-bold text-primary">
-                  {data.totalIndexedChunks.toLocaleString()}
-                </div>
-                <div className="text-sm text-text-muted">Indexed Chunks</div>
-              </div>
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-
-            {/* Search and Filter */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search philosophers, works, or descriptions..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 bg-surface-secondary border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+          ) : error ? (
+            <div className="text-center py-20 text-error">{error}</div>
+          ) : data ? (
+            <>
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-surface border border-border rounded-lg p-4">
+                  <div className="text-3xl font-bold text-primary">
+                    {data.totalPhilosophers}
+                  </div>
+                  <div className="text-sm text-text-muted">
+                    Philosophers & Theologians
+                  </div>
+                </div>
+                <div className="bg-surface border border-border rounded-lg p-4">
+                  <div className="text-3xl font-bold text-primary">
+                    {traditions.length}
+                  </div>
+                  <div className="text-sm text-text-muted">Traditions</div>
+                </div>
+                <div className="bg-surface border border-border rounded-lg p-4">
+                  <div className="text-3xl font-bold text-primary">
+                    {data.totalIndexedTexts ||
+                      data.philosophers.reduce(
+                        (sum, p) => sum + p.textSourceCount,
+                        0
+                      )}
+                  </div>
+                  <div className="text-sm text-text-muted">Primary Texts</div>
+                </div>
+                <div className="bg-surface border border-border rounded-lg p-4">
+                  <div className="text-3xl font-bold text-primary">
+                    {data.totalIndexedChunks.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-text-muted">Indexed Chunks</div>
+                </div>
               </div>
-              <select
-                value={selectedTradition || ''}
-                onChange={e => setSelectedTradition(e.target.value || null)}
-                className="px-4 py-2 bg-surface-secondary border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">All Traditions</option>
-                {traditions.map(t => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
+
+              {/* Search and Filter */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search philosophers, works, or descriptions..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full px-4 py-2 bg-surface-secondary border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <select
+                  value={selectedTradition || ''}
+                  onChange={e => setSelectedTradition(e.target.value || null)}
+                  className="px-4 py-2 bg-surface-secondary border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="">All Traditions</option>
+                  {traditions.map(t => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Results count */}
+              <div className="text-sm text-text-muted mb-4">
+                Showing {filteredPhilosophers?.length || 0} of{' '}
+                {data.totalPhilosophers} philosophers
+                {expandedIds.size > 0 && (
+                  <span className="ml-2">
+                    •{' '}
+                    <button
+                      onClick={() => setExpandedIds(new Set())}
+                      className="text-primary hover:underline"
+                    >
+                      Collapse all
+                    </button>
+                  </span>
+                )}
+              </div>
+
+              {/* Philosopher Grid */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredPhilosophers?.map(philosopher => (
+                  <PhilosopherCard
+                    key={philosopher.id}
+                    philosopher={philosopher}
+                    isExpanded={expandedIds.has(philosopher.id)}
+                    onToggle={() => {
+                      setExpandedIds(prev => {
+                        const next = new Set(prev);
+                        if (next.has(philosopher.id)) {
+                          next.delete(philosopher.id);
+                        } else {
+                          next.add(philosopher.id);
+                        }
+                        return next;
+                      });
+                    }}
+                  />
                 ))}
-              </select>
-            </div>
-
-            {/* Results count */}
-            <div className="text-sm text-text-muted mb-4">
-              Showing {filteredPhilosophers?.length || 0} of{' '}
-              {data.totalPhilosophers} philosophers
-              {expandedIds.size > 0 && (
-                <span className="ml-2">
-                  •{' '}
-                  <button
-                    onClick={() => setExpandedIds(new Set())}
-                    className="text-primary hover:underline"
-                  >
-                    Collapse all
-                  </button>
-                </span>
-              )}
-            </div>
-
-            {/* Philosopher Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPhilosophers?.map(philosopher => (
-                <PhilosopherCard
-                  key={philosopher.id}
-                  philosopher={philosopher}
-                  isExpanded={expandedIds.has(philosopher.id)}
-                  onToggle={() => {
-                    setExpandedIds(prev => {
-                      const next = new Set(prev);
-                      if (next.has(philosopher.id)) {
-                        next.delete(philosopher.id);
-                      } else {
-                        next.add(philosopher.id);
-                      }
-                      return next;
-                    });
-                  }}
-                />
-              ))}
-            </div>
-
-            {filteredPhilosophers?.length === 0 && (
-              <div className="text-center py-12 text-text-muted">
-                No philosophers found matching your search.
               </div>
-            )}
-          </>
-        ) : null}
+
+              {filteredPhilosophers?.length === 0 && (
+                <div className="text-center py-12 text-text-muted">
+                  No philosophers found matching your search.
+                </div>
+              )}
+            </>
+          ) : null}
+        </div>
       </div>
     </div>
   );
