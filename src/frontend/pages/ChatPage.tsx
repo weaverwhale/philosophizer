@@ -83,8 +83,10 @@ export function ChatPage() {
     },
   });
 
-  const { scrollEndRef, scrollContainerRef, handleScroll, enableAutoScroll } =
-    useAutoScroll(messages);
+  const { scrollContainerRef, handleScroll, enableAutoScroll } = useAutoScroll(
+    messages,
+    currentConversation?.id
+  );
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -394,7 +396,6 @@ export function ChatPage() {
               starterQuestions={randomQuestions}
               onStarterQuestion={handleStarterQuestion}
             />
-            <div ref={scrollEndRef} />
           </div>
         </div>
 
