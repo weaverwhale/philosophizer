@@ -108,7 +108,11 @@ export function Messages({
         return (
           <div
             key={message.id}
-            className={`py-8 ${index === messages.length - 1 ? 'pb-12' : ''}`}
+            className={`
+              py-8 
+              ${index === messages.length - 1 ? 'pb-12' : ''}
+              ${index === 0 ? 'pt-12' : ''}
+            `}
           >
             <div className="max-w-3xl mx-auto">
               <div className="flex gap-4">
