@@ -9,9 +9,7 @@ export function useAutoScroll<T>(
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
   const userScrollingRef = useRef(false);
-  const lastConversationIdRef = useRef<string | null | undefined>(
-    conversationId
-  );
+  const lastConversationIdRef = useRef<string | null | undefined>(undefined);
   const isStreamingRef = useRef(false);
 
   const scrollToBottom = useCallback((instant = false) => {
@@ -46,32 +44,24 @@ export function useAutoScroll<T>(
     isStreamingRef.current = true;
   }, []);
 
-  const scrollToBottomInstant = useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      // Use double RAF to ensure content is fully rendered
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: 'instant',
-          });
-        });
-      });
-    }
-  }, []);
-
-  // Handle conversation changes (instant scroll to bottom)
+  // Handle conversation changes - reset flags and scroll
   useEffect(() => {
     if (conversationId !== lastConversationIdRef.current) {
       lastConversationIdRef.current = conversationId;
       // Reset auto-scroll flags when conversation changes
       shouldAutoScrollRef.current = true;
       userScrollingRef.current = false;
-      // When conversation changes, scroll instantly after render
-      scrollToBottomInstant();
+
+      // Scroll to bottom for new conversation after delay
+      const hasMessages =
+        Array.isArray(dependency) && (dependency as any[]).length > 0;
+      if (hasMessages) {
+        setTimeout(() => {
+          scrollToBottom(false);
+        }, 100);
+      }
     }
-  }, [conversationId, scrollToBottomInstant]);
+  }, [conversationId, dependency, scrollToBottom]);
 
   // Handle message updates (smooth scroll during streaming)
   useEffect(() => {

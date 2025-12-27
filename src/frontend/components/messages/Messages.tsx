@@ -91,6 +91,11 @@ export function Messages({
   onStarterQuestion,
   onRegenerateLastMessage,
 }: MessagesProps) {
+  const isStreaming = status === 'submitted' || status === 'streaming';
+
+  // Check if there's a user message to regenerate
+  const hasUserMessage = messages.some(m => m.role === 'user');
+
   return (
     <>
       {messages.length === 0 && (
@@ -104,6 +109,10 @@ export function Messages({
         const isLastMessage = index === messages.length - 1;
         const isLastAssistantMessage =
           isLastMessage && message.role === 'assistant';
+
+        // Only show actions on last assistant message when not streaming AND there's a user message
+        const shouldShowActions =
+          isLastAssistantMessage && !isStreaming && hasUserMessage;
 
         return (
           <div
@@ -123,7 +132,7 @@ export function Messages({
                   ) : (
                     <AssistantMessage
                       message={message}
-                      showActions={isLastAssistantMessage}
+                      showActions={shouldShowActions}
                       onRegenerateLastMessage={onRegenerateLastMessage}
                     />
                   )}
