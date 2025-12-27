@@ -8,13 +8,13 @@ export function useAutoScroll<T>(
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
-  const userScrollingRef = useRef(false);
   const lastConversationIdRef = useRef<string | null | undefined>(undefined);
   const isStreamingRef = useRef(false);
+  const needsInitialScrollRef = useRef(false);
 
   const scrollToBottom = useCallback((instant = false) => {
     const container = scrollContainerRef.current;
-    if (shouldAutoScrollRef.current && !userScrollingRef.current && container) {
+    if (shouldAutoScrollRef.current && container) {
       container.scrollTo({
         top: container.scrollHeight,
         behavior: instant ? 'instant' : 'smooth',
@@ -29,39 +29,45 @@ export function useAutoScroll<T>(
     const distanceFromBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight;
 
-    if (distanceFromBottom > AUTO_SCROLL_THRESHOLD) {
-      shouldAutoScrollRef.current = false;
-      userScrollingRef.current = true;
-    } else {
-      shouldAutoScrollRef.current = true;
-      userScrollingRef.current = false;
-    }
+    // Disable auto-scroll if user scrolls up, enable if near bottom
+    shouldAutoScrollRef.current = distanceFromBottom <= AUTO_SCROLL_THRESHOLD;
   }, []);
 
   const enableAutoScroll = useCallback(() => {
     shouldAutoScrollRef.current = true;
-    userScrollingRef.current = false;
     isStreamingRef.current = true;
   }, []);
 
-  // Handle conversation changes - reset flags and scroll
+  // Detect conversation changes
   useEffect(() => {
     if (conversationId !== lastConversationIdRef.current) {
       lastConversationIdRef.current = conversationId;
-      // Reset auto-scroll flags when conversation changes
+      needsInitialScrollRef.current = true;
       shouldAutoScrollRef.current = true;
-      userScrollingRef.current = false;
-
-      // Scroll to bottom for new conversation after delay
-      const hasMessages =
-        Array.isArray(dependency) && (dependency as any[]).length > 0;
-      if (hasMessages) {
-        setTimeout(() => {
-          scrollToBottom(false);
-        }, 100);
-      }
     }
-  }, [conversationId, dependency, scrollToBottom]);
+  }, [conversationId]);
+
+  // Scroll when messages load after conversation change
+  useEffect(() => {
+    const hasMessages =
+      Array.isArray(dependency) && (dependency as any[]).length > 0;
+
+    if (needsInitialScrollRef.current && hasMessages && conversationId) {
+      needsInitialScrollRef.current = false;
+
+      // Wait for content to render
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            const container = scrollContainerRef.current;
+            if (container && container.scrollHeight > 0) {
+              scrollToBottom(false);
+            }
+          }, 300);
+        });
+      });
+    }
+  }, [dependency, conversationId, scrollToBottom]);
 
   // Handle message updates (smooth scroll during streaming)
   useEffect(() => {
