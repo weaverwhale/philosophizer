@@ -266,6 +266,47 @@ export function ChatPage() {
     clearCurrentConversation();
   };
 
+  const handleRegenerateLastMessage = useCallback(() => {
+    if (messages.length < 1 || isProcessing) return;
+
+    // Find the last user message
+    let lastUserMessage = null;
+
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg && msg.role === 'user') {
+        lastUserMessage = msg;
+        break;
+      }
+    }
+
+    if (!lastUserMessage) {
+      console.warn('No user message found to regenerate');
+      return;
+    }
+
+    // Extract message content
+    const messageContent =
+      lastUserMessage.parts
+        ?.filter((p: any) => p.type === 'text')
+        .map((p: any) => p.text)
+        .join('') || '';
+
+    if (!messageContent) {
+      console.warn('No message content found');
+      return;
+    }
+
+    // Enable auto-scroll for the new response
+    enableAutoScroll();
+
+    // Resend the last user message (keeping all previous messages)
+    sendMessage({
+      role: 'user',
+      parts: [{ type: 'text', text: messageContent }],
+    } as any);
+  }, [messages, isProcessing, enableAutoScroll, sendMessage]);
+
   // Show loading state while checking auth
   if (authLoading) {
     return (
@@ -395,6 +436,7 @@ export function ChatPage() {
               status={status}
               starterQuestions={randomQuestions}
               onStarterQuestion={handleStarterQuestion}
+              onRegenerateLastMessage={handleRegenerateLastMessage}
             />
           </div>
         </div>
