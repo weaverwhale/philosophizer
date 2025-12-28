@@ -2,7 +2,7 @@ import { MessageAvatar } from './MessageAvatar';
 
 export function ThinkingIndicator() {
   return (
-    <div className="pt-8 pb-12">
+    <div className="py-4 pb-12">
       <div className="max-w-3xl mx-auto">
         <div className="flex gap-4">
           <MessageAvatar role="assistant" />
