@@ -58,7 +58,8 @@ async function getRelevantMemoryContext(
 export async function createAgent(
   messages: UIMessage[],
   userId: string,
-  conversationId?: string
+  conversationId?: string,
+  philosopherId?: string
 ) {
   const provider = createProvider();
 
@@ -68,7 +69,7 @@ export async function createAgent(
     conversationId
   );
 
-  const systemPrompt = getSystemPrompt() + memoryContext;
+  const systemPrompt = getSystemPrompt(philosopherId) + memoryContext;
   const tools = createTools(userId);
 
   return new ToolLoopAgent({

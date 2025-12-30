@@ -5,6 +5,8 @@ interface ChatInputProps {
   isProcessing: boolean;
   onInputChange: (value: string) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  selectedPhilosopher?: string | null;
+  philosopherName?: string | null;
 }
 
 export function ChatInput({
@@ -12,6 +14,8 @@ export function ChatInput({
   isProcessing,
   onInputChange,
   onSubmit,
+  selectedPhilosopher,
+  philosopherName,
 }: ChatInputProps) {
   const formRef = React.useRef<HTMLFormElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -42,7 +46,11 @@ export function ChatInput({
           value={input}
           onChange={e => onInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask anything..."
+          placeholder={
+            selectedPhilosopher && philosopherName
+              ? `Ask ${philosopherName} anything...`
+              : 'Ask anything...'
+          }
           rows={1}
           disabled={isProcessing}
           className="w-full px-4 py-3 pr-12 bg-surface-secondary border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 resize-none overflow-y-auto no-scrollbar max-h-[240px]"

@@ -1,4 +1,5 @@
 import { PHILOSOPHERS } from './philosophers';
+import { TRADITION_GROUP_MAP, TRADITION_GROUP_ORDER } from './traditions';
 import { philosopherTools } from '../tools/philosophers';
 import { QUESTIONS_PER_CHUNK } from './rag';
 
@@ -25,47 +26,13 @@ function generatePhilosopherToolsList(): string {
 
   let output = '';
 
-  const groupMapping: Record<string, string> = {
-    'Ancient Greek Philosophy': 'Ancient Greek Philosophy',
-    Stoicism: 'Stoic Philosophy',
-    'Christian Theology': 'Christian Theology & Philosophy',
-    'Christian Philosophy / Patristics': 'Christian Theology & Philosophy',
-    'Catholic Scholasticism': 'Christian Theology & Philosophy',
-    'Christian Mysticism / Rhineland Mysticism': 'Christian Mysticism',
-    'Christian Theosophy / Protestant Mysticism': 'Christian Mysticism',
-    'Protestant Reformation': 'Protestant Reformation',
-    'Protestant Reformation / Reformed Theology': 'Protestant Reformation',
-    'Protestant Reformation / Swiss Reformed': 'Protestant Reformation',
-    'Protestant Reformation / Scottish Presbyterianism':
-      'Protestant Reformation',
-    'Protestant Reformation / Lutheran Theology': 'Protestant Reformation',
-    'Methodism / Evangelical Christianity': 'Protestant Christianity',
-    'Puritan / Baptist Christianity': 'Protestant Christianity',
-    'Reformed / Great Awakening': 'Protestant Christianity',
-    'Baptist / Reformed Christianity': 'Protestant Christianity',
-    'Christian Apologetics': 'Christian Apologetics',
-    'Chinese Philosophy / Confucianism': 'Eastern Philosophy',
-    Buddhism: 'Eastern Philosophy',
-    'Hindu Philosophy / Vedanta': 'Eastern Philosophy',
-    'Kabbalah / Jewish Mysticism': 'Jewish Philosophy & Mysticism',
-    'Jewish Philosophy / Rationalism': 'Jewish Philosophy & Mysticism',
-    'Hasidic Judaism': 'Jewish Philosophy & Mysticism',
-    'Hasidic Judaism / Breslov': 'Jewish Philosophy & Mysticism',
-    'Hasidic Judaism / Chabad-Lubavitch': 'Jewish Philosophy & Mysticism',
-    'Hermeticism / Western Esotericism': 'Hermetic Philosophy',
-    'German Idealism / Enlightenment': 'Modern Philosophy',
-    'Existentialism / Nihilism': 'Modern Philosophy',
-    'Existentialism / Christian Philosophy': 'Modern Philosophy',
-    'Existential Psychology / Logotherapy': 'Modern Philosophy',
-  };
-
   const grouped = new Map<
     string,
     Array<{ id: string; name: string; areas: string[] }>
   >();
 
   for (const [tradition, philosophers] of byTradition) {
-    const groupName = groupMapping[tradition] || tradition;
+    const groupName = TRADITION_GROUP_MAP[tradition] || tradition;
     if (!grouped.has(groupName)) {
       grouped.set(groupName, []);
     }
@@ -73,21 +40,8 @@ function generatePhilosopherToolsList(): string {
   }
 
   const sortedGroups = Array.from(grouped.entries()).sort(([a], [b]) => {
-    const order = [
-      'Ancient Greek Philosophy',
-      'Stoic Philosophy',
-      'Christian Theology & Philosophy',
-      'Christian Mysticism',
-      'Protestant Reformation',
-      'Protestant Christianity',
-      'Christian Apologetics',
-      'Eastern Philosophy',
-      'Jewish Philosophy & Mysticism',
-      'Hermetic Philosophy',
-      'Modern Philosophy',
-    ];
-    const indexA = order.indexOf(a);
-    const indexB = order.indexOf(b);
+    const indexA = TRADITION_GROUP_ORDER.indexOf(a);
+    const indexB = TRADITION_GROUP_ORDER.indexOf(b);
     if (indexA === -1 && indexB === -1) return a.localeCompare(b);
     if (indexA === -1) return 1;
     if (indexB === -1) return -1;
@@ -176,7 +130,59 @@ function generateResearchToolsList(): string {
   return output;
 }
 
-export function getSystemPrompt(): string {
+export function getSystemPrompt(philosopherId?: string): string {
+  // If a specific philosopher is selected, create a focused prompt
+  if (philosopherId) {
+    const philosopher = PHILOSOPHERS[philosopherId];
+    if (philosopher) {
+      return `
+You are channeling the wisdom and perspective of ${philosopher.name}, ${philosopher.era}.
+
+**FOCUSED PERSPECTIVE**: All responses should primarily draw from ${philosopher.name}'s philosophy, teachings, and worldview. You are speaking through the lens of ${philosopher.tradition}.
+
+**About ${philosopher.name}:**
+${philosopher.description}
+
+**Key Teachings:**
+${philosopher.keyTeachings.map(t => `- ${t}`).join('\n')}
+
+**Areas of Expertise:**
+${philosopher.areasOfExpertise.map(a => `- ${a}`).join('\n')}
+
+**Key Concepts:**
+${philosopher.keyConcepts.map(c => `- **${c.name}**: ${c.explanation}`).join('\n')}
+
+**Available Tools:**
+You have access to the **${philosopherId}** tool which provides:
+- Detailed teachings and concepts from ${philosopher.name}
+- Key excerpts from their major works
+- Famous quotes and primary source texts
+- Biographical information
+
+You also have access to research tools (webSearch, readUrl, wikipedia, newsSearch) to provide additional context when needed.
+
+**Response Style:**
+- Answer all questions primarily from ${philosopher.name}'s perspective and teachings
+- Use the ${philosopherId} tool to gather deep insights from their works
+- Reference their key concepts and teachings frequently
+- Include relevant quotes and excerpts to let ${philosopher.name} speak directly
+- If the question goes beyond ${philosopher.name}'s areas of expertise, acknowledge this and still provide their perspective while noting the limitations
+- You may supplement with research tools for historical context or current events, but always return to ${philosopher.name}'s framework
+
+**Example Approach:**
+When asked about [topic], you would:
+1. Call the ${philosopherId} tool with the relevant query
+2. Present ${philosopher.name}'s teaching on this topic
+3. Include key quotes or excerpts from their works
+4. Apply their philosophical framework to the user's specific question
+5. Optionally use research tools if additional context is needed
+
+Remember: You are speaking primarily through ${philosopher.name}'s voice and wisdom. Stay true to their teachings and perspective.
+`;
+    }
+  }
+
+  // Default prompt when no philosopher is selected
   return `
 You are a philosophical and theological guide, offering wisdom from history's greatest thinkers on life's deepest questions.
 

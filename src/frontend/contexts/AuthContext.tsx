@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
   id: string;
@@ -129,4 +129,3 @@ export function useAuth() {
   }
   return context;
 }
-

@@ -1,15 +1,21 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { Messages } from '../components/messages/Messages';
-import { STARTER_QUESTIONS } from '../../constants/questions';
+import {
+  STARTER_QUESTIONS,
+  QUESTIONS_BY_TRADITION,
+} from '../../constants/questions';
+import { TRADITION_GROUP_MAP } from '../../constants/traditions';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { ChatInput } from '../components/ChatInput';
 import { ConversationSidebar } from '../components/ConversationSidebar';
+import { ChatSettingsModal } from '../components/ChatSettingsModal';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useConversations } from '../hooks/useConversations';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from '../components/Logo';
+import { PHILOSOPHERS } from '../../constants/philosophers';
 
 // Utility to shuffle and limit questions
 function getRandomQuestions(questions: string[], limit: number): string[] {
@@ -35,13 +41,41 @@ export function ChatPage() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [input, setInput] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
-
-  // Get 15 random starter questions (memoized so they don't change on re-renders)
-  const randomQuestions = useMemo(
-    () => getRandomQuestions(STARTER_QUESTIONS, 15),
-    []
+  const [selectedPhilosopher, setSelectedPhilosopher] = useState<string | null>(
+    null
   );
+  const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Get random starter questions based on selected philosopher
+  const randomQuestions = useMemo(() => {
+    let questionsPool: string[] = [];
+
+    if (selectedPhilosopher) {
+      // If a philosopher is selected, get tradition-specific questions
+      const philosopher = PHILOSOPHERS[selectedPhilosopher];
+      if (philosopher) {
+        // Map the philosopher's tradition to a display group
+        const displayGroup = TRADITION_GROUP_MAP[philosopher.tradition];
+
+        // Get questions for that tradition, or fall back to general
+        if (displayGroup && QUESTIONS_BY_TRADITION[displayGroup]) {
+          questionsPool = QUESTIONS_BY_TRADITION[displayGroup];
+        } else {
+          questionsPool = STARTER_QUESTIONS;
+        }
+      }
+    } else {
+      // If no philosopher selected, combine all questions from all traditions
+      questionsPool = [
+        ...STARTER_QUESTIONS,
+        ...Object.values(QUESTIONS_BY_TRADITION).flat(),
+      ];
+    }
+
+    return getRandomQuestions(questionsPool, 15);
+  }, [selectedPhilosopher]);
 
   // Conversation management
   const {
@@ -66,6 +100,9 @@ export function ChatPage() {
         }
         return {};
       },
+      body: () => ({
+        philosopherId: selectedPhilosopher,
+      }),
     }),
     onError: err => {
       const errorText =
@@ -326,7 +363,7 @@ export function ChatPage() {
   const MenuButton = () => (
     <button
       onClick={() => setSidebarOpen(!sidebarOpen)}
-      className="flex items-center justify-center p-2 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+      className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
       title="Conversations"
     >
       <svg
@@ -371,10 +408,34 @@ export function ChatPage() {
     );
   };
 
+  const PhilosopherButton = () => (
+    <button
+      ref={settingsButtonRef}
+      onClick={() => setSettingsOpen(true)}
+      disabled={isProcessing}
+      className="flex items-center justify-center p-2 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      title="Focus philosopher"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    </button>
+  );
+
   const AboutButton = () => (
     <a
       href="/about"
-      className="flex items-center justify-center p-2 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+      className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
       title="About - View indexed philosophers"
     >
       <svg
@@ -418,6 +479,7 @@ export function ChatPage() {
             </div>
             <div className="flex items-center gap-3">
               {messages.length > 0 && <Clear />}
+              <PhilosopherButton />
               <AboutButton />
               <ThemeToggle />
             </div>
@@ -437,6 +499,12 @@ export function ChatPage() {
               starterQuestions={randomQuestions}
               onStarterQuestion={handleStarterQuestion}
               onRegenerateLastMessage={handleRegenerateLastMessage}
+              selectedPhilosopher={selectedPhilosopher}
+              philosopherName={
+                selectedPhilosopher
+                  ? PHILOSOPHERS[selectedPhilosopher]?.name
+                  : null
+              }
             />
           </div>
         </div>
@@ -454,9 +522,24 @@ export function ChatPage() {
               isProcessing={isProcessing}
               onInputChange={setInput}
               onSubmit={handleSubmit}
+              selectedPhilosopher={selectedPhilosopher}
+              philosopherName={
+                selectedPhilosopher
+                  ? PHILOSOPHERS[selectedPhilosopher]?.name
+                  : null
+              }
             />
           </div>
         </div>
+
+        {/* Settings Modal */}
+        <ChatSettingsModal
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          selectedPhilosopher={selectedPhilosopher}
+          onSelectPhilosopher={setSelectedPhilosopher}
+          anchorRef={settingsButtonRef}
+        />
       </div>
     </div>
   );

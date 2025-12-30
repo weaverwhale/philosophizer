@@ -11,6 +11,7 @@ export interface AskResponse {
 
 export interface AgentRequest {
   messages: Message[];
+  philosopherId?: string;
 }
 
 export interface ToolCall {

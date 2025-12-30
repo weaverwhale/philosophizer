@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/auth';
 
 interface AgentRequestWithConversation extends AgentRequest {
   conversationId?: string;
+  philosopherId?: string;
 }
 
 export const agent = {
@@ -58,13 +59,14 @@ export const agent = {
       });
 
       console.log(
-        `[Agent] Creating agent with ${formattedMessages.length} messages${body.conversationId ? ` (conversation: ${body.conversationId})` : ''}`
+        `[Agent] Creating agent with ${formattedMessages.length} messages${body.conversationId ? ` (conversation: ${body.conversationId})` : ''}${body.philosopherId ? ` (focused: ${body.philosopherId})` : ''}`
       );
 
       const agent = await createAgent(
         formattedMessages,
         user.id,
-        body.conversationId
+        body.conversationId,
+        body.philosopherId
       );
 
       return createAgentUIStreamResponse({

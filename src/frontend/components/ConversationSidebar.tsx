@@ -95,7 +95,7 @@ export function ConversationSidebar({
                   onNewConversation();
                   onClose();
                 }}
-                className="flex items-center justify-center p-2 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                 title="New conversation"
               >
                 <svg
@@ -115,7 +115,7 @@ export function ConversationSidebar({
               {/* Close Button (mobile only) */}
               <button
                 onClick={onClose}
-                className="flex items-center justify-center p-2 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                 title="Close sidebar"
               >
                 <svg
@@ -240,7 +240,7 @@ export function ConversationSidebar({
 
           {/* Footer with User Info */}
           {user && (
-            <div className="border-t border-border p-4">
+            <div className="border-t border-border p-4 py-6">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-text truncate">{user.email}</div>

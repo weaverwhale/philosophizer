@@ -3,18 +3,24 @@ import { Logo } from '../Logo';
 interface EmptyStateProps {
   starterQuestions: string[];
   onStarterQuestion: (question: string) => void;
+  selectedPhilosopher?: string | null;
+  philosopherName?: string | null;
 }
 
 export function EmptyState({
   starterQuestions,
   onStarterQuestion,
+  selectedPhilosopher,
+  philosopherName,
 }: EmptyStateProps) {
   return (
     <div className="flex items-center justify-center h-full">
       <div className="text-center py-8">
         <Logo />
         <h2 className="text-3xl font-semibold text-text">
-          Ask anything about philosophy or theology
+          {selectedPhilosopher && philosopherName
+            ? `Ask ${philosopherName}`
+            : 'Ask anything about philosophy or theology'}
         </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-8 mx-auto">
           {starterQuestions.map(question => (
