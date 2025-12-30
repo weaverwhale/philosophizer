@@ -10,6 +10,7 @@ import { philosopherQueryEndpoint } from './endpoints/philosopherQuery';
 import { signup, login, me } from './endpoints/auth';
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
+import os from 'os';
 
 console.log(
   `🚀 Starting bun server in ${process.env.NODE_ENV || 'development'} mode`
@@ -22,6 +23,7 @@ await initializeAgent();
 
 const server = Bun.serve({
   port: process.env.PORT ?? 1738,
+  hostname: process.env.HOSTNAME ?? 'localhost', // Use '0.0.0.0' for network access
   idleTimeout: 120,
   routes: {
     // Frontend routes
@@ -52,8 +54,27 @@ const server = Bun.serve({
       }),
 });
 
-console.log(`\n💻 Web UI: http://localhost:${server.port}`);
+// Get local network IP address
+const getLocalIP = () => {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name] || []) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost';
+};
+
+const localIP = getLocalIP();
+const isNetworkAccessible = server.hostname === '0.0.0.0';
+
+console.log(`\n💻 Web UI:`);
 console.log(`    http://localhost:${server.port}        - Main chat interface`);
+if (isNetworkAccessible) {
+  console.log(`    http://${localIP}:${server.port}        - Network access (from other devices)`);
+}
 console.log(`    http://localhost:${server.port}/about     - About page`);
 console.log(`    http://localhost:${server.port}/login     - Login page`);
 console.log(`    http://localhost:${server.port}/signup    - Signup page`);
