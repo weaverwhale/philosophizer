@@ -347,10 +347,8 @@ export function ChatPage() {
   // Show loading state while checking auth
   if (authLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="animate-pulse">
-          <Logo />
-        </div>
+      <div className="py-22">
+        <Logo />
       </div>
     );
   }

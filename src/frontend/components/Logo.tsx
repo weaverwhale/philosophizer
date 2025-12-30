@@ -8,10 +8,8 @@ export function Logo() {
 
 export function LoadingLogo() {
   return (
-    <div className="flex h-screen items-center justify-center bg-background">
-      <div className="animate-pulse">
-        <Logo />
-      </div>
+    <div className="animate-pulse">
+      <Logo />
     </div>
   );
 }
