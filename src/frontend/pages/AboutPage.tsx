@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { LoadingLogo } from '../components/Logo';
 
 interface TextSourceWithStatus {
   id: string;
@@ -120,9 +121,7 @@ function PhilosopherCard({
       {isExpanded && (
         <div className="px-5 pb-5 border-t border-border">
           {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            </div>
+            <LoadingLogo />
           ) : detail ? (
             <div className="pt-4 space-y-6">
               {/* Text Sources */}
@@ -366,9 +365,7 @@ export function AboutPage() {
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 py-8">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
+            <LoadingLogo />
           ) : error ? (
             <div className="text-center py-20 text-error">{error}</div>
           ) : data ? (
