@@ -73,7 +73,9 @@ const isNetworkAccessible = server.hostname === '0.0.0.0';
 console.log(`\n💻 Web UI:`);
 console.log(`    http://localhost:${server.port}        - Main chat interface`);
 if (isNetworkAccessible) {
-  console.log(`    http://${localIP}:${server.port}        - Network access (from other devices)`);
+  console.log(
+    `    http://${localIP}:${server.port}        - Network access (from other devices)`
+  );
 }
 console.log(`    http://localhost:${server.port}/about     - About page`);
 console.log(`    http://localhost:${server.port}/login     - Login page`);
