@@ -19,8 +19,11 @@
     "pgvector:restore": "./scripts/restore-pgvector.sh",
     "pgvector:publish": "./scripts/publish-pgvector.sh mjweaver01/philosophizer-pgvector",
     "pgvector:bp": "bun run pgvector:backup && bun run pgvector:publish",
-    "rag:index": "bun run src/rag/scripts/indexTexts.ts",
-    "rag:clear": "bun run src/rag/scripts/indexTexts.ts --clear"
+    "rag:index": "bun run src/rag/indexTexts.ts",
+    "rag:resume": "bun run src/rag/indexTexts.ts --resume",
+    "rag:clear": "bun run src/rag/indexTexts.ts --clear",
+    "rag:stats": "bun run src/rag/indexTexts.ts --stats",
+    "rag:force": "bun run src/rag/indexTexts.ts --force"
   },
   "devDependencies": {
     "@types/bun": "latest",
