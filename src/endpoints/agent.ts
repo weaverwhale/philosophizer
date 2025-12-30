@@ -2,6 +2,7 @@ import { createAgentUIStreamResponse } from 'ai';
 import type { AgentRequest } from '../types';
 import { createAgent } from '../utils/agent';
 import { requireAuth } from '../middleware/auth';
+import { trackEvent } from '../utils/usageTracking';
 
 interface AgentRequestWithConversation extends AgentRequest {
   conversationId?: string;
@@ -14,7 +15,7 @@ export const agent = {
       // Require authentication for agent endpoint
       const authResult = await requireAuth(req);
       if (authResult instanceof Response) return authResult;
-      const { user } = authResult;
+      const { user, sessionId } = authResult;
 
       const body = (await req.json()) as AgentRequestWithConversation;
 
@@ -61,6 +62,22 @@ export const agent = {
       console.log(
         `[Agent] Creating agent with ${formattedMessages.length} messages${body.conversationId ? ` (conversation: ${body.conversationId})` : ''}${body.philosopherId ? ` (focused: ${body.philosopherId})` : ''}`
       );
+
+      // Track message sent event
+      const lastMessage = formattedMessages[formattedMessages.length - 1];
+      if (lastMessage?.role === 'user') {
+        await trackEvent(
+          user.id,
+          'message_sent',
+          'chat',
+          {
+            conversationId: body.conversationId,
+            philosopherId: body.philosopherId,
+            messageLength: lastMessage.parts?.[0]?.text?.length || 0,
+          },
+          sessionId
+        );
+      }
 
       const agent = await createAgent(
         formattedMessages,

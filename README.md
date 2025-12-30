@@ -142,6 +142,59 @@ curl -X POST http://localhost:1738/rag \
 curl http://localhost:1738/rag
 ```
 
+## Usage Tracking & Analytics
+
+The app includes comprehensive usage tracking to help you understand how users interact with your application.
+
+### Features
+
+- **Session Tracking**: Monitors user login sessions, IP addresses, and activity
+- **Event Tracking**: Records user actions (messages, conversations, logins)
+- **Daily Statistics**: Aggregated metrics per user per day
+- **Analytics API**: Query and analyze usage data
+
+### Setup
+
+Run the migration to add usage tracking tables to your database:
+
+```bash
+./scripts/migrate-usage-tracking.sh
+```
+
+Or if setting up a fresh database, the schema is already included in `src/db/schema.sql`.
+
+### Analytics Endpoints
+
+All endpoints require authentication:
+
+```bash
+# Get user events
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://localhost:1738/analytics/events?limit=50"
+
+# Get daily statistics
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://localhost:1738/analytics/daily-stats"
+
+# Get activity summary (last 30 days)
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://localhost:1738/analytics/summary"
+
+# Get system-wide aggregate stats
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://localhost:1738/analytics/aggregate"
+```
+
+### Testing Analytics
+
+Use the provided test script:
+
+```bash
+./scripts/test-analytics.sh YOUR_AUTH_TOKEN
+```
+
+See `USAGE_TRACKING.md` for detailed documentation.
+
 ## Conversations API
 
 Save and recall chat conversations.

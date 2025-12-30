@@ -8,6 +8,7 @@ import {
 } from './endpoints/philosophers';
 import { philosopherQueryEndpoint } from './endpoints/philosopherQuery';
 import { signup, login, me } from './endpoints/auth';
+import { analytics } from './endpoints/analytics';
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
 
@@ -42,6 +43,8 @@ const server = Bun.serve({
     '/api/ask-philosopher': philosopherQueryEndpoint,
     '/conversations': conversations,
     '/conversations/:id': conversation,
+    // Analytics routes
+    ...analytics,
   },
   ...(process.env.NODE_ENV === 'production'
     ? {}
@@ -102,4 +105,16 @@ console.log(
 );
 console.log(
   '  GET  /api/ask-philosopher   - Ask a philosopher a question (via query params)'
+);
+
+console.log('\n📊 Analytics Endpoints:');
+console.log('  GET  /analytics/events      - Get user events (auth required)');
+console.log(
+  '  GET  /analytics/daily-stats - Get user daily statistics (auth required)'
+);
+console.log(
+  '  GET  /analytics/summary     - Get user activity summary (auth required)'
+);
+console.log(
+  '  GET  /analytics/aggregate   - Get aggregate stats for all users (auth required)'
 );

@@ -8,6 +8,7 @@ import {
   type ConversationMessage,
 } from '../utils/conversations';
 import { requireAuth } from '../middleware/auth';
+import { trackEvent } from '../utils/usageTracking';
 
 /**
  * Conversations endpoint
@@ -46,10 +47,22 @@ export const conversations = {
     try {
       const authResult = await requireAuth(req);
       if (authResult instanceof Response) return authResult;
-      const { user } = authResult;
+      const { user, sessionId } = authResult;
 
       const body = (await req.json()) as { title?: string };
       const conversation = await createConversation(user.id, body.title);
+
+      // Track conversation created event
+      await trackEvent(
+        user.id,
+        'conversation_created',
+        'conversation',
+        {
+          conversationId: conversation.id,
+          title: conversation.title,
+        },
+        sessionId
+      );
 
       return new Response(JSON.stringify(conversation), {
         status: 201,
@@ -207,7 +220,7 @@ export const conversation = {
     try {
       const authResult = await requireAuth(req);
       if (authResult instanceof Response) return authResult;
-      const { user } = authResult;
+      const { user, sessionId } = authResult;
 
       const url = new URL(req.url);
       const id = url.pathname.split('/').pop();
@@ -233,6 +246,17 @@ export const conversation = {
           }
         );
       }
+
+      // Track conversation deleted event
+      await trackEvent(
+        user.id,
+        'conversation_deleted',
+        'conversation',
+        {
+          conversationId: id,
+        },
+        sessionId
+      );
 
       return new Response(JSON.stringify({ success: true }), {
         status: 200,

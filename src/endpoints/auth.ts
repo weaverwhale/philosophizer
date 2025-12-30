@@ -3,6 +3,7 @@ import {
   authenticateUser,
   getUserFromRequest,
 } from '../utils/auth';
+import { trackEvent } from '../utils/usageTracking';
 
 /**
  * POST /auth/signup - Create a new user account
@@ -57,6 +58,16 @@ export const signup = async (req: Request) => {
       const user = await createUser(body.email, body.password);
       const { generateToken } = await import('../utils/auth');
       const token = generateToken(user);
+
+      // Track signup event
+      await trackEvent(
+        user.id,
+        'signup',
+        'authentication',
+        {
+          email: user.email,
+        }
+      );
 
       return new Response(
         JSON.stringify({
@@ -137,6 +148,16 @@ export const login = async (req: Request) => {
         }
       );
     }
+
+    // Track login event
+    await trackEvent(
+      result.user.id,
+      'login',
+      'authentication',
+      {
+        email: result.user.email,
+      }
+    );
 
     return new Response(
       JSON.stringify({
