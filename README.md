@@ -99,20 +99,23 @@ This significantly improves retrieval accuracy by matching user queries to seman
 ### Index Texts with HQE
 
 ```bash
-# Index all texts (generates questions automatically)
+# Index all texts (automatically resumes, skipping existing chunks)
 bun run rag:index
 
-# Resume indexing (skip existing chunks)
-bun run rag:resume
+# Reset: clear and reindex everything
+bun run rag:reset
 
-# Clear and reindex everything
+# Clear and reindex everything (same as reset)
 bun run rag:clear
 
 # Show collection statistics
 bun run rag:stats
 ```
 
-**Note:** HQE indexing takes 2-3x longer than standard indexing due to question generation.
+**Note:**
+
+- By default, indexing automatically resumes and skips existing chunks. Use `--force` or `--reset` to reindex everything.
+- HQE indexing takes 2-3x longer than standard indexing due to question generation.
 
 ### RAG API Endpoints
 

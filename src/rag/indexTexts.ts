@@ -3,11 +3,11 @@
  * Script to download and index philosopher texts into the vector store
  *
  * Usage:
- *   bun run src/rag/scripts/indexTexts.ts                    # Index all texts
+ *   bun run src/rag/scripts/indexTexts.ts                    # Index all texts (resumes by default)
  *   bun run src/rag/scripts/indexTexts.ts --philosopher plato  # Index specific philosopher
  *   bun run src/rag/scripts/indexTexts.ts --source plato-republic  # Index specific source
+ *   bun run src/rag/scripts/indexTexts.ts --reset             # Clear and reindex everything
  *   bun run src/rag/scripts/indexTexts.ts --clear            # Clear and reindex everything
- *   bun run src/rag/scripts/indexTexts.ts --resume           # Resume indexing (skip existing chunks)
  *   bun run src/rag/scripts/indexTexts.ts --force            # Force reindex everything
  *   bun run src/rag/scripts/indexTexts.ts --stats            # Show collection stats
  */
@@ -36,9 +36,9 @@ interface IndexOptions {
   philosopher?: string;
   sourceId?: string;
   clear?: boolean;
+  reset?: boolean;
   stats?: boolean;
   force?: boolean;
-  resume?: boolean;
 }
 
 /**
@@ -63,16 +63,15 @@ function parseArgs(): IndexOptions {
       case '-c':
         options.clear = true;
         break;
+      case '--reset':
+        options.reset = true;
+        break;
       case '--stats':
         options.stats = true;
         break;
       case '--force':
       case '-f':
         options.force = true;
-        break;
-      case '--resume':
-      case '-r':
-        options.resume = true;
         break;
       default:
         if (!arg?.startsWith('-')) {
@@ -90,21 +89,13 @@ function parseArgs(): IndexOptions {
  */
 async function indexSource(
   source: TextSource,
-  force: boolean = false,
-  resume: boolean = false
+  force: boolean = false
 ): Promise<boolean> {
   console.log(`\n📚 Processing: ${source.title} (${source.philosopher})`);
 
   // Check existing index status
   const existingChunkIndices = await getIndexedChunkIndices(source.id);
   const existingCount = existingChunkIndices.size;
-
-  if (!force && !resume && existingCount > 0) {
-    console.log(
-      `  ⏭ Already indexed (${existingCount} chunks), skipping (use --force to reindex or --resume to continue)`
-    );
-    return true;
-  }
 
   // Download the text
   const downloadResult = await downloadText(source);
@@ -137,10 +128,11 @@ async function indexSource(
   );
 
   // Determine which chunks to process
+  // By default, resume (skip existing chunks) unless force is true
   let chunksToProcess = allChunks;
   let skippedCount = 0;
 
-  if (resume && existingCount > 0) {
+  if (!force && existingCount > 0) {
     chunksToProcess = allChunks.filter(
       chunk => !existingChunkIndices.has(chunk.metadata.chunkIndex)
     );
@@ -192,7 +184,7 @@ async function indexSource(
 
     if ((i + 1) % 5 === 0 || i === chunksToProcess.length - 1) {
       console.log(
-        `    Progress: ${i + 1}/${chunksToProcess.length} chunks processed${resume && skippedCount > 0 ? ` (${skippedCount} already done)` : ''}`
+        `    Progress: ${i + 1}/${chunksToProcess.length} chunks processed${!force && skippedCount > 0 ? ` (${skippedCount} already done)` : ''}`
       );
     }
   }
@@ -205,7 +197,7 @@ async function indexSource(
   try {
     const added = await addChunks(chunksToProcess);
     console.log(
-      `  ✓ Indexed ${added} chunks with HQE${resume && existingCount > 0 ? ` (total: ${existingCount + added})` : ''}`
+      `  ✓ Indexed ${added} chunks with HQE${!force && existingCount > 0 ? ` (total: ${existingCount + added})` : ''}`
     );
     return true;
   } catch (error) {
@@ -243,8 +235,8 @@ async function main() {
     return;
   }
 
-  // Clear collection if requested
-  if (options.clear) {
+  // Clear collection if requested (reset or clear)
+  if (options.reset || options.clear) {
     console.log('\n🗑 Clearing existing collection...');
     await clearCollection();
   }
@@ -285,8 +277,7 @@ async function main() {
   for (const source of sources) {
     const result = await indexSource(
       source,
-      options.force || options.clear,
-      options.resume
+      options.force || options.clear || options.reset
     );
     if (result) {
       success++;
