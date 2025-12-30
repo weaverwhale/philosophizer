@@ -2,7 +2,7 @@
 
 Agentic chat with tools and reasoning, using the wisdom of history's greatest philosophers and theologians.
 
-Built with Bun, React, TypeScript, and ChromaDB for semantic search over primary source texts.
+Built with Bun, React, TypeScript, and PostgreSQL with pgvector for semantic search over primary source texts.
 
 ## Technologies Used
 
@@ -10,8 +10,8 @@ Built with Bun, React, TypeScript, and ChromaDB for semantic search over primary
 - **AI SDK**: Vercel AI SDK v6 (beta)
 - **Frontend**: React 19, TypeScript
 - **Styling**: TailwindCSS 4
-- **Database**: PostgreSQL 16
-- **Vector Database**: ChromaDB
+- **Database**: PostgreSQL 16 with pgvector
+- **RAG**: HQE (Hypothetical Question Embeddings) for improved semantic search
 - **Authentication**: JWT with bcrypt
 - **Markdown**: Streamdown (optimized for streaming AI responses)
 - **Validation**: Zod schemas
@@ -84,56 +84,35 @@ createdb philosophizer
 psql -d philosophizer -f src/db/schema.sql
 ```
 
-### ChromaDB (Vector Database)
+## RAG with HQE (Hypothetical Question Embeddings)
 
-Start ChromaDB:
+The app uses **HQE** to improve semantic search over philosophical and theological texts. For each text chunk, the system:
 
-```bash
-bun run chroma
-```
+1. Generates 3 hypothetical questions the chunk would answer
+2. Creates embeddings for both content and questions
+3. Uses hybrid search (70% questions, 30% content) for better query-answer alignment
 
-Stop ChromaDB:
+This significantly improves retrieval accuracy by matching user queries to semantically similar questions.
 
-```bash
-bun run chroma:stop
-```
+**Configuration:** Edit `src/constants/rag.ts` to adjust questions per chunk and search weights.
 
-### ChromaDB Admin UI (Optional)
-
-View and manage your vector database with a web interface:
+### Index Texts with HQE
 
 ```bash
-# Start the admin UI
-bun run chroma:admin
-
-# Open http://localhost:3001 in your browser
-# Use http://host.docker.internal:8000 as the connection URL
-
-# Stop the admin UI
-bun run chroma:admin:stop
-```
-
-## RAG (Retrieval Augmented Generation)
-
-The app includes a collection of primary source philosophical and theological texts that are indexed for semantic search.
-
-### Index Texts
-
-```bash
+# Index all texts (generates questions automatically)
 bun run rag:index
-```
 
-### Clear the Index
-
-```bash
+# Clear and reindex
 bun run rag:clear
 ```
+
+**Note:** HQE indexing takes 2-3x longer than standard indexing due to question generation.
 
 ### RAG API Endpoints
 
 Once the server is running, you can query the vector store via API:
 
-**Query passages:**
+**Query passages (HQE enabled by default):**
 
 ```bash
 curl -X POST http://localhost:1738/rag \
@@ -141,12 +120,20 @@ curl -X POST http://localhost:1738/rag \
   -d '{"query": "What is virtue?", "limit": 5}'
 ```
 
-With optional filters:
+With filters:
 
 ```bash
 curl -X POST http://localhost:1738/rag \
   -H "Content-Type: application/json" \
   -d '{"query": "What is virtue?", "philosopher": "aristotle", "limit": 10}'
+```
+
+Disable HQE (content-only search):
+
+```bash
+curl -X POST http://localhost:1738/rag \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is virtue?", "useHQE": false}'
 ```
 
 **Get collection stats:**
@@ -157,7 +144,7 @@ curl http://localhost:1738/rag
 
 ## Conversations API
 
-Save and recall chat conversations (stored in ChromaDB).
+Save and recall chat conversations.
 
 **List all conversations:**
 

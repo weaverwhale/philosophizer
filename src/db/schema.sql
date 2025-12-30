@@ -64,7 +64,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 -- ==========================================================================
--- Philosopher Text Chunks Table (RAG System)
+-- Philosopher Text Chunks Table (RAG System with HQE)
 -- ==========================================================================
 CREATE TABLE IF NOT EXISTS philosopher_text_chunks (
     id VARCHAR(255) PRIMARY KEY,
@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS philosopher_text_chunks (
     chunk_index INTEGER NOT NULL,
     start_char INTEGER DEFAULT 0,
     end_char INTEGER DEFAULT 0,
+    questions TEXT[], -- HQE: Array of hypothetical questions this chunk answers
+    question_embeddings vector(768)[], -- HQE: Embeddings for each hypothetical question
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

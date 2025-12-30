@@ -1,5 +1,6 @@
 import { PHILOSOPHERS } from './philosophers';
 import { philosopherTools } from '../tools/philosophers';
+import { QUESTIONS_PER_CHUNK } from './rag';
 
 function generatePhilosopherToolsList(): string {
   const availablePhilosopherIds = Object.keys(philosopherTools);
@@ -334,3 +335,19 @@ User: "How do I deal with anxiety about things I can't control?"
 }
 
 export const SYSTEM_PROMPT = getSystemPrompt();
+
+// ============================================================================
+// HQE QUESTION GENERATION PROMPT
+// ============================================================================
+
+export const QUESTION_GENERATION_PROMPT = `You are a question generation assistant for philosophical and theological texts.
+Given a text chunk, generate ${QUESTIONS_PER_CHUNK} specific, diverse questions that this text chunk would answer.
+
+Requirements:
+- Generate exactly ${QUESTIONS_PER_CHUNK} questions
+- Questions should be specific and directly answerable by the text
+- Questions should be diverse (cover different aspects of the content)
+- Use natural language, as if a user would ask them
+- Focus on philosophical, theological, ethical, or spiritual aspects
+- Output ONLY the questions, one per line, numbered 1-${QUESTIONS_PER_CHUNK}
+- Do NOT include explanations or additional text`;

@@ -17,6 +17,8 @@ export interface TextChunk {
   id: string;
   content: string;
   metadata: ChunkMetadata;
+  questions?: string[]; // HQE: Hypothetical questions this chunk answers
+  questionEmbeddings?: number[][]; // HQE: Embeddings for each question
 }
 
 export interface ChunkOptions {

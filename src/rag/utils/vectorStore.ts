@@ -10,6 +10,8 @@ import {
   MIN_RELEVANCE_SCORE,
   ADJACENT_CHUNK_WINDOW,
   EMBEDDING_BATCH_SIZE,
+  QUESTION_EMBEDDING_WEIGHT,
+  CONTENT_EMBEDDING_WEIGHT,
 } from '../../constants/rag';
 import { EMBEDDING_MODEL_NAME } from '../../constants/providers';
 import { EMBEDDING_MODEL } from '../../utils/providers';
@@ -71,7 +73,7 @@ export async function initVectorStore(): Promise<void> {
 }
 
 /**
- * Add chunks to the vector store
+ * Add chunks to the vector store with optional question embeddings (HQE)
  */
 export async function addChunks(chunks: TextChunk[]): Promise<number> {
   if (chunks.length === 0) return 0;
@@ -96,10 +98,15 @@ export async function addChunks(chunks: TextChunk[]): Promise<number> {
         const chunk = batch[j]!;
         const embedding = batchEmbeddings[j]!;
 
+        // Format question embeddings for PostgreSQL array of vectors
+        const questionEmbeddingsFormatted = chunk.questionEmbeddings
+          ? `{${chunk.questionEmbeddings.map(emb => `"${JSON.stringify(emb)}"`).join(',')}}`
+          : null;
+
         await client.query(
           `INSERT INTO philosopher_text_chunks 
-           (id, content, embedding, philosopher, source_id, title, chunk_index, start_char, end_char)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           (id, content, embedding, philosopher, source_id, title, chunk_index, start_char, end_char, questions, question_embeddings)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
            ON CONFLICT (id) DO UPDATE SET
              content = EXCLUDED.content,
              embedding = EXCLUDED.embedding,
@@ -108,7 +115,9 @@ export async function addChunks(chunks: TextChunk[]): Promise<number> {
              title = EXCLUDED.title,
              chunk_index = EXCLUDED.chunk_index,
              start_char = EXCLUDED.start_char,
-             end_char = EXCLUDED.end_char`,
+             end_char = EXCLUDED.end_char,
+             questions = EXCLUDED.questions,
+             question_embeddings = EXCLUDED.question_embeddings`,
           [
             chunk.id,
             chunk.content,
@@ -119,6 +128,8 @@ export async function addChunks(chunks: TextChunk[]): Promise<number> {
             chunk.metadata.chunkIndex,
             chunk.metadata.startChar ?? 0,
             chunk.metadata.endChar ?? 0,
+            chunk.questions || null,
+            questionEmbeddingsFormatted,
           ]
         );
       }
@@ -157,10 +168,12 @@ export interface QueryOptions {
   sourceId?: string;
   limit?: number;
   minScore?: number;
+  useHQE?: boolean; // Whether to use HQE hybrid search (default: true)
 }
 
 /**
- * Query for relevant passages
+ * Query for relevant passages using HQE hybrid search
+ * Combines content embeddings and question embeddings for better retrieval
  */
 export async function queryPassages(
   query: string,
@@ -171,6 +184,7 @@ export async function queryPassages(
     sourceId,
     limit = DEFAULT_QUERY_LIMIT,
     minScore = MIN_RELEVANCE_SCORE,
+    useHQE = true,
   } = options;
 
   await initVectorStore();
@@ -178,11 +192,12 @@ export async function queryPassages(
 
   // Generate query embedding
   const queryEmbedding = await generateEmbedding(query);
+  const queryEmbeddingStr = JSON.stringify(queryEmbedding);
 
   // Build WHERE clause
   const conditions: string[] = [];
-  const params: unknown[] = [JSON.stringify(queryEmbedding)];
-  let paramIndex = 2;
+  const params: unknown[] = [];
+  let paramIndex = 1;
 
   if (philosopher) {
     conditions.push(`philosopher = $${paramIndex}`);
@@ -199,28 +214,99 @@ export async function queryPassages(
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-  // Query using cosine distance (<=> operator)
-  // Cosine distance ranges from 0 (identical) to 2 (opposite)
-  // We convert to similarity score: 1 - (distance / 2) to get 0-1 range
+  if (!useHQE) {
+    // Traditional content-only search
+    const result = await pool.query(
+      `SELECT 
+         id,
+         content,
+         philosopher,
+         source_id,
+         title,
+         chunk_index,
+         1 - (embedding <=> $${paramIndex}::vector) AS relevance_score
+       FROM philosopher_text_chunks
+       ${whereClause}
+       ORDER BY embedding <=> $${paramIndex}::vector
+       LIMIT $${paramIndex + 1}`,
+      [...params, queryEmbeddingStr, limit * 2]
+    );
+
+    const queryResults: QueryResult[] = result.rows
+      .filter(row => row.relevance_score >= minScore)
+      .slice(0, limit)
+      .map(row => ({
+        id: row.id,
+        content: row.content,
+        philosopher: row.philosopher,
+        sourceId: row.source_id,
+        title: row.title,
+        chunkIndex: row.chunk_index,
+        relevanceScore: row.relevance_score,
+      }));
+
+    return queryResults;
+  }
+
+  // HQE hybrid search: combine content and question embeddings
+  // Get top results from both content embeddings and question embeddings
+  const contentQueryParam = paramIndex;
+  const questionQueryParam = paramIndex + 1;
+  const limitParam = paramIndex + 2;
+
   const result = await pool.query(
-    `SELECT 
-       id,
-       content,
-       philosopher,
-       source_id,
-       title,
-       chunk_index,
-       1 - (embedding <=> $1::vector) AS relevance_score
-     FROM philosopher_text_chunks
-     ${whereClause}
-     ORDER BY embedding <=> $1::vector
-     LIMIT $${paramIndex}`,
-    [...params, limit]
+    `WITH content_search AS (
+       SELECT 
+         id,
+         content,
+         philosopher,
+         source_id,
+         title,
+         chunk_index,
+         (1 - (embedding <=> $${contentQueryParam}::vector)) * ${CONTENT_EMBEDDING_WEIGHT} AS content_score
+       FROM philosopher_text_chunks
+       ${whereClause}
+       ORDER BY embedding <=> $${contentQueryParam}::vector
+       LIMIT $${limitParam}
+     ),
+     question_search AS (
+       SELECT 
+         id,
+         content,
+         philosopher,
+         source_id,
+         title,
+         chunk_index,
+         MAX(1 - (qemb::vector <=> $${questionQueryParam}::vector)) * ${QUESTION_EMBEDDING_WEIGHT} AS question_score
+       FROM philosopher_text_chunks
+       CROSS JOIN LATERAL unnest(question_embeddings) AS qemb
+       ${whereClause}
+       GROUP BY id, content, philosopher, source_id, title, chunk_index
+       ORDER BY question_score DESC
+       LIMIT $${limitParam}
+     ),
+     combined AS (
+       SELECT 
+         COALESCE(c.id, q.id) AS id,
+         COALESCE(c.content, q.content) AS content,
+         COALESCE(c.philosopher, q.philosopher) AS philosopher,
+         COALESCE(c.source_id, q.source_id) AS source_id,
+         COALESCE(c.title, q.title) AS title,
+         COALESCE(c.chunk_index, q.chunk_index) AS chunk_index,
+         COALESCE(c.content_score, 0) + COALESCE(q.question_score, 0) AS relevance_score
+       FROM content_search c
+       FULL OUTER JOIN question_search q ON c.id = q.id
+     )
+     SELECT * FROM combined
+     ORDER BY relevance_score DESC
+     LIMIT $${limitParam}`,
+    [...params, queryEmbeddingStr, queryEmbeddingStr, limit * 2]
   );
 
   // Filter by minimum score and format results
   const queryResults: QueryResult[] = result.rows
     .filter(row => row.relevance_score >= minScore)
+    .slice(0, limit)
     .map(row => ({
       id: row.id,
       content: row.content,
@@ -401,6 +487,38 @@ export async function isSourceIndexed(sourceId: string): Promise<boolean> {
 }
 
 /**
+ * Get indexed chunk indices for a source (for resume functionality)
+ */
+export async function getIndexedChunkIndices(
+  sourceId: string
+): Promise<Set<number>> {
+  await initVectorStore();
+  const pool = getPool();
+
+  const result = await pool.query(
+    'SELECT chunk_index FROM philosopher_text_chunks WHERE source_id = $1',
+    [sourceId]
+  );
+
+  return new Set(result.rows.map(row => row.chunk_index));
+}
+
+/**
+ * Get the count of indexed chunks for a source
+ */
+export async function getSourceChunkCount(sourceId: string): Promise<number> {
+  await initVectorStore();
+  const pool = getPool();
+
+  const result = await pool.query(
+    'SELECT COUNT(*) as count FROM philosopher_text_chunks WHERE source_id = $1',
+    [sourceId]
+  );
+
+  return parseInt(result.rows[0]?.count ?? '0', 10);
+}
+
+/**
  * Delete chunks for a source
  */
 export async function deleteSource(sourceId: string): Promise<number> {
@@ -445,4 +563,16 @@ export function formatResults(results: QueryResult[]): string {
   }
 
   return output;
+}
+
+/**
+ * Check if the RAG system has been initialized (texts indexed)
+ */
+export async function isRAGInitialized(): Promise<boolean> {
+  try {
+    const stats = await getCollectionStats();
+    return stats.totalChunks > 0;
+  } catch {
+    return false;
+  }
 }

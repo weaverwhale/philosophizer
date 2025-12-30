@@ -36,3 +36,16 @@ export const CONTEXT_PREVIEW_LENGTH = 200;
 
 /** Batch size for embedding chunks during indexing */
 export const EMBEDDING_BATCH_SIZE = 50;
+
+// ============================================================================
+// HQE (HYPOTHETICAL QUESTION EMBEDDINGS) SETTINGS
+// ============================================================================
+
+/** Number of hypothetical questions to generate per chunk */
+export const QUESTIONS_PER_CHUNK = 3;
+
+/** Weight for question embeddings vs content embeddings in hybrid search (0-1) */
+export const QUESTION_EMBEDDING_WEIGHT = 0.7;
+
+/** Weight for content embeddings in hybrid search (0-1) */
+export const CONTENT_EMBEDDING_WEIGHT = 0.3;

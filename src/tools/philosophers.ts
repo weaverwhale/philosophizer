@@ -14,7 +14,12 @@ import {
   ADJACENT_CHUNK_WINDOW,
   CONTEXT_PREVIEW_LENGTH,
 } from '../constants/rag';
-import { queryPhilosopher, isRAGInitialized, getAdjacentChunks } from '../rag';
+import {
+  getAdjacentChunks,
+  isRAGInitialized,
+  queryPassages,
+  type QueryResult,
+} from '../rag/utils/vectorStore';
 
 // ============================================================================
 // RAG INTEGRATION
@@ -225,4 +230,29 @@ export const philosopherTools = Object.entries(PHILOSOPHERS).reduce(
  */
 export function getAvailablePhilosophers(): string[] {
   return Object.keys(philosopherTools);
+}
+
+// ============================================================================
+// CONVENIENCE FUNCTIONS
+// ============================================================================
+
+/**
+ * Query a specific philosopher's texts for relevant passages
+ */
+export async function queryPhilosopher(
+  philosopher: string,
+  topic: string,
+  limit: number = 5
+): Promise<QueryResult[]> {
+  return queryPassages(topic, { philosopher, limit });
+}
+
+/**
+ * Query all philosophers for relevant passages
+ */
+export async function queryAllPhilosophers(
+  topic: string,
+  limit: number = 5
+): Promise<QueryResult[]> {
+  return queryPassages(topic, { limit });
 }
