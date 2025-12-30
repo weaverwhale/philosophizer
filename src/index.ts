@@ -6,6 +6,7 @@ import {
   philosophersEndpoint,
   philosopherDetailEndpoint,
 } from './endpoints/philosophers';
+import { philosopherQueryEndpoint } from './endpoints/philosopherQuery';
 import { signup, login, me } from './endpoints/auth';
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
@@ -38,6 +39,7 @@ const server = Bun.serve({
     '/rag': rag,
     '/api/philosophers': philosophersEndpoint,
     '/api/philosophers/:id': philosopherDetailEndpoint,
+    '/api/ask-philosopher': philosopherQueryEndpoint,
     '/conversations': conversations,
     '/conversations/:id': conversation,
   },
@@ -95,3 +97,9 @@ console.log(
 console.log('\n🧙 Philosopher Endpoints:');
 console.log('  GET  /api/philosophers      - List all indexed philosophers');
 console.log('  GET  /api/philosophers/:id  - Get philosopher details');
+console.log(
+  '  POST /api/ask-philosopher   - Ask a philosopher a question (simulates tool call)'
+);
+console.log(
+  '  GET  /api/ask-philosopher   - Ask a philosopher a question (via query params)'
+);

@@ -13,7 +13,6 @@ import {
   QUESTION_EMBEDDING_WEIGHT,
   CONTENT_EMBEDDING_WEIGHT,
 } from '../../constants/rag';
-import { EMBEDDING_MODEL_NAME } from '../../constants/providers';
 import { EMBEDDING_MODEL } from '../../utils/providers';
 import { getPool } from '../../db/connection';
 
