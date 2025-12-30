@@ -102,8 +102,14 @@ This significantly improves retrieval accuracy by matching user queries to seman
 # Index all texts (generates questions automatically)
 bun run rag:index
 
-# Clear and reindex
+# Resume indexing (skip existing chunks)
+bun run rag:resume
+
+# Clear and reindex everything
 bun run rag:clear
+
+# Show collection statistics
+bun run rag:stats
 ```
 
 **Note:** HQE indexing takes 2-3x longer than standard indexing due to question generation.
