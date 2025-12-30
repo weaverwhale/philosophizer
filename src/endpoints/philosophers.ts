@@ -6,6 +6,7 @@ import {
   type TextSource,
 } from '../constants/philosophers';
 import { getCollectionStats } from '../rag/utils/vectorStore';
+import { getPool } from '../db/connection';
 
 interface TextSourceWithStatus extends TextSource {
   indexedChunks: number;
@@ -64,16 +65,32 @@ export const philosophersEndpoint = {
       });
 
       // Group by tradition
-      const byTradition: Record<string, PhilosopherSummary[]> = {};
-      for (const p of philosophers) {
-        if (!byTradition[p.tradition]) {
-          byTradition[p.tradition] = [];
-        }
-        byTradition[p.tradition]!.push(p);
-      }
+      const byTradition = philosophers.reduce(
+        (acc, p) => {
+          if (!acc[p.tradition]) acc[p.tradition] = [];
+          acc[p.tradition]!.push(p);
+          return acc;
+        },
+        {} as Record<string, PhilosopherSummary[]>
+      );
 
       // Calculate total indexed texts
       const totalIndexedTexts = stats ? Object.keys(stats.bySource).length : 0;
+
+      // Get the most recent training date from the database
+      let trainedAt: string | null = null;
+      try {
+        const result = await getPool().query(
+          'SELECT MAX(created_at) as most_recent FROM philosopher_text_chunks'
+        );
+        const dateValue = result.rows[0]?.most_recent;
+        if (dateValue) {
+          trainedAt = new Date(dateValue).toISOString();
+        }
+      } catch (error) {
+        // Database might not be available or table might be empty
+        console.warn('Could not fetch training date:', error);
+      }
 
       return new Response(
         JSON.stringify({
@@ -82,6 +99,7 @@ export const philosophersEndpoint = {
             ? Object.values(stats.byPhilosopher).reduce((a, b) => a + b, 0)
             : 0,
           totalIndexedTexts,
+          trainedAt,
           byTradition,
           philosophers,
         }),

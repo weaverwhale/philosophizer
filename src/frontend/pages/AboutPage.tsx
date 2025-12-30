@@ -34,6 +34,7 @@ interface PhilosophersData {
   totalPhilosophers: number;
   totalIndexedChunks: number;
   totalIndexedTexts: number;
+  trainedAt: string | null;
   byTradition: Record<string, PhilosopherSummary[]>;
   philosophers: PhilosopherSummary[];
 }
@@ -371,7 +372,7 @@ export function AboutPage() {
           ) : data ? (
             <>
               {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
                 <div className="bg-surface border border-border rounded-lg p-4">
                   <div className="text-3xl font-bold text-primary">
                     {data.totalPhilosophers}
@@ -402,6 +403,17 @@ export function AboutPage() {
                   </div>
                   <div className="text-sm text-text-muted">Indexed Chunks</div>
                 </div>
+                {data.trainedAt && (
+                  <div className="bg-surface border border-border rounded-lg p-4">
+                    <div className="text-3xl font-bold text-primary">
+                      {new Date(data.trainedAt).toLocaleDateString('en-US', {
+                        month: '2-digit',
+                        year: '2-digit',
+                      })}
+                    </div>
+                    <div className="text-sm text-text-muted">Last trained</div>
+                  </div>
+                )}
               </div>
 
               {/* Search and Filter */}
