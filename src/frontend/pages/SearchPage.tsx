@@ -56,7 +56,7 @@ function ResultCard({ result, query }: { result: QueryResult; query: string }) {
   };
 
   // Truncate content for display
-  const truncateContent = (content: string, maxLength: number = 300) => {
+  const truncateContent = (content: string, maxLength: number = 500) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
   };
@@ -118,6 +118,7 @@ export function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState<number | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [philosopherFilter, setPhilosopherFilter] = useState<string>('');
   const [sourceIdFilter, setSourceIdFilter] = useState<string>('');
@@ -185,8 +186,10 @@ export function SearchPage() {
       const data: RagQueryResponse = await response.json();
       setResults(data.results);
       setElapsed(data.elapsed);
+      setHasSearched(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      setHasSearched(true);
     } finally {
       isSearchingRef.current = false;
       setLoading(false);
@@ -205,6 +208,7 @@ export function SearchPage() {
     if (!searchQuery.trim()) {
       setResults([]);
       setError(null);
+      setHasSearched(false);
       return;
     }
 
@@ -272,7 +276,7 @@ export function SearchPage() {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Search for passages, concepts, or topics..."
+                placeholder="Ask anything - or search for passages, concepts, or topics..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -386,17 +390,15 @@ export function SearchPage() {
             </>
           )}
 
-          {!loading && !error && results.length === 0 && searchQuery && (
-            <div className="text-center py-12 text-text-muted">
-              No results found. Try adjusting your search query or filters.
-            </div>
-          )}
-
-          {!loading && !error && !searchQuery && (
-            <div className="text-center py-12 text-text-muted">
-              Enter a search query to find relevant passages from the database.
-            </div>
-          )}
+          {!loading &&
+            !error &&
+            hasSearched &&
+            results.length === 0 &&
+            searchQuery && (
+              <div className="text-center py-12 text-text-muted">
+                No results found. Try adjusting your search query or filters.
+              </div>
+            )}
         </div>
       </div>
     </div>
