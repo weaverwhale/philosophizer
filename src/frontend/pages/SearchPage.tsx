@@ -127,8 +127,8 @@ export function SearchPage() {
     null
   );
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isSearchingRef = useRef(false);
+  const lastSearchParamsRef = useRef<string>('');
 
   // Load philosophers list for filter
   useEffect(() => {
@@ -146,8 +146,26 @@ export function SearchPage() {
     fetchPhilosophers();
   }, []);
 
+  // Load default results on mount
+  useEffect(() => {
+    performSearch();
+  }, []);
+
   const performSearch = useCallback(async () => {
-    if (!searchQuery.trim() || isSearchingRef.current) {
+    if (isSearchingRef.current) {
+      return;
+    }
+
+    // Create a unique identifier for current search params
+    const currentSearchParams = JSON.stringify({
+      query: searchQuery.trim(),
+      philosopher: philosopherFilter,
+      sourceId: sourceIdFilter.trim(),
+      minScore: minScoreFilter,
+    });
+
+    // Skip if search params haven't changed
+    if (currentSearchParams === lastSearchParamsRef.current) {
       return;
     }
 
@@ -164,7 +182,7 @@ export function SearchPage() {
         limit?: number;
         minScore?: number;
       } = {
-        query: searchQuery,
+        query: searchQuery.trim(),
         limit: 20,
       };
 
@@ -187,6 +205,9 @@ export function SearchPage() {
       setResults(data.results);
       setElapsed(data.elapsed);
       setHasSearched(true);
+
+      // Update last search params after successful search
+      lastSearchParamsRef.current = currentSearchParams;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setHasSearched(true);
@@ -199,41 +220,15 @@ export function SearchPage() {
     }
   }, [searchQuery, philosopherFilter, sourceIdFilter, minScoreFilter]);
 
-  // Debounced auto-search
-  useEffect(() => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    if (!searchQuery.trim()) {
-      setResults([]);
-      setError(null);
-      setHasSearched(false);
-      return;
-    }
-
-    debounceTimeoutRef.current = setTimeout(performSearch, 500);
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-    };
-  }, [
-    searchQuery,
-    philosopherFilter,
-    sourceIdFilter,
-    minScoreFilter,
-    performSearch,
-  ]);
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-        debounceTimeoutRef.current = null;
-      }
+    if (e.key === 'Enter') {
       performSearch();
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    performSearch();
   };
 
   return (
@@ -272,17 +267,39 @@ export function SearchPage() {
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Search Bar */}
           <div className="mb-6">
-            <div className="mb-4">
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Ask anything - or search for passages, concepts, or topics..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full px-4 py-3 bg-surface-secondary border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary pr-10"
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="mb-4">
+              <div className="flex gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Ask anything - or search for passages, concepts, or topics..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 px-4 py-3 bg-surface-secondary border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex items-center justify-center px-4 py-3 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Search"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                  </svg>
+                </button>
+              </div>
+            </form>
 
             {/* Advanced Filters Toggle */}
             <button

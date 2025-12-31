@@ -1,4 +1,8 @@
 import {
+  DEFAULT_SEARCH_QUERY,
+  DEFAULT_MIN_RELEVANCE_SCORE,
+} from '../constants/rag';
+import {
   queryPassages,
   getCollectionStats,
   type QueryResult,
@@ -32,7 +36,7 @@ export const rag = {
     try {
       const body = (await req.json()) as RagQueryRequest;
 
-      if (!body.query || typeof body.query !== 'string') {
+      if (typeof body.query !== 'string') {
         return new Response(
           JSON.stringify({
             error: "Missing or invalid 'query' parameter",
@@ -45,11 +49,15 @@ export const rag = {
       }
 
       const startTime = Date.now();
-      const results = await queryPassages(body.query, {
+
+      // If query is empty, use a default query to get sample results
+      const query = body.query.trim() || DEFAULT_SEARCH_QUERY;
+
+      const results = await queryPassages(query, {
         philosopher: body.philosopher,
         sourceId: body.sourceId,
         limit: body.limit,
-        minScore: body.minScore,
+        minScore: body.minScore ?? DEFAULT_MIN_RELEVANCE_SCORE,
       });
       const elapsed = Date.now() - startTime;
 
@@ -110,4 +118,3 @@ export const rag = {
     }
   },
 };
-
