@@ -278,32 +278,19 @@ The published image includes:
 - Database schema
 - Pre-loaded vector data
 
-#### Workflow 3: Extract Backup from Docker Hub
+#### Workflow 3: Restore Backup to Local Database
 
-If you need to extract the backup file from a published Docker image (e.g., when setting up a new development environment):
+Restore vector data from a backup file to your local development database:
 
 ```bash
-# 1. Pull the Docker image
-docker pull your-dockerhub-username/philosophizer-pgvector:latest
-
-# 2. Extract the backup file from the image
-docker create --name temp-pgvector your-dockerhub-username/philosophizer-pgvector:latest
-docker cp temp-pgvector:/docker-entrypoint-initdb.d/02-data.sql ./pgvector-backup.sql
-docker rm temp-pgvector
-
-# 3. Now you can use the backup file
-# - Build a new Docker image: docker build -f Dockerfile.pgvector -t ...
-# - Restore locally: ./scripts/restore-pgvector.sh
-# - Merge to remote: ./scripts/merge-pgvector.sh "$DATABASE_URL"
+# Restore the backup (auto-detects if merge or full restore is needed)
+./scripts/restore-pgvector.sh
 ```
 
-**One-liner version:**
+Or restore directly if you have the backup file:
 
 ```bash
-docker pull your-dockerhub-username/philosophizer-pgvector:latest && \
-docker create --name temp-pgvector your-dockerhub-username/philosophizer-pgvector:latest && \
-docker cp temp-pgvector:/docker-entrypoint-initdb.d/02-data.sql ./pgvector-backup.sql && \
-docker rm temp-pgvector
+docker compose exec -T postgres psql -U postgres -d philosophizer < pgvector-backup.sql
 ```
 
 #### Workflow 4: Sync Between Environments
