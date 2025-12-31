@@ -330,7 +330,7 @@ export function AboutPage() {
   const traditions = data ? Object.keys(data.byTradition).sort() : [];
 
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div className="flex flex-col h-dvh bg-background overflow-hidden">
       {/* Header */}
       <div className="border-b border-border bg-surface shrink-0">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">

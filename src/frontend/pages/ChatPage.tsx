@@ -454,7 +454,7 @@ export function ChatPage() {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-dvh bg-background">
       {/* Sidebar */}
       <ConversationSidebar
         conversations={conversations}
