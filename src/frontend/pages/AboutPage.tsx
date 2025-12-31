@@ -337,7 +337,7 @@ export function AboutPage() {
           <div className="flex items-center gap-4">
             <a
               href="/"
-              className="flex items-center justify-center p-2 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all"
+              className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all"
               title="Back to chat"
             >
               <svg
@@ -358,7 +358,28 @@ export function AboutPage() {
               Philosophers & Theologians
             </h1>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <a
+              href="/search"
+              className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all"
+              title="Search the database"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </a>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 

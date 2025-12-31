@@ -7,6 +7,7 @@ import {
   philosopherDetailEndpoint,
 } from './endpoints/philosophers';
 import { philosopherQueryEndpoint } from './endpoints/philosopherQuery';
+import { textsEndpoint } from './endpoints/texts';
 import { signup, login, me } from './endpoints/auth';
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
@@ -29,6 +30,7 @@ const server = Bun.serve({
     // Frontend routes
     '/': indexPageHtml,
     '/about': indexPageHtml,
+    '/search': indexPageHtml,
     '/login': indexPageHtml,
     '/signup': indexPageHtml,
     '/c/:id': indexPageHtml,
@@ -42,6 +44,7 @@ const server = Bun.serve({
     '/api/philosophers': philosophersEndpoint,
     '/api/philosophers/:id': philosopherDetailEndpoint,
     '/api/ask-philosopher': philosopherQueryEndpoint,
+    '/api/texts/:sourceId': textsEndpoint,
     '/conversations': conversations,
     '/conversations/:id': conversation,
   },
@@ -78,6 +81,7 @@ if (isNetworkAccessible) {
   );
 }
 console.log(`    http://localhost:${server.port}/about     - About page`);
+console.log(`    http://localhost:${server.port}/search    - Search page`);
 console.log(`    http://localhost:${server.port}/login     - Login page`);
 console.log(`    http://localhost:${server.port}/signup    - Signup page`);
 console.log(
@@ -126,3 +130,6 @@ console.log(
 console.log(
   '  GET  /api/ask-philosopher   - Ask a philosopher a question (via query params)'
 );
+
+console.log('\n📄 Text Endpoints:');
+console.log('  GET  /api/texts/:sourceId   - Download a text source file');
