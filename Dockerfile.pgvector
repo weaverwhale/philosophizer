@@ -2,11 +2,11 @@
 # 
 # Build:
 #   ./scripts/backup-pgvector.sh                    # First, create the backup
-#   ./scripts/publish-pgvector.sh mjweaver01/philosophizer-pgvector:latest
+#   ./scripts/publish-pgvector.sh mjweaver01/philosophizer-pgv-hqe:latest
 #
 # Or manually:
-#   docker build -f Dockerfile.pgvector -t mjweaver01/philosophizer-pgvector:latest .
-#   docker push mjweaver01/philosophizer-pgvector:latest
+#   docker build -f Dockerfile.pgvector -t mjweaver01/philosophizer-pgv-hqe:latest .
+#   docker push mjweaver01/philosophizer-pgv-hqe:latest
 #
 # Use in production:
 #   Update docker-compose.yml to use this image instead of pgvector/pgvector:pg16

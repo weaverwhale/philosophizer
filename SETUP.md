@@ -187,9 +187,21 @@ Create a backup of the vector data from your local database:
 
 This creates three files:
 
-- `pgvector-backup.sql` - Standard SQL dump with INSERT statements
-- `pgvector-merge.sql` - Transaction-wrapped version for safe merging
-- `pgvector-backup-TIMESTAMP.sql` - Versioned backup
+1. **`pgvector-backup.sql`** - Standard SQL dump with INSERT statements
+   - Raw `pg_dump` output containing all vector data
+   - Use for local restores or inspection
+   - Required for building Docker images
+
+2. **`pgvector-backup-TIMESTAMP.sql`** - Versioned backup (e.g., `pgvector-backup-20241215_143022.sql`)
+   - Timestamped copy of the main backup
+   - Use for keeping backup history and version control
+   - Useful for rollback scenarios
+
+3. **`pgvector-merge.sql`** - Transaction-safe merge file
+   - Wraps the backup in a transaction with `BEGIN`/`COMMIT`
+   - Includes `TRUNCATE` to clear existing data before insert
+   - Includes verification query at the end
+   - Use for safely updating production/remote databases without affecting other tables
 
 ### Restore to Local Database
 
@@ -266,7 +278,35 @@ The published image includes:
 - Database schema
 - Pre-loaded vector data
 
-#### Workflow 3: Sync Between Environments
+#### Workflow 3: Extract Backup from Docker Hub
+
+If you need to extract the backup file from a published Docker image (e.g., when setting up a new development environment):
+
+```bash
+# 1. Pull the Docker image
+docker pull your-dockerhub-username/philosophizer-pgvector:latest
+
+# 2. Extract the backup file from the image
+docker create --name temp-pgvector your-dockerhub-username/philosophizer-pgvector:latest
+docker cp temp-pgvector:/docker-entrypoint-initdb.d/02-data.sql ./pgvector-backup.sql
+docker rm temp-pgvector
+
+# 3. Now you can use the backup file
+# - Build a new Docker image: docker build -f Dockerfile.pgvector -t ...
+# - Restore locally: ./scripts/restore-pgvector.sh
+# - Merge to remote: ./scripts/merge-pgvector.sh "$DATABASE_URL"
+```
+
+**One-liner version:**
+
+```bash
+docker pull your-dockerhub-username/philosophizer-pgvector:latest && \
+docker create --name temp-pgvector your-dockerhub-username/philosophizer-pgvector:latest && \
+docker cp temp-pgvector:/docker-entrypoint-initdb.d/02-data.sql ./pgvector-backup.sql && \
+docker rm temp-pgvector
+```
+
+#### Workflow 4: Sync Between Environments
 
 Copy vector data from one environment to another while keeping conversations:
 
