@@ -6,6 +6,7 @@ import { SearchPage } from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import './styles.css';
 
 function App() {
@@ -29,16 +30,15 @@ function App() {
     return <SignupPage />;
   }
 
-  if (currentPath === '/about') {
-    return <AboutPage />;
-  }
-
-  if (currentPath === '/search') {
-    return <SearchPage />;
-  }
-
-  // Default to chat interface (handles / and /c/:id)
-  return <ChatPage />;
+  // All other routes require authentication
+  return (
+    <ProtectedRoute>
+      {currentPath === '/about' && <AboutPage />}
+      {currentPath === '/search' && <SearchPage />}
+      {/* Default to chat interface (handles / and /c/:id) */}
+      {currentPath !== '/about' && currentPath !== '/search' && <ChatPage />}
+    </ProtectedRoute>
+  );
 }
 
 const root = createRoot(document.getElementById('root') as HTMLElement);

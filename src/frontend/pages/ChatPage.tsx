@@ -13,8 +13,6 @@ import { ConversationSidebar } from '../components/ConversationSidebar';
 import { ChatSettingsModal } from '../components/ChatSettingsModal';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useConversations } from '../hooks/useConversations';
-import { useAuth } from '../contexts/AuthContext';
-import { Logo } from '../components/Logo';
 import { PHILOSOPHERS } from '../../constants/philosophers';
 
 // Utility to shuffle and limit questions
@@ -38,7 +36,6 @@ function setConversationIdInUrl(id: string | null) {
 }
 
 export function ChatPage() {
-  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [input, setInput] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -124,13 +121,6 @@ export function ChatPage() {
     messages,
     currentConversation?.id
   );
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      window.location.href = '/login';
-    }
-  }, [authLoading, isAuthenticated]);
 
   const isProcessing = status === 'submitted' || status === 'streaming';
 
@@ -343,20 +333,6 @@ export function ChatPage() {
       parts: [{ type: 'text', text: messageContent }],
     } as any);
   }, [messages, isProcessing, enableAutoScroll, sendMessage]);
-
-  // Show loading state while checking auth
-  if (authLoading) {
-    return (
-      <div className="py-23">
-        <Logo />
-      </div>
-    );
-  }
-
-  // Don't render anything if not authenticated (will redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
 
   const MenuButton = () => (
     <button
