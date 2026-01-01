@@ -115,6 +115,7 @@ function ResultCard({ result, query }: { result: QueryResult; query: string }) {
 export function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<QueryResult[]>([]);
+  const [resultsQuery, setResultsQuery] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState<number | null>(null);
@@ -128,7 +129,6 @@ export function SearchPage() {
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const isSearchingRef = useRef(false);
-  const lastSearchParamsRef = useRef<string>('');
 
   // Load philosophers list for filter
   useEffect(() => {
@@ -146,26 +146,18 @@ export function SearchPage() {
     fetchPhilosophers();
   }, []);
 
-  // Load default results on mount
-  useEffect(() => {
-    performSearch();
-  }, []);
-
   const performSearch = useCallback(async () => {
     if (isSearchingRef.current) {
       return;
     }
 
-    // Create a unique identifier for current search params
-    const currentSearchParams = JSON.stringify({
-      query: searchQuery.trim(),
-      philosopher: philosopherFilter,
-      sourceId: sourceIdFilter.trim(),
-      minScore: minScoreFilter,
-    });
+    // Don't search if query is empty
+    if (!searchQuery.trim()) {
+      return;
+    }
 
     // Skip if search params haven't changed
-    if (currentSearchParams === lastSearchParamsRef.current) {
+    if (resultsQuery === searchQuery.trim()) {
       return;
     }
 
@@ -173,6 +165,7 @@ export function SearchPage() {
     isSearchingRef.current = true;
     setLoading(true);
     setError(null);
+    setHasSearched(false);
 
     try {
       const requestBody: {
@@ -204,15 +197,12 @@ export function SearchPage() {
       const data: RagQueryResponse = await response.json();
       setResults(data.results);
       setElapsed(data.elapsed);
-      setHasSearched(true);
-
-      // Update last search params after successful search
-      lastSearchParamsRef.current = currentSearchParams;
+      setResultsQuery(data.query);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      setHasSearched(true);
     } finally {
       isSearchingRef.current = false;
+      setHasSearched(true);
       setLoading(false);
       if (wasFocused) {
         setTimeout(() => inputRef.current?.focus(), 0);
@@ -393,6 +383,7 @@ export function SearchPage() {
             <>
               <div className="text-sm text-text-muted mb-4">
                 Found {results.length} result{results.length !== 1 ? 's' : ''}
+                {resultsQuery && ` for "${resultsQuery.trim()}"`}
                 {elapsed !== null && ` in ${elapsed}ms`}
               </div>
               <div className="grid gap-4">
@@ -411,11 +402,17 @@ export function SearchPage() {
             !error &&
             hasSearched &&
             results.length === 0 &&
-            searchQuery && (
+            searchQuery.trim() && (
               <div className="text-center py-12 text-text-muted">
                 No results found. Try adjusting your search query or filters.
               </div>
             )}
+
+          {!loading && !error && !hasSearched && (
+            <div className="text-center py-12 text-text-muted">
+              Enter a search query to explore philosophical texts and wisdom.
+            </div>
+          )}
         </div>
       </div>
     </div>

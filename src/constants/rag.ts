@@ -50,8 +50,5 @@ export const QUESTION_EMBEDDING_WEIGHT = 0.7;
 /** Weight for content embeddings in hybrid search (0-1) */
 export const CONTENT_EMBEDDING_WEIGHT = 0.3;
 
-/** Default search query for rag search page */
-export const DEFAULT_SEARCH_QUERY = 'wisdom';
-
 /** Default minimum relevance score for a result to be included */
 export const DEFAULT_MIN_RELEVANCE_SCORE = 0.3;
