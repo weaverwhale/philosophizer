@@ -12,6 +12,9 @@ import {
   EMBEDDING_BATCH_SIZE,
   QUESTION_EMBEDDING_WEIGHT,
   CONTENT_EMBEDDING_WEIGHT,
+  USE_METADATA_BOOSTING,
+  AUTHOR_MATCH_BOOST,
+  TITLE_MATCH_BOOST,
 } from '../../constants/rag';
 import { EMBEDDING_MODEL } from '../../utils/providers';
 import { getPool } from '../../db/connection';
@@ -104,14 +107,15 @@ export async function addChunks(chunks: TextChunk[]): Promise<number> {
 
         await client.query(
           `INSERT INTO philosopher_text_chunks 
-           (id, content, embedding, philosopher, source_id, title, chunk_index, start_char, end_char, questions, question_embeddings)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           (id, content, embedding, philosopher, source_id, title, author, chunk_index, start_char, end_char, questions, question_embeddings)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
            ON CONFLICT (id) DO UPDATE SET
              content = EXCLUDED.content,
              embedding = EXCLUDED.embedding,
              philosopher = EXCLUDED.philosopher,
              source_id = EXCLUDED.source_id,
              title = EXCLUDED.title,
+             author = EXCLUDED.author,
              chunk_index = EXCLUDED.chunk_index,
              start_char = EXCLUDED.start_char,
              end_char = EXCLUDED.end_char,
@@ -124,6 +128,7 @@ export async function addChunks(chunks: TextChunk[]): Promise<number> {
             chunk.metadata.philosopher,
             chunk.metadata.sourceId,
             chunk.metadata.title,
+            chunk.metadata.author,
             chunk.metadata.chunkIndex,
             chunk.metadata.startChar ?? 0,
             chunk.metadata.endChar ?? 0,
@@ -158,6 +163,7 @@ export interface QueryResult {
   philosopher: string;
   sourceId: string;
   title: string;
+  author: string;
   chunkIndex: number;
   relevanceScore: number;
 }
@@ -168,6 +174,11 @@ export interface QueryOptions {
   limit?: number;
   minScore?: number;
   useHQE?: boolean; // Whether to use HQE hybrid search (default: true)
+  useMetadataBoosting?: boolean; // Whether to boost results based on metadata matches (default: true)
+  questionWeight?: number; // Weight for question embeddings in HQE (default: from constants)
+  contentWeight?: number; // Weight for content embeddings in HQE (default: from constants)
+  authorBoost?: number; // Boost amount for author matches (default: from constants)
+  titleBoost?: number; // Boost amount for title matches (default: from constants)
 }
 
 /**
@@ -184,6 +195,11 @@ export async function queryPassages(
     limit = DEFAULT_QUERY_LIMIT,
     minScore = MIN_RELEVANCE_SCORE,
     useHQE = true,
+    useMetadataBoosting = USE_METADATA_BOOSTING,
+    questionWeight = QUESTION_EMBEDDING_WEIGHT,
+    contentWeight = CONTENT_EMBEDDING_WEIGHT,
+    authorBoost = AUTHOR_MATCH_BOOST,
+    titleBoost = TITLE_MATCH_BOOST,
   } = options;
 
   await initVectorStore();
@@ -215,21 +231,83 @@ export async function queryPassages(
 
   if (!useHQE) {
     // Traditional content-only search
-    const result = await pool.query(
-      `SELECT 
-         id,
-         content,
-         philosopher,
-         source_id,
-         title,
-         chunk_index,
-         1 - (embedding <=> $${paramIndex}::vector) AS relevance_score
-       FROM philosopher_text_chunks
-       ${whereClause}
-       ORDER BY embedding <=> $${paramIndex}::vector
-       LIMIT $${paramIndex + 1}`,
-      [...params, queryEmbeddingStr, limit * 2]
-    );
+    const queryParam = paramIndex;
+    const limitQueryParam = paramIndex + 1;
+    const boostQueryParam = paramIndex + 2;
+    const authorBoostParam = paramIndex + 3;
+    const titleBoostParam = paramIndex + 4;
+
+    let sqlQuery: string;
+    let queryParams: unknown[];
+
+    if (useMetadataBoosting) {
+      sqlQuery = `
+        WITH base_results AS (
+          SELECT 
+            id,
+            content,
+            philosopher,
+            source_id,
+            title,
+            author,
+            chunk_index,
+            1 - (embedding <=> $${queryParam}::vector) AS vector_score
+          FROM philosopher_text_chunks
+          ${whereClause}
+          ORDER BY embedding <=> $${queryParam}::vector
+          LIMIT $${limitQueryParam}
+        ),
+        with_metadata_boost AS (
+          SELECT
+            *,
+            vector_score +
+            CASE 
+              WHEN $${boostQueryParam}::text ILIKE '%' || COALESCE(author, '') || '%' 
+                AND COALESCE(author, '') != '' 
+              THEN $${authorBoostParam}::float
+              ELSE 0
+            END +
+            CASE
+              WHEN $${boostQueryParam}::text ILIKE '%' || title || '%' 
+              THEN $${titleBoostParam}::float
+              ELSE 0
+            END AS relevance_score
+          FROM base_results
+        )
+        SELECT * FROM with_metadata_boost
+        ORDER BY relevance_score DESC
+        LIMIT $${limitQueryParam}
+      `;
+
+      queryParams = [
+        ...params,
+        queryEmbeddingStr,
+        limit * 2,
+        query,
+        authorBoost,
+        titleBoost,
+      ];
+    } else {
+      sqlQuery = `
+        SELECT 
+          id,
+          content,
+          philosopher,
+          source_id,
+          title,
+          author,
+          chunk_index,
+          1 - (embedding <=> $${queryParam}::vector) AS relevance_score
+        FROM philosopher_text_chunks
+        ${whereClause}
+        ORDER BY embedding <=> $${queryParam}::vector
+        LIMIT $${limitQueryParam}
+      `;
+
+      queryParams = [...params, queryEmbeddingStr, limit * 2];
+    }
+
+    const result = await pool.query(sqlQuery, queryParams);
 
     const queryResults: QueryResult[] = result.rows
       .filter(row => row.relevance_score >= minScore)
@@ -240,6 +318,7 @@ export async function queryPassages(
         philosopher: row.philosopher,
         sourceId: row.source_id,
         title: row.title,
+        author: row.author || '',
         chunkIndex: row.chunk_index,
         relevanceScore: row.relevance_score,
       }));
@@ -252,55 +331,158 @@ export async function queryPassages(
   const contentQueryParam = paramIndex;
   const questionQueryParam = paramIndex + 1;
   const limitParam = paramIndex + 2;
+  const contentWeightParam = paramIndex + 3;
+  const questionWeightParam = paramIndex + 4;
+  const boostQueryParam = paramIndex + 5;
+  const authorBoostParam = paramIndex + 6;
+  const titleBoostParam = paramIndex + 7;
 
-  const result = await pool.query(
-    `WITH content_search AS (
-       SELECT 
-         id,
-         content,
-         philosopher,
-         source_id,
-         title,
-         chunk_index,
-         (1 - (embedding <=> $${contentQueryParam}::vector)) * ${CONTENT_EMBEDDING_WEIGHT} AS content_score
-       FROM philosopher_text_chunks
-       ${whereClause}
-       ORDER BY embedding <=> $${contentQueryParam}::vector
-       LIMIT $${limitParam}
-     ),
-     question_search AS (
-       SELECT 
-         id,
-         content,
-         philosopher,
-         source_id,
-         title,
-         chunk_index,
-         MAX(1 - (qemb::vector <=> $${questionQueryParam}::vector)) * ${QUESTION_EMBEDDING_WEIGHT} AS question_score
-       FROM philosopher_text_chunks
-       CROSS JOIN LATERAL unnest(question_embeddings) AS qemb
-       ${whereClause}
-       GROUP BY id, content, philosopher, source_id, title, chunk_index
-       ORDER BY question_score DESC
-       LIMIT $${limitParam}
-     ),
-     combined AS (
-       SELECT 
-         COALESCE(c.id, q.id) AS id,
-         COALESCE(c.content, q.content) AS content,
-         COALESCE(c.philosopher, q.philosopher) AS philosopher,
-         COALESCE(c.source_id, q.source_id) AS source_id,
-         COALESCE(c.title, q.title) AS title,
-         COALESCE(c.chunk_index, q.chunk_index) AS chunk_index,
-         COALESCE(c.content_score, 0) + COALESCE(q.question_score, 0) AS relevance_score
-       FROM content_search c
-       FULL OUTER JOIN question_search q ON c.id = q.id
-     )
-     SELECT * FROM combined
-     ORDER BY relevance_score DESC
-     LIMIT $${limitParam}`,
-    [...params, queryEmbeddingStr, queryEmbeddingStr, limit * 2]
-  );
+  let sqlQuery: string;
+  let queryParams: unknown[];
+
+  if (useMetadataBoosting) {
+    sqlQuery = `
+      WITH content_search AS (
+        SELECT 
+          id,
+          content,
+          philosopher,
+          source_id,
+          title,
+          author,
+          chunk_index,
+          (1 - (embedding <=> $${contentQueryParam}::vector)) * $${contentWeightParam}::float AS content_score
+        FROM philosopher_text_chunks
+        ${whereClause}
+        ORDER BY embedding <=> $${contentQueryParam}::vector
+        LIMIT $${limitParam}
+      ),
+      question_search AS (
+        SELECT 
+          id,
+          content,
+          philosopher,
+          source_id,
+          title,
+          author,
+          chunk_index,
+          MAX(1 - (qemb::vector <=> $${questionQueryParam}::vector)) * $${questionWeightParam}::float AS question_score
+        FROM philosopher_text_chunks
+        CROSS JOIN LATERAL unnest(question_embeddings) AS qemb
+        ${whereClause}
+        GROUP BY id, content, philosopher, source_id, title, author, chunk_index
+        ORDER BY question_score DESC
+        LIMIT $${limitParam}
+      ),
+      combined AS (
+        SELECT 
+          COALESCE(c.id, q.id) AS id,
+          COALESCE(c.content, q.content) AS content,
+          COALESCE(c.philosopher, q.philosopher) AS philosopher,
+          COALESCE(c.source_id, q.source_id) AS source_id,
+          COALESCE(c.title, q.title) AS title,
+          COALESCE(c.author, q.author) AS author,
+          COALESCE(c.chunk_index, q.chunk_index) AS chunk_index,
+          COALESCE(c.content_score, 0) + COALESCE(q.question_score, 0) AS vector_score
+        FROM content_search c
+        FULL OUTER JOIN question_search q ON c.id = q.id
+      ),
+      with_metadata_boost AS (
+        SELECT
+          *,
+          vector_score +
+          CASE 
+            WHEN $${boostQueryParam}::text ILIKE '%' || COALESCE(author, '') || '%' 
+              AND COALESCE(author, '') != '' 
+            THEN $${authorBoostParam}::float
+            ELSE 0
+          END +
+          CASE
+            WHEN $${boostQueryParam}::text ILIKE '%' || title || '%' 
+            THEN $${titleBoostParam}::float
+            ELSE 0
+          END AS relevance_score
+        FROM combined
+      )
+      SELECT * FROM with_metadata_boost
+      ORDER BY relevance_score DESC
+      LIMIT $${limitParam}
+    `;
+
+    queryParams = [
+      ...params,
+      queryEmbeddingStr,
+      queryEmbeddingStr,
+      limit * 2,
+      contentWeight,
+      questionWeight,
+      query,
+      authorBoost,
+      titleBoost,
+    ];
+  } else {
+    sqlQuery = `
+      WITH content_search AS (
+        SELECT 
+          id,
+          content,
+          philosopher,
+          source_id,
+          title,
+          author,
+          chunk_index,
+          (1 - (embedding <=> $${contentQueryParam}::vector)) * $${contentWeightParam}::float AS content_score
+        FROM philosopher_text_chunks
+        ${whereClause}
+        ORDER BY embedding <=> $${contentQueryParam}::vector
+        LIMIT $${limitParam}
+      ),
+      question_search AS (
+        SELECT 
+          id,
+          content,
+          philosopher,
+          source_id,
+          title,
+          author,
+          chunk_index,
+          MAX(1 - (qemb::vector <=> $${questionQueryParam}::vector)) * $${questionWeightParam}::float AS question_score
+        FROM philosopher_text_chunks
+        CROSS JOIN LATERAL unnest(question_embeddings) AS qemb
+        ${whereClause}
+        GROUP BY id, content, philosopher, source_id, title, author, chunk_index
+        ORDER BY question_score DESC
+        LIMIT $${limitParam}
+      ),
+      combined AS (
+        SELECT 
+          COALESCE(c.id, q.id) AS id,
+          COALESCE(c.content, q.content) AS content,
+          COALESCE(c.philosopher, q.philosopher) AS philosopher,
+          COALESCE(c.source_id, q.source_id) AS source_id,
+          COALESCE(c.title, q.title) AS title,
+          COALESCE(c.author, q.author) AS author,
+          COALESCE(c.chunk_index, q.chunk_index) AS chunk_index,
+          COALESCE(c.content_score, 0) + COALESCE(q.question_score, 0) AS relevance_score
+        FROM content_search c
+        FULL OUTER JOIN question_search q ON c.id = q.id
+      )
+      SELECT * FROM combined
+      ORDER BY relevance_score DESC
+      LIMIT $${limitParam}
+    `;
+
+    queryParams = [
+      ...params,
+      queryEmbeddingStr,
+      queryEmbeddingStr,
+      limit * 2,
+      contentWeight,
+      questionWeight,
+    ];
+  }
+
+  const result = await pool.query(sqlQuery, queryParams);
 
   // Filter by minimum score and format results
   const queryResults: QueryResult[] = result.rows
@@ -312,6 +494,7 @@ export async function queryPassages(
       philosopher: row.philosopher,
       sourceId: row.source_id,
       title: row.title,
+      author: row.author,
       chunkIndex: row.chunk_index,
       relevanceScore: row.relevance_score,
     }));
@@ -361,6 +544,7 @@ export async function getAdjacentChunks(
        philosopher,
        source_id,
        title,
+       author,
        chunk_index
      FROM philosopher_text_chunks
      WHERE source_id = $1 
@@ -377,6 +561,7 @@ export async function getAdjacentChunks(
     philosopher: row.philosopher,
     sourceId: row.source_id,
     title: row.title,
+    author: row.author,
     chunkIndex: row.chunk_index,
     relevanceScore: 1, // Adjacent chunks have full relevance to context
   }));
@@ -401,6 +586,7 @@ export async function getPassageWithContext(
        philosopher,
        source_id,
        title,
+       author,
        chunk_index
      FROM philosopher_text_chunks
      WHERE source_id = $1 AND chunk_index = $2
@@ -417,6 +603,7 @@ export async function getPassageWithContext(
       philosopher: row.philosopher,
       sourceId: row.source_id,
       title: row.title,
+      author: row.author,
       chunkIndex: row.chunk_index,
       relevanceScore: 1,
     };

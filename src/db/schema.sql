@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS philosopher_text_chunks (
     philosopher VARCHAR(255) NOT NULL,
     source_id VARCHAR(255) NOT NULL,
     title TEXT NOT NULL,
+    author VARCHAR(255), -- Author of the text (for metadata boosting)
     chunk_index INTEGER NOT NULL,
     start_char INTEGER DEFAULT 0,
     end_char INTEGER DEFAULT 0,
@@ -83,6 +84,7 @@ CREATE TABLE IF NOT EXISTS philosopher_text_chunks (
 
 CREATE INDEX IF NOT EXISTS idx_philosopher_text_chunks_philosopher ON philosopher_text_chunks(philosopher);
 CREATE INDEX IF NOT EXISTS idx_philosopher_text_chunks_source_id ON philosopher_text_chunks(source_id);
+CREATE INDEX IF NOT EXISTS idx_philosopher_text_chunks_author ON philosopher_text_chunks(author);
 CREATE INDEX IF NOT EXISTS idx_philosopher_text_chunks_chunk_index ON philosopher_text_chunks(chunk_index);
 
 -- Vector similarity index using HNSW for fast approximate nearest neighbor search

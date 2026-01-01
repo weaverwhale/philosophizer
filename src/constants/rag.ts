@@ -50,5 +50,15 @@ export const QUESTION_EMBEDDING_WEIGHT = 0.7;
 /** Weight for content embeddings in hybrid search (0-1) */
 export const CONTENT_EMBEDDING_WEIGHT = 0.3;
 
-/** Default minimum relevance score for a result to be included */
-export const DEFAULT_MIN_RELEVANCE_SCORE = 0.3;
+// ============================================================================
+// METADATA BOOSTING SETTINGS
+// ============================================================================
+
+/** Enable metadata boosting by default */
+export const USE_METADATA_BOOSTING = true;
+
+/** Relevance boost when query matches author name */
+export const AUTHOR_MATCH_BOOST = 0.15;
+
+/** Relevance boost when query matches document title */
+export const TITLE_MATCH_BOOST = 0.1;

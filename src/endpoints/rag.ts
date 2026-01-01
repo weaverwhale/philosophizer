@@ -1,25 +1,21 @@
-import { DEFAULT_MIN_RELEVANCE_SCORE } from '../constants/rag';
 import {
   queryPassages,
   getCollectionStats,
   type QueryResult,
+  type QueryOptions,
 } from '../rag/utils/vectorStore';
 
-interface RagQueryRequest {
+export interface RagQueryRequest extends QueryOptions {
   query: string;
-  philosopher?: string;
-  sourceId?: string;
-  limit?: number;
-  minScore?: number;
 }
 
-interface RagQueryResponse {
+export interface RagQueryResponse {
   results: QueryResult[];
   query: string;
   elapsed: number;
 }
 
-interface RagStatsResponse {
+export interface RagStatsResponse {
   totalChunks: number;
   byPhilosopher: Record<string, number>;
   bySource: Record<string, number>;
@@ -49,12 +45,7 @@ export const rag = {
       const startTime = Date.now();
       const query = body.query.trim();
 
-      const results = await queryPassages(query, {
-        philosopher: body.philosopher,
-        sourceId: body.sourceId,
-        limit: body.limit,
-        minScore: body.minScore ?? DEFAULT_MIN_RELEVANCE_SCORE,
-      });
+      const results = await queryPassages(query, body);
       const elapsed = Date.now() - startTime;
 
       const response: RagQueryResponse = {

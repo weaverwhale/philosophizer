@@ -2,21 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { LoadingLogo } from '../components/Logo';
 
-interface QueryResult {
-  id: string;
-  content: string;
-  philosopher: string;
-  sourceId: string;
-  title: string;
-  chunkIndex: number;
-  relevanceScore: number;
-}
-
-interface RagQueryResponse {
-  results: QueryResult[];
-  query: string;
-  elapsed: number;
-}
+import type { RagQueryResponse } from '../../endpoints/rag';
+import type { QueryResult } from '../../rag/utils/vectorStore';
 
 interface PhilosophersData {
   philosophers: Array<{
@@ -124,6 +111,10 @@ export function SearchPage() {
   const [philosopherFilter, setPhilosopherFilter] = useState<string>('');
   const [sourceIdFilter, setSourceIdFilter] = useState<string>('');
   const [minScoreFilter, setMinScoreFilter] = useState<number>(0.3);
+  const [useHQE, setUseHQE] = useState<boolean>(true);
+  const [useMetadataBoosting, setUseMetadataBoosting] = useState<boolean>(true);
+  const [questionWeight, setQuestionWeight] = useState<number>(0.4);
+  const [contentWeight, setContentWeight] = useState<number>(0.6);
   const [philosophers, setPhilosophers] = useState<PhilosophersData | null>(
     null
   );
@@ -174,6 +165,10 @@ export function SearchPage() {
         sourceId?: string;
         limit?: number;
         minScore?: number;
+        useHQE?: boolean;
+        useMetadataBoosting?: boolean;
+        questionWeight?: number;
+        contentWeight?: number;
       } = {
         query: searchQuery.trim(),
         limit: 20,
@@ -182,6 +177,10 @@ export function SearchPage() {
       if (philosopherFilter) requestBody.philosopher = philosopherFilter;
       if (sourceIdFilter.trim()) requestBody.sourceId = sourceIdFilter.trim();
       if (minScoreFilter > 0) requestBody.minScore = minScoreFilter;
+      requestBody.useHQE = useHQE;
+      requestBody.useMetadataBoosting = useMetadataBoosting;
+      requestBody.questionWeight = questionWeight;
+      requestBody.contentWeight = contentWeight;
 
       const response = await fetch('/rag', {
         method: 'POST',
@@ -208,7 +207,16 @@ export function SearchPage() {
         setTimeout(() => inputRef.current?.focus(), 0);
       }
     }
-  }, [searchQuery, philosopherFilter, sourceIdFilter, minScoreFilter]);
+  }, [
+    searchQuery,
+    philosopherFilter,
+    sourceIdFilter,
+    minScoreFilter,
+    useHQE,
+    useMetadataBoosting,
+    questionWeight,
+    contentWeight,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -271,7 +279,7 @@ export function SearchPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center justify-center px-4 py-3 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center px-4 py-3 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                   title="Search"
                 >
                   <svg
@@ -313,6 +321,7 @@ export function SearchPage() {
             {/* Advanced Filters Panel */}
             {showFilters && (
               <div className="mt-4 p-4 bg-surface-secondary border border-border rounded-lg space-y-4">
+                {/* Basic Filters */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-text mb-2">
@@ -362,6 +371,102 @@ export function SearchPage() {
                     />
                   </div>
                 </div>
+
+                {/* Search Algorithm Options */}
+                <div className="border-t border-border pt-4">
+                  <h4 className="text-sm font-semibold text-text mb-3">
+                    Search Algorithm
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="useHQE"
+                        checked={useHQE}
+                        onChange={e => setUseHQE(e.target.checked)}
+                        className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
+                      />
+                      <label
+                        htmlFor="useHQE"
+                        className="text-sm text-text cursor-pointer"
+                      >
+                        Use Hybrid Search (HQE)
+                        <span className="block text-xs text-text-muted">
+                          Combines content and question embeddings
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="useMetadataBoosting"
+                        checked={useMetadataBoosting}
+                        onChange={e => setUseMetadataBoosting(e.target.checked)}
+                        className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
+                      />
+                      <label
+                        htmlFor="useMetadataBoosting"
+                        className="text-sm text-text cursor-pointer"
+                      >
+                        Metadata Boosting
+                        <span className="block text-xs text-text-muted">
+                          Boost results matching author/title
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Weight Tuning (only show when HQE is enabled) */}
+                {useHQE && (
+                  <div className="border-t border-border pt-4">
+                    <h4 className="text-sm font-semibold text-text mb-3">
+                      Embedding Weights
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text mb-2">
+                          Question Weight: {questionWeight.toFixed(2)}
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={questionWeight}
+                          onChange={e =>
+                            setQuestionWeight(parseFloat(e.target.value))
+                          }
+                          className="w-full"
+                        />
+                        <p className="text-xs text-text-muted mt-1">
+                          Weight for hypothetical question embeddings
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-text mb-2">
+                          Content Weight: {contentWeight.toFixed(2)}
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={contentWeight}
+                          onChange={e =>
+                            setContentWeight(parseFloat(e.target.value))
+                          }
+                          className="w-full"
+                        />
+                        <p className="text-xs text-text-muted mt-1">
+                          Weight for direct content embeddings
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -407,12 +512,6 @@ export function SearchPage() {
                 No results found. Try adjusting your search query or filters.
               </div>
             )}
-
-          {!loading && !error && !hasSearched && (
-            <div className="text-center py-12 text-text-muted">
-              Enter a search query to explore philosophical texts and wisdom.
-            </div>
-          )}
         </div>
       </div>
     </div>

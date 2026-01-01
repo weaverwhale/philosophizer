@@ -9,6 +9,7 @@ import {
   getAllTextSources,
   getTextSourcesForPhilosopher,
   getAllPhilosopherIds,
+  getPhilosopher,
   type TextSource as PhilosopherTextSource,
 } from '../constants/philosophers';
 
@@ -25,15 +26,18 @@ export interface TextSource {
 /**
  * Get all text sources formatted for RAG indexing
  */
-export const TEXT_SOURCES: TextSource[] = getAllTextSources().map(source => ({
-  id: source.id,
-  title: source.title,
-  author: source.title, // Will be overwritten with philosopher name
-  philosopher: source.philosopher,
-  url: source.url,
-  format: source.format,
-  description: source.description,
-}));
+export const TEXT_SOURCES: TextSource[] = getAllTextSources().map(source => {
+  const philosopher = getPhilosopher(source.philosopher);
+  return {
+    id: source.id,
+    title: source.title,
+    author: philosopher?.name || source.philosopher,
+    philosopher: source.philosopher,
+    url: source.url,
+    format: source.format,
+    description: source.description,
+  };
+});
 
 /**
  * Group sources by philosopher
