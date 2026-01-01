@@ -288,6 +288,28 @@ function PhilosopherCard({
   );
 }
 
+export const SearchButton = () => (
+  <a
+    href="/search"
+    className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all"
+    title="Search the database"
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  </a>
+);
+
 export function AboutPage() {
   const [data, setData] = useState<PhilosophersData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -359,25 +381,7 @@ export function AboutPage() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <a
-              href="/search"
-              className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all"
-              title="Search the database"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </a>
+            <SearchButton />
             <ThemeToggle />
           </div>
         </div>

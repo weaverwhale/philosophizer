@@ -14,6 +14,7 @@ import { ChatSettingsModal } from '../components/ChatSettingsModal';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useConversations } from '../hooks/useConversations';
 import { PHILOSOPHERS } from '../../constants/philosophers';
+import { SearchButton } from './AboutPage';
 
 // Utility to shuffle and limit questions
 function getRandomQuestions(questions: string[], limit: number): string[] {
@@ -454,6 +455,7 @@ export function ChatPage() {
             <div className="flex items-center gap-3">
               {messages.length > 0 && <Clear />}
               <PhilosopherButton />
+              <SearchButton />
               <AboutButton />
               <ThemeToggle />
             </div>
