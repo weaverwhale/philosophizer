@@ -22,6 +22,7 @@ export function ChatSettingsModal({
 }: ChatSettingsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [isPositioned, setIsPositioned] = useState(false);
 
   // Calculate position based on anchor button
   useEffect(() => {
@@ -44,6 +45,9 @@ export function ChatSettingsModal({
       }
 
       setPosition({ top, left });
+      setIsPositioned(true);
+    } else if (!isOpen) {
+      setIsPositioned(false);
     }
   }, [isOpen, anchorRef]);
 
@@ -87,10 +91,12 @@ export function ChatSettingsModal({
       {/* Modal - Tooltip Style */}
       <div
         ref={modalRef}
-        className="fixed w-80 bg-surface border border-border rounded-lg shadow-2xl z-50 max-h-[60vh] flex flex-col"
+        className="fixed w-80 bg-surface border border-border rounded-lg shadow-2xl z-50 max-h-[60vh] flex flex-col transition-opacity"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
+          opacity: isPositioned ? 1 : 0,
+          pointerEvents: isPositioned ? 'auto' : 'none',
         }}
       >
         {/* Header */}
