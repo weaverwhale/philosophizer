@@ -74,6 +74,7 @@ export function AdminPage() {
   const [backups, setBackups] = useState<BackupFile[]>([]);
   const [dockerImages, setDockerImages] = useState<DockerImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [operationLogs, setOperationLogs] = useState('');
   const [operationInProgress, setOperationInProgress] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState('');
@@ -114,6 +115,7 @@ export function AdminPage() {
 
   const loadStats = async () => {
     try {
+      setRefreshing(true);
       const token = localStorage.getItem('auth_token');
       const res = await fetch('/admin/stats', {
         headers: { Authorization: `Bearer ${token}` },
@@ -124,6 +126,7 @@ export function AdminPage() {
       console.error('Failed to load stats:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -311,39 +314,50 @@ export function AdminPage() {
             <h2 className="text-xl font-semibold text-text mb-4">
               Database Statistics
             </h2>
+            {!stats && !loading && (
+              <div className="text-text-muted text-sm">
+                Failed to load statistics. Try refreshing.
+              </div>
+            )}
             {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-surface border border-border rounded-lg p-4">
-                  <div className="text-text-muted text-sm">
-                    Total RAG Chunks
+              <div
+                className={`relative ${refreshing ? 'opacity-60' : ''} transition-opacity`}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-surface border border-border rounded-lg p-4">
+                    <div className="text-text-muted text-sm">
+                      Total RAG Chunks
+                    </div>
+                    <div className="text-3xl font-bold text-text mt-1">
+                      {stats.rag.totalChunks.toLocaleString()}
+                    </div>
                   </div>
-                  <div className="text-3xl font-bold text-text mt-1">
-                    {stats.rag.totalChunks.toLocaleString()}
+                  <div className="bg-surface border border-border rounded-lg p-4">
+                    <div className="text-text-muted text-sm">Philosophers</div>
+                    <div className="text-3xl font-bold text-text mt-1">
+                      {Object.keys(stats.rag.byPhilosopher).length}
+                    </div>
                   </div>
-                </div>
-                <div className="bg-surface border border-border rounded-lg p-4">
-                  <div className="text-text-muted text-sm">Philosophers</div>
-                  <div className="text-3xl font-bold text-text mt-1">
-                    {Object.keys(stats.rag.byPhilosopher).length}
+                  <div className="bg-surface border border-border rounded-lg p-4">
+                    <div className="text-text-muted text-sm">Users</div>
+                    <div className="text-3xl font-bold text-text mt-1">
+                      {stats.database.users}
+                    </div>
                   </div>
-                </div>
-                <div className="bg-surface border border-border rounded-lg p-4">
-                  <div className="text-text-muted text-sm">Users</div>
-                  <div className="text-3xl font-bold text-text mt-1">
-                    {stats.database.users}
-                  </div>
-                </div>
-                <div className="bg-surface border border-border rounded-lg p-4">
-                  <div className="text-text-muted text-sm">Conversations</div>
-                  <div className="text-3xl font-bold text-text mt-1">
-                    {stats.database.conversations}
+                  <div className="bg-surface border border-border rounded-lg p-4">
+                    <div className="text-text-muted text-sm">Conversations</div>
+                    <div className="text-3xl font-bold text-text mt-1">
+                      {stats.database.conversations}
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
             {stats && (
-              <div className="mt-4 bg-surface border border-border rounded-lg p-4">
+              <div
+                className={`mt-4 bg-surface border border-border rounded-lg p-4 ${refreshing ? 'opacity-60' : ''} transition-opacity`}
+              >
                 <h3 className="text-md font-semibold text-text mb-3">
                   Database Sizes
                 </h3>
@@ -377,7 +391,9 @@ export function AdminPage() {
             )}
 
             {stats && Object.keys(stats.rag.byPhilosopher).length > 0 && (
-              <div className="mt-4 bg-surface border border-border rounded-lg p-4">
+              <div
+                className={`mt-4 bg-surface border border-border rounded-lg p-4 ${refreshing ? 'opacity-60' : ''} transition-opacity`}
+              >
                 <h3 className="text-md font-semibold text-text mb-3">
                   Chunks by Philosopher
                 </h3>
@@ -420,10 +436,23 @@ export function AdminPage() {
                 </button>
                 <button
                   onClick={loadStats}
-                  disabled={operationInProgress}
-                  className="px-4 py-2 bg-surface border border-border text-text rounded-md hover:bg-surface-hover disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
+                  disabled={operationInProgress || refreshing}
+                  className="px-4 py-2 bg-surface border border-border text-text rounded-md hover:bg-surface-hover disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
-                  Refresh Stats
+                  <svg
+                    className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  {refreshing ? 'Refreshing...' : 'Refresh Stats'}
                 </button>
               </div>
               <div className="text-xs text-text-muted">
