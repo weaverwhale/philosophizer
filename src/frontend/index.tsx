@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { ChatPage } from './pages/ChatPage';
 import { AboutPage } from './pages/AboutPage';
 import { SearchPage } from './pages/SearchPage';
+import { AdminPage } from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import { AuthProvider } from './contexts/AuthContext';
@@ -35,8 +36,11 @@ function App() {
     <ProtectedRoute>
       {currentPath === '/about' && <AboutPage />}
       {currentPath === '/search' && <SearchPage />}
+      {currentPath === '/admin' && <AdminPage />}
       {/* Default to chat interface (handles / and /c/:id) */}
-      {currentPath !== '/about' && currentPath !== '/search' && <ChatPage />}
+      {currentPath !== '/about' &&
+        currentPath !== '/search' &&
+        currentPath !== '/admin' && <ChatPage />}
     </ProtectedRoute>
   );
 }

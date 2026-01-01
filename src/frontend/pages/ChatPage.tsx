@@ -15,6 +15,7 @@ import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useConversations } from '../hooks/useConversations';
 import { PHILOSOPHERS } from '../../constants/philosophers';
 import { SearchButton } from './AboutPage';
+import { AdminButton } from './AdminPage';
 
 // Utility to shuffle and limit questions
 function getRandomQuestions(questions: string[], limit: number): string[] {
@@ -458,6 +459,7 @@ export function ChatPage() {
               <PhilosopherButton />
               <SearchButton />
               <AboutButton />
+              <AdminButton />
               <ThemeToggle />
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { getUserFromRequest, type User } from '../utils/auth';
+import { getUserFromRequest, isAdmin, type User } from '../utils/auth';
 
 export interface AuthenticatedRequest extends Request {
   user?: User;
@@ -27,6 +27,37 @@ export async function requireAuth(
   }
 
   return { user };
+}
+
+/**
+ * Middleware to require admin authentication
+ * Returns a 401 if not authenticated, 403 if not an admin
+ */
+export async function requireAdmin(
+  request: Request
+): Promise<{ user: User } | Response> {
+  const authResult = await requireAuth(request);
+
+  // If requireAuth returned a Response (error), return it
+  if (authResult instanceof Response) {
+    return authResult;
+  }
+
+  // Check if user is an admin
+  if (!isAdmin(authResult.user)) {
+    return new Response(
+      JSON.stringify({
+        error: 'Forbidden',
+        message: 'Admin access required',
+      }),
+      {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+
+  return authResult;
 }
 
 /**

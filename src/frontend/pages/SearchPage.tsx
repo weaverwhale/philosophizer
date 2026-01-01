@@ -4,6 +4,7 @@ import { LoadingLogo } from '../components/Logo';
 
 import type { RagQueryResponse } from '../../endpoints/rag';
 import type { QueryResult } from '../../rag/utils/vectorStore';
+import { AdminButton } from './AdminPage';
 
 interface PhilosophersData {
   philosophers: Array<{
@@ -256,7 +257,10 @@ export function SearchPage() {
             </a>
             <h1 className="text-lg font-semibold text-text">Search Database</h1>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <AdminButton />
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 

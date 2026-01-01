@@ -183,3 +183,12 @@ export async function authenticateUser(
 
   return { user, token };
 }
+
+/**
+ * Check if a user is an admin based on ADMIN_EMAILS environment variable
+ */
+export function isAdmin(user: User): boolean {
+  const adminEmails =
+    process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
+  return adminEmails.includes(user.email);
+}

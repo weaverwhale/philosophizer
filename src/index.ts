@@ -9,6 +9,17 @@ import {
 import { philosopherQueryEndpoint } from './endpoints/philosopherQuery';
 import { textsEndpoint } from './endpoints/texts';
 import { signup, login, me } from './endpoints/auth';
+import {
+  getStats,
+  clearRAG,
+  reseedRAG,
+  createBackup,
+  listBackups,
+  downloadBackup,
+  restoreBackup,
+  publishDocker,
+  getDockerImages,
+} from './endpoints/admin';
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
 import os from 'os';
@@ -33,11 +44,22 @@ const server = Bun.serve({
     '/search': indexPageHtml,
     '/login': indexPageHtml,
     '/signup': indexPageHtml,
+    '/admin': indexPageHtml,
     '/c/:id': indexPageHtml,
     // Auth routes
     '/auth/signup': { POST: signup },
     '/auth/login': { POST: login },
     '/auth/me': { GET: me },
+    // Admin routes
+    '/admin/stats': { GET: getStats },
+    '/admin/rag/clear': { POST: clearRAG },
+    '/admin/rag/reseed': { POST: reseedRAG },
+    '/admin/backup': { POST: createBackup },
+    '/admin/backups': { GET: listBackups },
+    '/admin/backups/:filename': { GET: downloadBackup },
+    '/admin/restore': { POST: restoreBackup },
+    '/admin/publish': { POST: publishDocker },
+    '/admin/docker/images': { GET: getDockerImages },
     // API routes
     '/agent': agent,
     '/rag': rag,

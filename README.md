@@ -48,14 +48,90 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/philosophizer
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRES_IN=7d
 
+# Admin Access
+ADMIN_EMAILS=admin@example.com,another.admin@example.com
+
 # AI Provider
 OPENAI_API_KEY=your-openai-api-key
 
 # Optional: ChromaDB (defaults to localhost:8000)
 CHROMA_URL=http://localhost:8000
+
+# Optional: Docker Hub Integration (for admin panel)
+DOCKER_HUB_USERNAME=your-dockerhub-username
+DOCKER_HUB_REPO=philosophizer-pgvector
+DOCKER_HUB_TOKEN=your-dockerhub-token
 ```
 
 See `.env.example` for all available configuration options.
+
+## Admin Panel
+
+The admin panel provides a web interface for managing the database, RAG system, and backups.
+
+### Admin Access
+
+Set admin email addresses in your `.env` file:
+
+```env
+ADMIN_EMAILS=admin@example.com,another.admin@example.com
+```
+
+Only users with email addresses listed in `ADMIN_EMAILS` can access the admin panel at `/admin`.
+
+### Admin Features
+
+The admin panel provides:
+
+1. **Database Statistics**
+   - View total chunks, philosophers indexed, user count, conversation count
+   - Database sizes and detailed breakdowns
+   - Real-time stats refresh
+
+2. **RAG Management**
+   - Re-seed database: Clear and re-index all philosopher texts
+   - Clear RAG data: Remove all RAG data from the database
+   - Monitor operation progress with real-time logs
+
+3. **Backup Management**
+   - Create new backups of the pgvector database
+   - List all backup files with sizes and timestamps
+   - Download backup files
+
+4. **Restore & Publish**
+   - Restore from any backup file
+   - Publish Docker images to Docker Hub
+   - Monitor script execution with console output
+
+5. **Docker Hub Integration**
+   - View published Docker images
+   - See image tags, sizes, architectures, and last updated times
+   - Direct links to Docker Hub
+
+### Docker Hub Configuration
+
+To enable Docker Hub integration in the admin panel, set these environment variables:
+
+```env
+DOCKER_HUB_USERNAME=your-dockerhub-username
+DOCKER_HUB_REPO=philosophizer-pgvector
+DOCKER_HUB_TOKEN=your-dockerhub-token  # Optional, for private repos
+```
+
+### Backup & Restore Scripts
+
+The admin panel uses the same scripts available from the command line:
+
+```bash
+# Create a backup
+./scripts/backup-pgvector.sh
+
+# Restore from a backup
+./scripts/restore-pgvector.sh
+
+# Publish to Docker Hub
+./scripts/publish-pgvector.sh username/repo:tag
+```
 
 ## Database Setup
 

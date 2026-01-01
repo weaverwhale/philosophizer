@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { LoadingLogo } from '../components/Logo';
+import { AdminButton } from './AdminPage';
 
 interface TextSourceWithStatus {
   id: string;
@@ -382,6 +383,7 @@ export function AboutPage() {
           </div>
           <div className="flex items-center gap-3">
             <SearchButton />
+            <AdminButton />
             <ThemeToggle />
           </div>
         </div>

@@ -2,6 +2,7 @@ import {
   createUser,
   authenticateUser,
   getUserFromRequest,
+  isAdmin,
 } from '../utils/auth';
 
 /**
@@ -193,6 +194,7 @@ export const me = async (req: Request) => {
           id: user.id,
           email: user.email,
           createdAt: user.createdAt,
+          isAdmin: isAdmin(user),
         },
       }),
       {
