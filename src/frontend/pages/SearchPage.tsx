@@ -472,11 +472,7 @@ export function SearchPage() {
           </div>
 
           {/* Results */}
-          {loading && (
-            <div className="flex justify-center py-20">
-              <LoadingLogo />
-            </div>
-          )}
+          {loading && <LoadingLogo />}
 
           {error && (
             <div className="bg-error-bg border border-error-border text-error-text rounded-lg p-4 mb-6">

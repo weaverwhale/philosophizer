@@ -347,7 +347,7 @@ export function ChatPage() {
   // Show loading state while checking auth
   if (authLoading) {
     return (
-      <div className="py-22">
+      <div className="py-23">
         <Logo />
       </div>
     );
