@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 interface AdminStats {
   rag: {
@@ -38,35 +38,6 @@ interface DockerImage {
   architectures: string[];
   url: string;
 }
-
-export const AdminButton = () => {
-  const { user } = useAuth();
-
-  if (!user?.isAdmin) return null;
-
-  return (
-    <a
-      href="/admin"
-      className="flex items-center justify-center w-9 h-9 bg-surface border border-red-600 text-red-600  rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-600 cursor-pointer"
-      title="Admin Panel"
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-        <path d="M2 17l10 5 10-5" />
-        <path d="M2 12l10 5 10-5" />
-      </svg>
-    </a>
-  );
-};
 
 export function AdminPage() {
   const { user } = useAuth();

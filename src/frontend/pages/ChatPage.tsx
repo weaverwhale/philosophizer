@@ -14,8 +14,11 @@ import { ChatSettingsModal } from '../components/ChatSettingsModal';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useConversations } from '../hooks/useConversations';
 import { PHILOSOPHERS } from '../../constants/philosophers';
-import { SearchButton } from './AboutPage';
-import { AdminButton } from './AdminPage';
+import {
+  SearchButton,
+  AboutButton,
+  AdminButton,
+} from '../components/NavigationButtons';
 
 // Utility to shuffle and limit questions
 function getRandomQuestions(questions: string[], limit: number): string[] {
@@ -385,7 +388,7 @@ export function ChatPage() {
     );
   };
 
-  const PhilosopherButton = () => (
+  const SettingsButton = () => (
     <button
       ref={settingsButtonRef}
       onClick={() => setSettingsOpen(true)}
@@ -407,29 +410,6 @@ export function ChatPage() {
         <circle cx="12" cy="12" r="3" />
       </svg>
     </button>
-  );
-
-  const AboutButton = () => (
-    <a
-      href="/about"
-      className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-      title="About - View indexed philosophers"
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="16" x2="12" y2="12" />
-        <line x1="12" y1="8" x2="12.01" y2="8" />
-      </svg>
-    </a>
   );
 
   return (
@@ -456,7 +436,7 @@ export function ChatPage() {
             </div>
             <div className="flex items-center gap-3">
               {messages.length > 0 && <Clear />}
-              <PhilosopherButton />
+              <SettingsButton />
               <SearchButton />
               <AboutButton />
               <AdminButton />

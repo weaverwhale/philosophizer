@@ -4,7 +4,11 @@ import { LoadingLogo } from '../components/Logo';
 
 import type { RagQueryResponse } from '../../endpoints/rag';
 import type { QueryResult } from '../../rag/utils/vectorStore';
-import { AdminButton } from './AdminPage';
+import {
+  ChatButton,
+  AboutButton,
+  AdminButton,
+} from '../components/NavigationButtons';
 
 interface PhilosophersData {
   philosophers: Array<{
@@ -236,28 +240,11 @@ export function SearchPage() {
       <div className="border-b border-border bg-surface shrink-0">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a
-              href="/"
-              className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all"
-              title="Back to chat"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
-            </a>
             <h1 className="text-lg font-semibold text-text">Search Database</h1>
           </div>
           <div className="flex items-center gap-3">
+            <ChatButton />
+            <AboutButton />
             <AdminButton />
             <ThemeToggle />
           </div>
