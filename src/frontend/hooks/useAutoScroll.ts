@@ -4,13 +4,16 @@ const AUTO_SCROLL_THRESHOLD = 50;
 
 export function useAutoScroll<T>(
   dependency: T,
-  conversationId?: string | null
+  conversationId?: string | null,
+  status?: string
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
   const lastConversationIdRef = useRef<string | null | undefined>(undefined);
   const isStreamingRef = useRef(false);
   const needsInitialScrollRef = useRef(false);
+  const wasStreamingRef = useRef(false);
+  const lastScrollHeightRef = useRef(0);
 
   const scrollToBottom = useCallback((instant = false) => {
     const container = scrollContainerRef.current;
@@ -19,6 +22,7 @@ export function useAutoScroll<T>(
         top: container.scrollHeight,
         behavior: instant ? 'instant' : 'smooth',
       });
+      lastScrollHeightRef.current = container.scrollHeight;
     }
   }, []);
 
@@ -55,7 +59,7 @@ export function useAutoScroll<T>(
     if (needsInitialScrollRef.current && hasMessages && conversationId) {
       needsInitialScrollRef.current = false;
 
-      // Wait for content to render
+      // Wait for content to render, including MessageActions buttons
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setTimeout(() => {
@@ -67,7 +71,25 @@ export function useAutoScroll<T>(
         });
       });
     }
-  }, [dependency, conversationId, scrollToBottom]);
+  }, [dependency, conversationId, scrollToBottom, status]);
+
+  // Handle content height changes (e.g., when MessageActions buttons appear)
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !shouldAutoScrollRef.current) return;
+
+    const currentHeight = container.scrollHeight;
+    const heightChanged =
+      currentHeight !== lastScrollHeightRef.current &&
+      lastScrollHeightRef.current > 0;
+
+    // If height increased significantly (e.g., buttons appeared), scroll to show them
+    if (heightChanged && currentHeight > lastScrollHeightRef.current) {
+      requestAnimationFrame(() => {
+        scrollToBottom(false);
+      });
+    }
+  }, [dependency, status, scrollToBottom]);
 
   // Handle message updates (smooth scroll during streaming)
   useEffect(() => {
@@ -75,6 +97,26 @@ export function useAutoScroll<T>(
       scrollToBottom(false);
     }
   }, [dependency, scrollToBottom]);
+
+  // Handle streaming completion - scroll when buttons appear
+  useEffect(() => {
+    const isCurrentlyStreaming =
+      status === 'submitted' || status === 'streaming';
+
+    // Detect when streaming just finished
+    if (wasStreamingRef.current && !isCurrentlyStreaming) {
+      isStreamingRef.current = false;
+
+      // Wait for MessageActions buttons to render, then scroll
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          scrollToBottom(false);
+        });
+      });
+    }
+
+    wasStreamingRef.current = isCurrentlyStreaming;
+  }, [status, scrollToBottom]);
 
   return {
     scrollContainerRef,

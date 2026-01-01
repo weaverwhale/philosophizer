@@ -120,7 +120,8 @@ export function ChatPage() {
 
   const { scrollContainerRef, handleScroll, enableAutoScroll } = useAutoScroll(
     messages,
-    currentConversation?.id
+    currentConversation?.id,
+    status
   );
 
   const isProcessing = status === 'submitted' || status === 'streaming';
