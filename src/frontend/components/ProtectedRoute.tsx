@@ -19,7 +19,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Show loading state if not authenticated (loading or redirecting)
   if (!isAuthenticated) {
     return (
-      <div className="py-23">
+      <div className="py-23.25">
         <Logo />
       </div>
     );
