@@ -32,7 +32,7 @@ export function MessageAvatar({ role }: MessageAvatarProps) {
     return (
       <div className="shrink-0">
         <div className="w-8 h-8 rounded-sm flex items-center justify-center bg-green-600 p-1">
-          <Logo width={10} height={10} className="invert mb-1!" />
+          <Logo width={12} height={12} invert margin="mb-1" />
         </div>
       </div>
     );
