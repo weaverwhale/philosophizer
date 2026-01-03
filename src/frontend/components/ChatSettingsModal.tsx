@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useRef } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 import { PHILOSOPHERS } from '../../constants/philosophers';
 import {
   TRADITION_GROUP_MAP,
