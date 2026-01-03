@@ -27,7 +27,8 @@
     "rag:reset": "bun run src/rag/indexTexts.ts --reset",
     "rag:clear": "bun run src/rag/indexTexts.ts --clear",
     "rag:stats": "bun run src/rag/indexTexts.ts --stats",
-    "rag:force": "bun run src/rag/indexTexts.ts --force"
+    "rag:force": "bun run src/rag/indexTexts.ts --force",
+    "rag:test": "bun run src/rag/testChunking.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
