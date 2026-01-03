@@ -66,7 +66,7 @@ docker compose exec app cat /app/secrets/.secrets
 
 # Example output:
 # Auto-generated secrets - DO NOT EDIT MANUALLY
-# Generated: 2024-01-03 12:34:56 UTC
+# Generated: 2026-01-03 12:34:56 UTC
 # JWT_SECRET=abc123...xyz789
 # POSTGRES_PASSWORD=def456...uvw012
 ```

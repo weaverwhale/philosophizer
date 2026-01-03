@@ -54,7 +54,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       # Password will be set by app container's entrypoint script
       # If you prefer to set manually, create .env with POSTGRES_PASSWORD
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-philosophizer_auto_generated_2024}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-philosophizer_auto_generated_2026}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./src/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -187,7 +187,7 @@ services:
       - PORT=1738
 
       # === Database Configuration ===
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-philosophizer_auto_generated_2024}@postgres:5432/${POSTGRES_DB:-philosophizer}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-philosophizer_auto_generated_2026}@postgres:5432/${POSTGRES_DB:-philosophizer}
 
       # === JWT Configuration ===
       # Will be auto-generated on first run if not set

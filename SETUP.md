@@ -245,7 +245,7 @@ This creates three files:
    - Use for local restores or inspection
    - Required for building Docker images
 
-2. **`pgvector-backup-TIMESTAMP.sql`** - Versioned backup (e.g., `pgvector-backup-20241215_143022.sql`)
+2. **`pgvector-backup-TIMESTAMP.sql`** - Versioned backup (e.g., `pgvector-backup-20261215_143022.sql`)
    - Timestamped copy of the main backup
    - Use for keeping backup history and version control
    - Useful for rollback scenarios
