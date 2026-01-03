@@ -1,4 +1,5 @@
 import indexPageHtml from './frontend/index.html';
+import manifest from './frontend/manifest.json';
 import { agent } from './endpoints/agent';
 import { rag } from './endpoints/rag';
 import { conversations, conversation } from './endpoints/conversations';
@@ -23,6 +24,8 @@ import {
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
 import os from 'os';
+import path from 'path';
+import { existsSync } from 'fs';
 
 console.log(
   `🚀 Starting bun server in ${process.env.NODE_ENV || 'development'} mode`
@@ -38,6 +41,23 @@ const server = Bun.serve({
   hostname: process.env.HOSTNAME ?? 'localhost', // Use '0.0.0.0' for network access
   idleTimeout: 120,
   routes: {
+    // PWA routes
+    '/manifest.json': {
+      GET: () => {
+        return new Response(JSON.stringify(manifest), {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      },
+    },
+    '/sw.js': {
+      GET: () => {
+        const swPath = path.join(import.meta.dir, 'frontend', 'sw.js');
+        const file = Bun.file(swPath);
+        return new Response(file, {
+          headers: { 'Content-Type': 'application/javascript' },
+        });
+      },
+    },
     // Frontend routes
     '/': indexPageHtml,
     '/about': indexPageHtml,
@@ -69,6 +89,27 @@ const server = Bun.serve({
     '/api/texts/:sourceId': textsEndpoint,
     '/conversations': conversations,
     '/conversations/:id': conversation,
+  },
+  async fetch(req) {
+    const url = new URL(req.url);
+
+    // Handle icon files (both SVG and PNG)
+    if (url.pathname.startsWith('/icons/')) {
+      const iconPath = path.join(import.meta.dir, 'frontend', url.pathname);
+
+      if (existsSync(iconPath)) {
+        const file = Bun.file(iconPath);
+        const ext = iconPath.split('.').pop();
+        const contentType = ext === 'svg' ? 'image/svg+xml' : 'image/png';
+        return new Response(file, {
+          headers: { 'Content-Type': contentType },
+        });
+      }
+      return new Response('Icon not found', { status: 404 });
+    }
+
+    // Let the router handle other routes
+    return undefined as any;
   },
   ...(process.env.NODE_ENV === 'production'
     ? {}

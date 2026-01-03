@@ -10,6 +10,7 @@ Built with Bun, React, TypeScript, and PostgreSQL with pgvector for semantic sea
 - **RAG Search**: HQE (Hypothetical Question Embeddings) for improved semantic search over philosophical texts
 - **Authentication**: Secure JWT-based user authentication
 - **Conversations**: Save and manage chat history
+- **PWA Support**: Install on mobile devices and desktops for an app-like experience
 - **Admin Panel**: Web interface for database management, backups, and Docker Hub integration
 - **Modern Stack**: React 19, TailwindCSS 4, Vercel AI SDK v6, PostgreSQL 16 with pgvector
 
@@ -63,6 +64,7 @@ The system automatically generates secure secrets, downloads GPU-accelerated mod
 
 | Guide                              | Description                                                             |
 | ---------------------------------- | ----------------------------------------------------------------------- |
+| **[PWA.md](PWA.md)**               | Progressive Web App installation, offline support, and mobile setup     |
 | **[DOCKER.md](DOCKER.md)**         | Choose the right Docker Compose config for your hardware (dev/GPU/DGX)  |
 | **[SETUP.md](SETUP.md)**           | Complete installation, configuration, RAG indexing, and admin workflows |
 | **[DEPLOYMENT.md](DEPLOYMENT.md)** | Automated deployment, secret management, backup/restore procedures      |
