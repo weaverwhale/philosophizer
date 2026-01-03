@@ -282,14 +282,14 @@ export const christianPhilosophers = {
       {
         id: 'gregory-nyssa-soul-resurrection',
         title: 'On the Soul and Resurrection',
-        url: 'https://archive.org/download/asceticandmystic027695mbp/asceticandmystic027695mbp_djvu.txt',
-        format: 'txt',
+        url: 'https://www.documentacatholicaomnia.eu/03d/0330-0395,_Gregorius_Nyssenus,_On_the_Soul_and_the_Resurrection_[Schaff],_EN.pdf',
+        format: 'pdf',
         description: 'Dialogue on the nature of the soul and afterlife',
       },
       {
         id: 'gregory-nyssa-great-catechism',
         title: 'The Great Catechism',
-        url: 'https://archive.org/download/npnf205/npnf205_djvu.txt',
+        url: 'http://www.newhumanityinstitute.org/pdf-articles/Gregory-of-Nyssa-Great-Catechism-quotations-atonement.pdf',
         format: 'txt',
         description: 'Systematic presentation of Christian doctrine',
       },
@@ -1840,7 +1840,7 @@ export const christianPhilosophers = {
       {
         id: 'teresa-way-perfection',
         title: 'The Way of Perfection',
-        url: 'https://archive.org/download/wayofperfectiona00tere/wayofperfectiona00tere_djvu.txt',
+        url: 'hhttps://dn790003.ca.archive.org/0/items/thewayofperfecti00tereuoft/thewayofperfecti00tereuoft_djvu.txt',
         format: 'txt',
         description: 'Practical guide to prayer for her nuns',
       },
