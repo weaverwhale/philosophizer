@@ -2,6 +2,103 @@
 // JEWISH PHILOSOPHY & HASIDISM
 // ==========================================================================
 export const jewishPhilosophers = {
+  philoOfAlexandria: {
+    id: 'philoOfAlexandria',
+    name: 'Philo of Alexandria',
+    era: 'c. 20 BC – 50 AD',
+    tradition: 'Hellenistic Jewish Philosophy',
+    description:
+      'Hellenistic Jewish philosopher from Alexandria who synthesized Jewish Scripture with Greek philosophy, especially Platonism and Stoicism. His allegorical interpretations of the Torah influenced early Christian theology and later Jewish philosophy.',
+    keyTeachings: [
+      'The Logos as divine intermediary between God and creation',
+      'Allegorical interpretation reveals the deeper meaning of Scripture',
+      'God is utterly transcendent and unknowable in essence',
+      'Contemplation of God is the highest human activity',
+      'Moses as the ideal philosopher and prophet',
+      'Virtues lead the soul toward God',
+      'The Patriarchs embody philosophical virtues',
+    ],
+    keyConcepts: [
+      {
+        name: 'The Logos',
+        explanation:
+          'The divine Word or Reason that mediates between the transcendent God and the created world. The Logos is the instrument of creation, the pattern of the universe, and the highest of divine powers. This concept deeply influenced Christian theology.',
+        relatedTerms: ['divine Word', 'mediator', 'reason', 'creative power'],
+      },
+      {
+        name: 'Allegorical Interpretation',
+        explanation:
+          "The literal sense of Scripture is for the body; the allegorical sense is for the soul. Behind the historical narratives lie philosophical and spiritual truths. The Patriarchs represent virtues; the Exodus symbolizes the soul's journey from passion to wisdom.",
+        relatedTerms: ['allegory', 'spiritual meaning', 'hermeneutics'],
+      },
+      {
+        name: 'Divine Transcendence',
+        explanation:
+          'God is absolutely transcendent, beyond all categories and descriptions. We can know that God is, but not what God is. God acts through intermediary powers (Logos, angels) rather than directly.',
+        relatedTerms: [
+          'transcendence',
+          'unknowability',
+          'negative theology',
+          'divine powers',
+        ],
+      },
+      {
+        name: 'Contemplative Life',
+        explanation:
+          'The highest human calling is the contemplative life (bios theoretikos), which involves withdrawing from the world to contemplate God. Moses represents this ideal—he ascended the mountain to commune with the divine.',
+        relatedTerms: ['theoria', 'contemplation', 'philosophy', 'Moses'],
+      },
+    ],
+    notableWorks: [
+      'Allegorical Commentary on Genesis',
+      'On the Creation of the World',
+      'Life of Moses',
+      'On the Decalogue',
+      'The Special Laws',
+      'Questions and Answers on Genesis and Exodus',
+      'On the Contemplative Life',
+    ],
+    textSources: [
+      {
+        id: 'philo-complete-works',
+        title: 'The Complete Works of Philo (Complete and Unabridged)',
+        url: 'https://dn721902.ca.archive.org/0/items/the-complete-works-of-philo-complete-and-unabridged/The%20Complete%20Works%20of%20Philo%20Complete%20and%20Unabridged_djvu.txt',
+        format: 'txt',
+        description:
+          "Complete collection of all Philo's works translated by C. D. Yonge, including On the Creation, Life of Moses, Allegorical Interpretations, and all other writings",
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'On the Creation, 16',
+        passage:
+          'God, being God, judged that a beautiful copy would never be produced apart from a beautiful pattern. So when He willed to create this visible world, He first formed the intelligible world, in order that He might employ a pattern incorporeal and most God-like.',
+        context: 'On the Logos as the intelligible pattern of creation',
+      },
+      {
+        work: 'Allegorical Interpretation, I.31',
+        passage:
+          'We must, indeed, take the account of the creation literally, but we must look for deeper meanings as well.',
+        context: 'Method of allegorical interpretation',
+      },
+    ],
+    famousQuotes: [
+      'Be kind, for everyone you meet is fighting a great battle.',
+      'God is not the cause of evils; the cause is the choice of the free will.',
+      'Every good man is free, and every bad man is a slave.',
+      'The mind is the sovereign of the soul.',
+    ],
+    areasOfExpertise: [
+      'Hellenistic Judaism',
+      'biblical interpretation',
+      'allegory',
+      'Logos theology',
+      'Greek philosophy',
+      'divine transcendence',
+      'contemplative life',
+    ],
+  },
+
   maimonides: {
     id: 'maimonides',
     name: 'Moses Maimonides (Rambam)',

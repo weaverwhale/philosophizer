@@ -98,6 +98,20 @@ export const greekPhilosophers = {
         description: "Aristotle's works on logic",
       },
       {
+        id: 'aristotle-metaphysics',
+        title: 'Metaphysics',
+        url: 'https://classics.mit.edu/Aristotle/metaphysics.mb.txt',
+        format: 'txt',
+        description: 'Foundational work on first philosophy and being',
+      },
+      {
+        id: 'aristotle-de-anima',
+        title: 'De Anima (On the Soul)',
+        url: 'https://ia601602.us.archive.org/22/items/aristotledeanim00hickgoog/aristotledeanim00hickgoog_djvu.txt',
+        format: 'txt',
+        description: 'Treatise on the nature of the soul and psychology',
+      },
+      {
         id: 'aristotle-history-animals',
         title: 'History of Animals',
         url: 'https://www.gutenberg.org/cache/epub/59058/pg59058.txt',
@@ -520,6 +534,231 @@ export const greekPhilosophers = {
       'virtue',
       'piety',
       'justice',
+    ],
+  },
+
+  heraclitus: {
+    id: 'heraclitus',
+    name: 'Heraclitus of Ephesus',
+    era: 'c. 535–475 BC',
+    tradition: 'Pre-Socratic Philosophy',
+    description:
+      'Pre-Socratic Greek philosopher known as "the Obscure" and "the Weeping Philosopher." Famous for his doctrine of flux ("everything flows"), the unity of opposites, and his concept of the Logos as the rational principle governing the cosmos.',
+    keyTeachings: [
+      'Panta Rhei: Everything flows; constant change is the fundamental essence of reality',
+      'You cannot step into the same river twice',
+      'The Logos: A universal principle of order and knowledge underlying all things',
+      'The unity of opposites: Opposing forces are interconnected and interdependent',
+      'Strife and conflict are necessary for harmony and creation',
+      'The way up and the way down are one and the same',
+      'Character is destiny',
+    ],
+    keyConcepts: [
+      {
+        name: 'Panta Rhei (Everything Flows)',
+        explanation:
+          'Reality is in constant flux. Nothing remains static; everything is always changing. The river metaphor captures this: you cannot step into the same river twice, for new waters are ever flowing upon you.',
+        relatedTerms: ['flux', 'change', 'becoming', 'impermanence'],
+      },
+      {
+        name: 'Logos',
+        explanation:
+          'The rational, divine principle that orders the cosmos. Though the Logos is common to all, most people live as if they have their own private understanding. The Logos is both the rational structure of reality and the word or discourse that expresses it.',
+        relatedTerms: ['reason', 'cosmic order', 'divine law', 'word'],
+      },
+      {
+        name: 'Unity of Opposites',
+        explanation:
+          'Opposites are not separate but unified in a deeper harmony. Day and night, hot and cold, life and death—all opposites depend on each other and are aspects of the same underlying reality. "The path up and down is one and the same."',
+        relatedTerms: ['coincidence of opposites', 'polarity', 'tension'],
+      },
+      {
+        name: 'Fire as the Arche',
+        explanation:
+          'Fire is the primary element or principle (arche) of the universe. It symbolizes constant transformation—consuming and creating simultaneously. All things are exchanged for fire, and fire for all things.',
+        relatedTerms: [
+          'first principle',
+          'transformation',
+          'primordial element',
+        ],
+      },
+    ],
+    notableWorks: [
+      'Fragments (collected sayings and quotations)',
+      'On Nature (lost work, known through fragments)',
+    ],
+    textSources: [
+      {
+        id: 'heraclitus-fragments',
+        title: 'The Fragments of Heraclitus',
+        url: 'https://ia801309.us.archive.org/1/items/fragmentsofworko00hera/fragmentsofworko00hera_djvu.txt',
+        format: 'txt',
+        description: 'Collection of surviving fragments and sayings',
+      },
+      {
+        id: 'presocratics-collection',
+        title: 'Early Greek Philosophy (including Heraclitus)',
+        url: 'https://archive.org/download/presocraticphilo033229mbp/presocraticphilo033229mbp_djvu.txt',
+        format: 'txt',
+        description: 'Translations and commentary on Pre-Socratic philosophers',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Fragment 12',
+        passage:
+          'Upon those who step into the same rivers, different and again different waters flow.',
+        context: 'The famous river metaphor on constant flux',
+      },
+      {
+        work: 'Fragment 50',
+        passage:
+          'Listening not to me but to the Logos, it is wise to agree that all things are one.',
+        context: 'On the Logos and the unity of all things',
+      },
+      {
+        work: 'Fragment 8',
+        passage:
+          'What is in opposition is in concert, and from things that differ comes the most beautiful harmony.',
+        context: 'The unity and necessity of opposites',
+      },
+    ],
+    famousQuotes: [
+      'You cannot step into the same river twice.',
+      'The path up and down is one and the same.',
+      'Character is destiny.',
+      'The way up and the way down are one and the same.',
+      'Much learning does not teach understanding.',
+      'Big results require big ambitions.',
+      'All things come into being through opposition.',
+    ],
+    areasOfExpertise: [
+      'metaphysics',
+      'change and flux',
+      'cosmic order',
+      'unity of opposites',
+      'logos',
+      'cosmology',
+      'epistemology',
+    ],
+  },
+
+  parmenides: {
+    id: 'parmenides',
+    name: 'Parmenides of Elea',
+    era: 'Born c. 515 BC',
+    tradition: 'Pre-Socratic Philosophy / Eleatic School',
+    description:
+      'Pre-Socratic Greek philosopher and founder of the Eleatic school. In stark contrast to Heraclitus, Parmenides argued that reality is unchanging, indivisible, and eternal. His philosophical poem "On Nature" distinguishes between the "Way of Truth" (Being is) and the "Way of Opinion" (the illusory world of change).',
+    keyTeachings: [
+      'Being is; Non-being is not—this is the fundamental truth',
+      'Change, motion, and multiplicity are illusions of the senses',
+      'Reality is one, eternal, indivisible, and unchanging',
+      'What can be thought and what can be are the same',
+      'The Way of Truth vs. The Way of Opinion (Doxa)',
+      'From nothing, nothing comes',
+      'Thought and being are identical',
+    ],
+    keyConcepts: [
+      {
+        name: 'The Way of Truth',
+        explanation:
+          'The path of reason reveals that "Being is" and "Non-being is not." True reality is one, unchanging, eternal, indivisible, and complete. It has no past or future—only an eternal present.',
+        relatedTerms: [
+          'Being',
+          'Aletheia',
+          'rational truth',
+          'unchanging reality',
+        ],
+      },
+      {
+        name: 'The Way of Opinion (Doxa)',
+        explanation:
+          'The path of the senses leads to illusion. The everyday world of change, motion, birth, and death is mere appearance, not true reality. Mortals are deceived by their senses.',
+        relatedTerms: [
+          'illusion',
+          'appearance',
+          'sensory deception',
+          'phenomenal world',
+        ],
+      },
+      {
+        name: 'Monism',
+        explanation:
+          'Reality is one indivisible whole. There is no multiplicity, no parts, no divisions. What appears as many separate things is actually One Being.',
+        relatedTerms: ['unity', 'oneness', 'indivisibility', 'wholeness'],
+      },
+      {
+        name: 'Eternalism',
+        explanation:
+          'Being is eternal—it neither comes into existence nor passes away. It has no beginning or end. Time and change are illusions; only the eternal "now" exists.',
+        relatedTerms: ['timelessness', 'eternity', 'permanence', 'unchanging'],
+      },
+      {
+        name: 'Identity of Thought and Being',
+        explanation:
+          'What can be thought and what can be are the same. There is a fundamental identity between thinking and being. One cannot think of nothing; one can only think what is.',
+        relatedTerms: ['thinking and being', 'rationalism', 'epistemology'],
+      },
+    ],
+    notableWorks: [
+      'On Nature (Peri Physeōs)',
+      'Proem (Prologue to On Nature)',
+      'The Way of Truth',
+      'The Way of Opinion',
+    ],
+    textSources: [
+      {
+        id: 'parmenides-fragments',
+        title: 'Fragments of Parmenides',
+        url: 'https://dn790007.ca.archive.org/0/items/fragmentsofparme00parm/fragmentsofparme00parm_djvu.txt',
+        format: 'txt',
+        description: 'Surviving fragments of the philosophical poem On Nature',
+      },
+      {
+        id: 'plato-parmenides-dialogue',
+        title: "Plato's Parmenides",
+        url: 'https://www.gutenberg.org/cache/epub/1687/pg1687.txt',
+        format: 'txt',
+        description: "Plato's dialogue examining Parmenides' philosophy",
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'On Nature, Fragment 2',
+        passage:
+          'Come now, I will tell thee—and do thou hearken to my saying and carry it away—the only two ways of search that can be thought of. The first, namely, that It is, and that it is impossible for it not to be, is the way of belief, for truth is its companion.',
+        context: 'The fundamental principle: Being is',
+      },
+      {
+        work: 'On Nature, Fragment 3',
+        passage: 'For the same thing can be thought and can be.',
+        context: 'The identity of thought and being',
+      },
+      {
+        work: 'On Nature, Fragment 8',
+        passage:
+          'One way only is left to be spoken of, that It is; and on this way are full many signs that what is is uncreated and imperishable, for it is entire, immovable and without end.',
+        context: 'The nature of Being as eternal and unchanging',
+      },
+    ],
+    famousQuotes: [
+      'Being is; Non-being is not.',
+      'What is, is. What is not, is not.',
+      'For the same thing can be thought and can be.',
+      'You could not discover what is not—for that is impossible—nor express it.',
+      'The thing that can be thought and that for the sake of which the thought exists is the same.',
+      'How could what is perish? How could it have come to be?',
+    ],
+    areasOfExpertise: [
+      'metaphysics',
+      'ontology',
+      'being and non-being',
+      'monism',
+      'eternalism',
+      'rationalism',
+      'epistemology',
+      'critique of change',
     ],
   },
 };

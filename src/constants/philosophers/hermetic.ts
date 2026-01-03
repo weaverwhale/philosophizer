@@ -81,7 +81,7 @@ export const hermeticPhilosophers = {
       {
         id: 'hermetica',
         title: 'The Divine Pymander (Corpus Hermeticum)',
-        url: 'https://dn720501.ca.archive.org/0/items/bim_early-english-books-1641-1700_the-divine-pymander-_hermes-trismegistus_1650/bim_early-english-books-1641-1700_the-divine-pymander-_hermes-trismegistus_1650_djvu.txt',
+        url: 'https://archive.org/download/bim_early-english-books-1641-1700_the-divine-pymander-_hermes-trismegistus_1650/bim_early-english-books-1641-1700_the-divine-pymander-_hermes-trismegistus_1650_djvu.txt',
         format: 'txt',
         description: 'Ancient Hermetic texts attributed to Hermes Trismegistus',
       },

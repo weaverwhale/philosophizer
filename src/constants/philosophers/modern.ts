@@ -2,6 +2,494 @@
 // MODERN PHILOSOPHY
 // ==========================================================================
 export const modernPhilosophers = {
+  descartes: {
+    id: 'descartes',
+    name: 'René Descartes',
+    era: '1596–1650',
+    tradition: 'Rationalism / Early Modern Philosophy',
+    description:
+      'French philosopher, mathematician, and scientist known as the "Father of Modern Philosophy." His method of systematic doubt and famous dictum "I think, therefore I am" laid foundations for modern epistemology and rationalist philosophy.',
+    keyTeachings: [
+      'Cogito, ergo sum: I think, therefore I am',
+      'Method of doubt: Doubt everything that can be doubted to find certainty',
+      'Mind-body dualism: Mind (res cogitans) and body (res extensa) are distinct substances',
+      'Clear and distinct ideas are the criterion of truth',
+      'God exists and is not a deceiver (guarantor of truth)',
+      'Innate ideas exist in the mind prior to experience',
+      'Mathematics is the model for certain knowledge',
+    ],
+    keyConcepts: [
+      {
+        name: 'Cogito, Ergo Sum (I Think, Therefore I Am)',
+        explanation:
+          'The one indubitable truth discovered through systematic doubt. Even if an evil demon deceives me about everything, I cannot doubt that I am thinking. The thinking self is the foundation of all knowledge.',
+        relatedTerms: [
+          'foundationalism',
+          'self-knowledge',
+          'certainty',
+          'cogito',
+        ],
+      },
+      {
+        name: 'Method of Systematic Doubt',
+        explanation:
+          'Doubt everything that can possibly be doubted—sense experience, mathematics, even the existence of the external world. Only by finding what cannot be doubted can we establish certain foundations for knowledge.',
+        relatedTerms: [
+          'skeptical method',
+          'methodical doubt',
+          'evil demon',
+          'foundationalism',
+        ],
+      },
+      {
+        name: 'Mind-Body Dualism',
+        explanation:
+          'Reality consists of two fundamentally different substances: mind (thinking substance, res cogitans) and body (extended substance, res extensa). The mind is immaterial and indivisible; the body is material and divisible.',
+        relatedTerms: [
+          'substance dualism',
+          'res cogitans',
+          'res extensa',
+          'interaction problem',
+        ],
+      },
+      {
+        name: 'Clear and Distinct Ideas',
+        explanation:
+          'The criterion of truth: whatever I perceive very clearly and distinctly is true. God, who is not a deceiver, guarantees that our clear and distinct perceptions correspond to reality.',
+        relatedTerms: [
+          'clarity',
+          'distinctness',
+          'truth criterion',
+          'innate ideas',
+        ],
+      },
+    ],
+    notableWorks: [
+      'Meditations on First Philosophy',
+      'Discourse on Method',
+      'Principles of Philosophy',
+      'Rules for the Direction of the Mind',
+      'Passions of the Soul',
+    ],
+    textSources: [
+      {
+        id: 'descartes-meditations',
+        title: 'Meditations on First Philosophy',
+        url: 'https://dn720002.ca.archive.org/0/items/the-blackwell-guide-to-descartes-meditations/The%20Blackwell%20guide%20to%20Descartes%27%20Meditations_djvu.txt',
+        format: 'txt',
+        description: 'Foundational work establishing the cogito and dualism',
+      },
+      {
+        id: 'descartes-discourse-method',
+        title: 'Discourse on Method',
+        url: 'https://www.gutenberg.org/cache/epub/59/pg59.txt',
+        format: 'txt',
+        description:
+          'Autobiographical introduction to his philosophical method',
+      },
+      {
+        id: 'descartes-principles-philosophy',
+        title: 'Principles of Philosophy',
+        url: 'https://www.gutenberg.org/cache/epub/4391/pg4391.txt',
+        format: 'txt',
+        description: 'Systematic presentation of his natural philosophy',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Meditations, Second Meditation',
+        passage:
+          'I am, I exist—that is certain. But for how long? For as long as I am thinking. For it could be that, if I totally ceased from thinking, I should totally cease to exist.',
+        context: 'The cogito argument',
+      },
+      {
+        work: 'Discourse on Method, Part IV',
+        passage:
+          'I think, therefore I am was so certain and so evident that all the most extravagant suppositions of the skeptics were not capable of shaking it.',
+        context: 'The famous cogito statement',
+      },
+    ],
+    famousQuotes: [
+      'I think, therefore I am.',
+      'Doubt is the origin of wisdom.',
+      'The reading of all good books is like a conversation with the finest minds of past centuries.',
+      'It is not enough to have a good mind; the main thing is to use it well.',
+      'If you would be a real seeker after truth, it is necessary that at least once in your life you doubt, as far as possible, all things.',
+    ],
+    areasOfExpertise: [
+      'epistemology',
+      'rationalism',
+      'mind-body problem',
+      'foundations of knowledge',
+      'mathematics',
+      'method',
+      'metaphysics',
+    ],
+  },
+
+  spinoza: {
+    id: 'spinoza',
+    name: 'Baruch Spinoza',
+    era: '1632–1677',
+    tradition: 'Rationalism / Early Modern Philosophy',
+    description:
+      'Dutch philosopher of Portuguese-Jewish origin who developed a radical rationalist metaphysics. His Ethics presents a pantheistic system where God and Nature are identical, and human freedom comes through understanding necessity.',
+    keyTeachings: [
+      'Deus sive Natura: God or Nature—they are one and the same',
+      'There is only one substance (God/Nature); everything else is a mode',
+      'Freedom is understanding necessity, not escaping it',
+      'The intellectual love of God (amor Dei intellectualis) is the highest good',
+      'Emotions are caused by inadequate ideas; reason brings peace',
+      'Human beings are modes of God, not separate from divine substance',
+      'Everything follows necessarily from the nature of God',
+    ],
+    keyConcepts: [
+      {
+        name: 'Substance Monism',
+        explanation:
+          'There is only one substance—God or Nature. Everything that exists is either this one substance or a mode (modification) of it. God is not a transcendent creator but the immanent cause of all things.',
+        relatedTerms: ['monism', 'Deus sive Natura', 'substance', 'pantheism'],
+      },
+      {
+        name: 'Determinism and Freedom',
+        explanation:
+          "Everything in nature follows necessarily from God's nature. There is no free will in the libertarian sense. True freedom is understanding necessity and living according to reason, not being enslaved by passive emotions.",
+        relatedTerms: ['necessity', 'determinism', 'freedom', 'reason'],
+      },
+      {
+        name: 'Intellectual Love of God (Amor Dei Intellectualis)',
+        explanation:
+          'The highest human achievement is an intellectual love of God/Nature that comes from understanding the eternal necessity of all things. This brings peace, joy, and freedom from the bondage of passions.',
+        relatedTerms: [
+          'blessedness',
+          'intellectual love',
+          'eternity',
+          'salvation',
+        ],
+      },
+      {
+        name: 'Conatus (Striving)',
+        explanation:
+          'Each thing strives to persevere in its being. This conatus is the essence of every individual thing. In humans, conatus manifests as desire—the fundamental drive of human nature.',
+        relatedTerms: ['self-preservation', 'essence', 'desire', 'striving'],
+      },
+    ],
+    notableWorks: [
+      'Ethics (Ethica Ordine Geometrico Demonstrata)',
+      'Theological-Political Treatise',
+      'Political Treatise',
+      'Short Treatise on God, Man, and His Well-Being',
+    ],
+    textSources: [
+      {
+        id: 'spinoza-ethics',
+        title: 'Ethics',
+        url: 'https://www.gutenberg.org/cache/epub/3800/pg3800.txt',
+        format: 'txt',
+        description: 'Masterwork on metaphysics, ethics, and human freedom',
+      },
+      {
+        id: 'spinoza-theological-political',
+        title: 'A Theologico-Political Treatise',
+        url: 'https://www.gutenberg.org/cache/epub/989/pg989.txt',
+        format: 'txt',
+        description: 'On religious freedom and biblical interpretation',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Ethics, Part I, Definition 3',
+        passage:
+          'By substance I understand that which is in itself and is conceived through itself.',
+        context: 'Definition of substance',
+      },
+      {
+        work: 'Ethics, Part I, Proposition 14',
+        passage: 'Besides God, no substance can be or be conceived.',
+        context: 'The uniqueness of substance',
+      },
+      {
+        work: 'Ethics, Part V, Proposition 42',
+        passage: 'Blessedness is not the reward of virtue, but virtue itself.',
+        context: 'The highest good',
+      },
+    ],
+    famousQuotes: [
+      'God or Nature (Deus sive Natura).',
+      'Freedom is the recognition of necessity.',
+      'He who loves God cannot strive that God should love him in return.',
+      'All things excellent are as difficult as they are rare.',
+      'Peace is not an absence of war, it is a virtue, a state of mind, a disposition for benevolence.',
+      'The highest activity a human being can attain is learning for understanding.',
+    ],
+    areasOfExpertise: [
+      'rationalism',
+      'pantheism',
+      'determinism',
+      'metaphysics',
+      'ethics',
+      'emotions',
+      'freedom',
+      'biblical criticism',
+    ],
+  },
+
+  locke: {
+    id: 'locke',
+    name: 'John Locke',
+    era: '1632–1704',
+    tradition: 'Empiricism / Early Modern Philosophy',
+    description:
+      'English philosopher and physician who laid the foundations of empiricism and liberal political philosophy. He argued that the mind begins as a blank slate (tabula rasa) and that all knowledge comes from experience.',
+    keyTeachings: [
+      'Tabula Rasa: The mind is a blank slate at birth; all ideas come from experience',
+      'No innate ideas: All knowledge derives from sensation and reflection',
+      'Primary and secondary qualities: Some properties are in objects, others in perception',
+      'Natural rights: Life, liberty, and property are inalienable',
+      'Government by consent: Legitimate authority comes from the consent of the governed',
+      'Right of revolution: People may overthrow tyrannical governments',
+      'Religious toleration: The state should not enforce religious conformity',
+    ],
+    keyConcepts: [
+      {
+        name: 'Tabula Rasa (Blank Slate)',
+        explanation:
+          'The mind at birth is like a blank tablet. There are no innate ideas or principles. All knowledge is acquired through experience—through sensation (external experience) and reflection (internal experience).',
+        relatedTerms: [
+          'empiricism',
+          'experience',
+          'blank slate',
+          'no innate ideas',
+        ],
+      },
+      {
+        name: 'Primary and Secondary Qualities',
+        explanation:
+          'Primary qualities (solidity, extension, motion, number) exist in objects themselves. Secondary qualities (color, sound, taste, smell) exist only in our perception. A tree falling in the forest with no one around makes no sound.',
+        relatedTerms: [
+          'perception',
+          'qualities',
+          'objectivity',
+          'subjectivity',
+        ],
+      },
+      {
+        name: 'Natural Rights',
+        explanation:
+          'In the state of nature, all people possess natural rights to life, liberty, and property. Government exists to protect these rights. When government violates them, revolution is justified.',
+        relatedTerms: [
+          'life, liberty, property',
+          'natural law',
+          'social contract',
+        ],
+      },
+      {
+        name: 'Social Contract',
+        explanation:
+          'People consent to form governments to protect their natural rights. Government legitimacy derives from this consent. Rulers who violate the contract forfeit their authority.',
+        relatedTerms: [
+          'consent',
+          'legitimacy',
+          'contract',
+          'political authority',
+        ],
+      },
+    ],
+    notableWorks: [
+      'An Essay Concerning Human Understanding',
+      'Two Treatises of Government',
+      'A Letter Concerning Toleration',
+      'Some Thoughts Concerning Education',
+    ],
+    textSources: [
+      {
+        id: 'locke-essay-understanding',
+        title: 'An Essay Concerning Humane Understanding',
+        url: 'https://www.gutenberg.org/cache/epub/10615/pg10615.txt',
+        format: 'txt',
+        description: 'Foundational work of empiricism',
+      },
+      {
+        id: 'locke-two-treatises',
+        title: 'Two Treatises of Government',
+        url: 'https://www.gutenberg.org/cache/epub/7370/pg7370.txt',
+        format: 'txt',
+        description: 'Classic of liberal political philosophy',
+      },
+      {
+        id: 'locke-toleration',
+        title: 'A Letter Concerning Toleration',
+        url: 'https://dn790000.ca.archive.org/0/items/lockeletterconcerningtolerationcamb.txt/Locke%20%20-%20%27%27Letter%20Concerning%20Toleration%27%27%20%5BCamb.txt%5D_djvu.txt',
+        format: 'txt',
+        description: 'Argument for religious freedom',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Essay Concerning Human Understanding, Book II, Ch. 1',
+        passage:
+          'Let us then suppose the mind to be, as we say, white paper, void of all characters, without any ideas. How comes it to be furnished? To this I answer, in one word, from experience.',
+        context: 'The tabula rasa doctrine',
+      },
+      {
+        work: 'Two Treatises, Second Treatise, §222',
+        passage:
+          'Whenever the legislators endeavor to take away and destroy the property of the people... they put themselves into a state of war with the people.',
+        context: 'The right of revolution',
+      },
+    ],
+    famousQuotes: [
+      "No man's knowledge here can go beyond his experience.",
+      'All mankind... being all equal and independent, no one ought to harm another in his life, health, liberty or possessions.',
+      'The end of law is not to abolish or restrain, but to preserve and enlarge freedom.',
+      'Reading furnishes the mind only with materials of knowledge; it is thinking that makes what we read ours.',
+      'New opinions are always suspected, and usually opposed, without any other reason but because they are not already common.',
+    ],
+    areasOfExpertise: [
+      'empiricism',
+      'epistemology',
+      'political philosophy',
+      'natural rights',
+      'liberal theory',
+      'toleration',
+      'education',
+    ],
+  },
+
+  hume: {
+    id: 'hume',
+    name: 'David Hume',
+    era: '1711–1776',
+    tradition: 'Empiricism / Scottish Enlightenment',
+    description:
+      'Scottish philosopher, historian, and economist who developed radical empiricism and skepticism. He argued that all knowledge comes from experience, causation is just habit of mind, and reason is the slave of the passions.',
+    keyTeachings: [
+      'All ideas derive from impressions (sense experiences)',
+      'Causation is not a logical necessity but a habit of expectation',
+      'The self is a bundle of perceptions, not a unified substance',
+      'We cannot derive "ought" from "is" (the is-ought problem)',
+      'Reason is and ought to be the slave of the passions',
+      'Miracles are inherently improbable and cannot be proven',
+      'The problem of induction: Past experience does not logically justify future predictions',
+    ],
+    keyConcepts: [
+      {
+        name: 'Impressions and Ideas',
+        explanation:
+          'All mental contents are either impressions (vivid sense experiences) or ideas (faint copies of impressions). There are no innate ideas. Every idea can be traced back to prior impressions.',
+        relatedTerms: ['empiricism', 'sense experience', 'mental contents'],
+      },
+      {
+        name: 'The Problem of Causation',
+        explanation:
+          'We never directly observe causal power—only constant conjunction (A is always followed by B). Our belief in causation is a habit of mind formed by repeated experience, not a rational inference.',
+        relatedTerms: ['constant conjunction', 'habit', 'custom', 'necessity'],
+      },
+      {
+        name: 'The Problem of Induction',
+        explanation:
+          'Past experience does not logically justify predictions about the future. That the sun has risen every day does not prove it will rise tomorrow. Induction rests on custom, not reason.',
+        relatedTerms: [
+          'induction',
+          'uniformity of nature',
+          'habit',
+          'skepticism',
+        ],
+      },
+      {
+        name: 'The Bundle Theory of Self',
+        explanation:
+          'There is no enduring self or soul—only a bundle of constantly changing perceptions. When I look within, I find only particular impressions, never a "self" that has them.',
+        relatedTerms: ['no-self', 'bundle', 'personal identity', 'perceptions'],
+      },
+      {
+        name: 'Reason as Slave of the Passions',
+        explanation:
+          "Reason alone cannot motivate action. Only desires and emotions (passions) can move us to act. Reason's role is instrumental—it shows us means to our passionately chosen ends.",
+        relatedTerms: [
+          'motivation',
+          'desire',
+          'passion',
+          'instrumental reason',
+        ],
+      },
+    ],
+    notableWorks: [
+      'A Treatise of Human Nature',
+      'An Enquiry Concerning Human Understanding',
+      'An Enquiry Concerning the Principles of Morals',
+      'Dialogues Concerning Natural Religion',
+      'History of England',
+    ],
+    textSources: [
+      {
+        id: 'hume-enquiry-understanding',
+        title: 'An Enquiry Concerning Human Understanding',
+        url: 'https://www.gutenberg.org/cache/epub/9662/pg9662.txt',
+        format: 'txt',
+        description: 'Accessible presentation of his empiricist philosophy',
+      },
+      {
+        id: 'hume-treatise-human-nature',
+        title: 'A Treatise of Human Nature',
+        url: 'https://www.gutenberg.org/cache/epub/4705/pg4705.txt',
+        format: 'txt',
+        description: 'Comprehensive early statement of his philosophy',
+      },
+      {
+        id: 'hume-enquiry-morals',
+        title: 'An Enquiry Concerning the Principles of Morals',
+        url: 'https://www.gutenberg.org/cache/epub/4320/pg4320.txt',
+        format: 'txt',
+        description: 'On the foundations of ethics and virtue',
+      },
+      {
+        id: 'hume-dialogues-natural-religion',
+        title: 'Dialogues Concerning Natural Religion',
+        url: 'https://www.gutenberg.org/cache/epub/4583/pg4583.txt',
+        format: 'txt',
+        description: "Skeptical examination of arguments for God's existence",
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Enquiry Concerning Human Understanding, Section VII',
+        passage:
+          'All inferences from experience suppose, as their foundation, that the future will resemble the past. To endeavor, therefore, the proof of this last supposition by probable arguments... must evidently be going in a circle.',
+        context: 'The problem of induction',
+      },
+      {
+        work: 'Treatise of Human Nature, Book II, Part III, Section 3',
+        passage:
+          'Reason is, and ought only to be the slave of the passions, and can never pretend to any other office than to serve and obey them.',
+        context: 'The relationship between reason and passion',
+      },
+      {
+        work: 'Treatise of Human Nature, Book I, Part IV, Section 6',
+        passage:
+          'When I enter most intimately into what I call myself, I always stumble on some particular perception... I never can catch myself at any time without a perception.',
+        context: 'The bundle theory of self',
+      },
+    ],
+    famousQuotes: [
+      'Reason is, and ought only to be the slave of the passions.',
+      'Beauty in things exists merely in the mind which contemplates them.',
+      'A wise man proportions his belief to the evidence.',
+      'Custom is the great guide of human life.',
+      'Generally speaking, the errors in religion are dangerous; those in philosophy only ridiculous.',
+    ],
+    areasOfExpertise: [
+      'empiricism',
+      'skepticism',
+      'causation',
+      'induction',
+      'personal identity',
+      'moral philosophy',
+      'philosophy of religion',
+      'epistemology',
+    ],
+  },
+
   kant: {
     id: 'kant',
     name: 'Immanuel Kant',
@@ -414,6 +902,13 @@ export const modernPhilosophers = {
         url: 'http://www.historyguide.org/europe/present_age.html',
         format: 'txt',
         description: 'Critique of modernity and the loss of passion',
+      },
+      {
+        id: 'kierkegaard-either-or',
+        title: 'Either/Or',
+        url: 'https://dn790007.ca.archive.org/0/items/in.ernet.dli.2015.504967/2015.504967.eitheror_djvu.txt',
+        format: 'txt',
+        description: 'Exploration of aesthetic and ethical modes of existence',
       },
     ],
     keyExcerpts: [

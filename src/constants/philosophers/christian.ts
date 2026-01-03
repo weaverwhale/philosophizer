@@ -110,6 +110,228 @@ export const christianPhilosophers = {
     ],
   },
 
+  origen: {
+    id: 'origen',
+    name: 'Origen of Alexandria',
+    era: 'c. 185–253 AD',
+    tradition: 'Early Christian Theology / Patristics',
+    description:
+      'Early Church Father, scholar, and theologian from Alexandria. One of the most learned and prolific Christian authors of his time, he developed allegorical biblical interpretation and systematic theology. Though some of his views were later condemned, his influence on Christian thought is immense.',
+    keyTeachings: [
+      'The Bible has multiple levels of meaning: literal, moral, and spiritual/allegorical',
+      'Apokatastasis: The eventual restoration of all souls to God (controversial teaching)',
+      'The pre-existence of souls before their incarnation in bodies',
+      'The Father, Son, and Holy Spirit are distinct in substance (subordinationism)',
+      'Free will is essential to moral responsibility and spiritual growth',
+      'Christ as the Logos is the mediator between God and creation',
+    ],
+    keyConcepts: [
+      {
+        name: 'Allegorical Interpretation',
+        explanation:
+          'Scripture has three levels corresponding to body, soul, and spirit: (1) Literal/historical; (2) Moral/psychological; (3) Spiritual/mystical. The deepest truths require moving beyond the letter to the spirit.',
+        relatedTerms: ['biblical hermeneutics', 'typology', 'spiritual sense'],
+      },
+      {
+        name: 'Apokatastasis (Universal Restoration)',
+        explanation:
+          "At the end of time, all rational creatures—including the devil—will be restored to God through purification. Evil has no eternal substance; all will eventually choose the Good. This teaching was later condemned but reflects Origen's optimism about God's love.",
+        relatedTerms: [
+          'universal salvation',
+          'restoration',
+          'purification',
+          'final reconciliation',
+        ],
+      },
+      {
+        name: 'Pre-existence of Souls',
+        explanation:
+          'Souls existed as rational spirits (logikoi) before their embodiment. They fell from contemplation of God and were placed in bodies as punishment or for education. This explained the diversity of human conditions.',
+        relatedTerms: ['pre-existence', 'fall of souls', 'embodiment'],
+      },
+      {
+        name: 'Christology and the Logos',
+        explanation:
+          "Christ is the eternal Logos, the Wisdom of God through whom all things were made. He mediates between the transcendent Father and creation. Origen emphasized Christ's divinity but in subordinationist terms.",
+        relatedTerms: ['Logos', 'mediation', 'incarnation', 'subordinationism'],
+      },
+    ],
+    notableWorks: [
+      'On First Principles (De Principiis)',
+      'Against Celsus (Contra Celsum)',
+      'Commentary on John',
+      'Commentary on Matthew',
+      'Hexapla (six-column Bible)',
+      'Homilies on various biblical books',
+    ],
+    textSources: [
+      {
+        id: 'origen-first-principles',
+        title: 'On First Principles (De Principiis)',
+        url: 'https://archive.org/download/origen-on-first-principles/Origen%20-%20On%20First%20Principles_djvu.txt',
+        format: 'txt',
+        description:
+          'Systematic theology covering God, creation, fall, and restoration',
+      },
+      {
+        id: 'origen-against-celsus',
+        title: 'Against Celsus (Contra Celsum)',
+        url: 'https://archive.org/download/bim_eighteenth-century_contra-celsum-english_origen_1710/bim_eighteenth-century_contra-celsum-english_origen_1710_djvu.txt',
+        format: 'txt',
+        description: 'Defense of Christianity against pagan philosopher Celsus',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'On First Principles, Book IV',
+        passage:
+          'The sacred books are not the works of men, but were composed and have come down to us as a result of the inspiration of the Holy Spirit.',
+        context: 'On the inspiration of Scripture',
+      },
+      {
+        work: 'Against Celsus, Book I',
+        passage:
+          'We maintain that the human soul is immortal, and that when it departs from the body it is judged according to its deserts.',
+        context: 'Defense of Christian doctrine on the afterlife',
+      },
+    ],
+    famousQuotes: [
+      'The power of choosing good and evil is within the reach of all.',
+      'What each man honors before all else, what before all things he admires and loves, this for him is God.',
+      'You yourself must be the first work, the book that must be studied.',
+      'The Word was made flesh in order that we might be made gods.',
+    ],
+    areasOfExpertise: [
+      'biblical interpretation',
+      'systematic theology',
+      'Christology',
+      'eschatology',
+      'free will',
+      'allegory',
+      'apologetics',
+    ],
+  },
+
+  gregoryOfNyssa: {
+    id: 'gregoryOfNyssa',
+    name: 'Gregory of Nyssa',
+    era: 'c. 335–395 AD',
+    tradition: 'Cappadocian Fathers / Christian Mysticism',
+    description:
+      "One of the three Cappadocian Fathers (along with his brother Basil and Gregory of Nazianzus), Gregory of Nyssa was a profound theologian, philosopher, and mystic. He synthesized Greek philosophy with Christian doctrine and developed mystical theology centered on the soul's infinite ascent toward God.",
+    keyTeachings: [
+      "Epektasis: The soul's eternal progress toward the infinite God",
+      'The incomprehensibility of God—we can know God through unknowing',
+      'Divine darkness: God is encountered beyond concepts and images',
+      "Universal salvation through Christ's redemptive work",
+      'The image of God in humanity can be restored through Christ',
+      'Virtue has no limit—we can always grow closer to God',
+    ],
+    keyConcepts: [
+      {
+        name: 'Epektasis (Perpetual Progress)',
+        explanation:
+          "Since God is infinite, the soul's journey toward God is endless. Even in heaven, the blessed continue to progress forever, moving from glory to glory. Perfection consists not in arriving but in perpetually advancing.",
+        relatedTerms: [
+          'infinite progress',
+          'eternal growth',
+          'from glory to glory',
+          'divine infinity',
+        ],
+      },
+      {
+        name: 'Divine Darkness (The Cloud of Unknowing)',
+        explanation:
+          'The highest knowledge of God comes through unknowing. As Moses entered the darkness on Mount Sinai, so the soul encounters God beyond all concepts, images, and words. This "luminous darkness" is the apophatic path.',
+        relatedTerms: [
+          'apophatic theology',
+          'mystical darkness',
+          'via negativa',
+          'unknowing',
+        ],
+      },
+      {
+        name: 'Apokatastasis (Universal Restoration)',
+        explanation:
+          "Following Origen, Gregory taught that God's goodness will eventually triumph over all evil. All rational beings will be restored to their original purity. Hell is medicinal, not eternal.",
+        relatedTerms: ['universal salvation', 'restoration', 'divine love'],
+      },
+      {
+        name: 'The Image of God (Imago Dei)',
+        explanation:
+          'Humanity is created in the image of God, which means we are called to participate in divine virtues. Though the image was obscured by sin, Christ restores it. The goal of life is theosis—becoming like God.',
+        relatedTerms: ['imago Dei', 'theosis', 'divinization', 'restoration'],
+      },
+    ],
+    notableWorks: [
+      'Life of Moses',
+      'On the Soul and Resurrection',
+      'The Great Catechism',
+      'Against Eunomius',
+      'On Virginity',
+      'Homilies on the Song of Songs',
+    ],
+    textSources: [
+      {
+        id: 'gregory-nyssa-life-moses',
+        title: 'The Life of Moses',
+        url: 'https://archive.org/download/gregory-of-nyssa-the-letters-supplements-to-vigiliae-christianae-by-gregory-of-nyssa-anna-m.-silvas/Gregory%20of%20Nyssa%20The%20Life%20of%20Moses%20%28HarperCollins%20Spiritual%20Classics%29%20by%20Harpercollins%20Spiritual_djvu.txt',
+        format: 'txt',
+        description: "Allegory of Moses' life as the soul's journey to God",
+      },
+      {
+        id: 'gregory-nyssa-soul-resurrection',
+        title: 'On the Soul and Resurrection',
+        url: 'https://archive.org/download/asceticandmystic027695mbp/asceticandmystic027695mbp_djvu.txt',
+        format: 'txt',
+        description: 'Dialogue on the nature of the soul and afterlife',
+      },
+      {
+        id: 'gregory-nyssa-great-catechism',
+        title: 'The Great Catechism',
+        url: 'https://archive.org/download/npnf205/npnf205_djvu.txt',
+        format: 'txt',
+        description: 'Systematic presentation of Christian doctrine',
+      },
+      {
+        id: 'gregory-nyssa-letters',
+        title: 'The Letters',
+        url: 'https://archive.org/download/gregory-of-nyssa-the-letters-supplements-to-vigiliae-christianae-by-gregory-of-nyssa-anna-m.-silvas/Gregory%20of%20Nyssa%20%20The%20Letters%20%28Supplements%20to%20Vigiliae%20Christianae%29%20by%20Gregory%20of%20Nyssa%2C%20Anna%20M.%20Silvas_djvu.txt',
+        format: 'txt',
+        description: 'Collection of letters with introduction and commentary',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Life of Moses, Book II',
+        passage:
+          'This truly is the vision of God: never to be satisfied in the desire to see him. But one must always, by looking at what he can see, rekindle his desire to see more.',
+        context: 'The concept of epektasis—perpetual progress',
+      },
+      {
+        work: 'Life of Moses, Book II',
+        passage:
+          'Moses entered into the darkness where God was. What does this mean? It means that Moses came to a knowledge of God through ignorance.',
+        context: 'The apophatic path—knowing God through unknowing',
+      },
+    ],
+    famousQuotes: [
+      'Concepts create idols; only wonder grasps anything.',
+      "The one thing truly worthwhile is becoming God's friend.",
+      'Sin is not henceforth the result of nature but of deliberate choice.',
+      'The soul that looks on beauty becomes beautiful.',
+    ],
+    areasOfExpertise: [
+      'mystical theology',
+      'apophatic theology',
+      'spiritual progress',
+      'biblical allegory',
+      'Trinity',
+      'eschatology',
+      'anthropology',
+    ],
+  },
+
   augustine: {
     id: 'augustine',
     name: 'Augustine of Hippo (Saint Augustine)',
@@ -188,6 +410,13 @@ export const christianPhilosophers = {
         description:
           'Guide to interpreting Scripture and teaching Christian truth',
       },
+      // {
+      //   id: 'augustine-free-choice-will',
+      //   title: 'On Free Choice of the Will',
+      //   url: '',
+      //   format: 'txt',
+      //   description: 'Dialogue on free will and the problem of evil',
+      // },
     ],
     keyExcerpts: [
       {
@@ -983,6 +1212,13 @@ export const christianPhilosophers = {
         format: 'txt',
         description: 'Allegory of spiritual warfare for the soul',
       },
+      {
+        id: 'bunyan-mr-badman',
+        title: 'The Life and Death of Mr. Badman',
+        url: 'https://www.gutenberg.org/cache/epub/1986/pg1986.txt',
+        format: 'txt',
+        description: 'Moral tale contrasting the wicked life with the godly',
+      },
     ],
     keyExcerpts: [
       {
@@ -1184,6 +1420,13 @@ export const christianPhilosophers = {
         url: 'https://www.gutenberg.org/cache/epub/14420/pg14420.txt',
         format: 'txt',
         description: 'Comprehensive commentary on the Psalms',
+      },
+      {
+        id: 'spurgeon-morning-evening',
+        title: 'Morning and Evening: Daily Readings',
+        url: 'https://ia801302.us.archive.org/34/items/morning_evening_1105_librivox/morning_evening_1105_djvu.txt',
+        format: 'txt',
+        description: 'Daily devotional readings for morning and evening',
       },
     ],
     keyExcerpts: [
@@ -1513,6 +1756,270 @@ export const christianPhilosophers = {
       'theodicy',
       'spiritual alchemy',
       'regeneration',
+    ],
+  },
+
+  teresaOfAvila: {
+    id: 'teresaOfAvila',
+    name: 'Teresa of Ávila (Saint Teresa)',
+    era: '1515–1582',
+    tradition: 'Christian Mysticism / Carmelite Spirituality',
+    description:
+      "Spanish Carmelite nun, mystic, reformer, and Doctor of the Church. She reformed the Carmelite order, founded numerous convents, and wrote profound works on prayer and the spiritual life. Her Interior Castle describes the soul's journey through seven mansions toward union with God.",
+    keyTeachings: [
+      'The Interior Castle: The soul has seven mansions leading to union with God',
+      'Mental prayer is intimate conversation with God, our friend',
+      'Recollection: Withdrawing the senses to focus on God within',
+      "The Prayer of Quiet: God's presence brings deep peace",
+      'Spiritual Marriage: The highest union with God in this life',
+      'God dwells in the innermost mansion of the soul',
+      'Humility and self-knowledge are essential to spiritual progress',
+    ],
+    keyConcepts: [
+      {
+        name: 'The Interior Castle',
+        explanation:
+          'The soul is like a castle with seven mansions. The outer mansions represent early spiritual life; the inner mansions deepen in prayer and union. The seventh mansion is spiritual marriage—full union with God while still on earth.',
+        relatedTerms: [
+          'seven mansions',
+          'spiritual journey',
+          'inner castle',
+          'contemplation',
+        ],
+      },
+      {
+        name: 'Mental Prayer (Oración Mental)',
+        explanation:
+          'Prayer is not about saying many words but about intimate friendship with God. Mental prayer is taking time frequently to be alone with Him who we know loves us.',
+        relatedTerms: [
+          'contemplative prayer',
+          'friendship with God',
+          'intimacy',
+          'conversation',
+        ],
+      },
+      {
+        name: 'Recollection (Recogimiento)',
+        explanation:
+          'The practice of withdrawing the senses and faculties inward to attend to God dwelling within the soul. The soul gathers its powers to be with God alone.',
+        relatedTerms: ['inner focus', 'withdrawal', 'centering', 'presence'],
+      },
+      {
+        name: 'Spiritual Marriage',
+        explanation:
+          'The highest union with God attainable in this life, occurring in the seventh mansion. The soul is permanently united with God, like water poured into water. Ecstasies cease; the soul enjoys constant peace and works actively in the world.',
+        relatedTerms: ['mystical union', 'transforming union', 'deification'],
+      },
+      {
+        name: 'The Prayer of Quiet',
+        explanation:
+          "A supernatural prayer where God infuses peace and delight into the will, though the intellect may still wander. The soul enjoys God's presence with minimal effort.",
+        relatedTerms: [
+          'infused contemplation',
+          'passive prayer',
+          'divine touch',
+          'quietude',
+        ],
+      },
+    ],
+    notableWorks: [
+      'The Interior Castle',
+      'The Way of Perfection',
+      'The Book of Her Life (Autobiography)',
+      'Spiritual Testimonies',
+      'Foundations',
+    ],
+    textSources: [
+      {
+        id: 'teresa-interior-castle',
+        title: 'The Interior Castle',
+        url: 'https://www.gutenberg.org/cache/epub/8120/pg8120.txt',
+        format: 'txt',
+        description: 'Masterwork on the seven mansions of the soul',
+      },
+      {
+        id: 'teresa-way-perfection',
+        title: 'The Way of Perfection',
+        url: 'https://archive.org/download/wayofperfectiona00tere/wayofperfectiona00tere_djvu.txt',
+        format: 'txt',
+        description: 'Practical guide to prayer for her nuns',
+      },
+      {
+        id: 'teresa-life',
+        title: 'The Life of St. Teresa of Jesus',
+        url: 'https://www.gutenberg.org/cache/epub/8120/pg8120.txt',
+        format: 'txt',
+        description:
+          'Spiritual autobiography describing her mystical experiences',
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Interior Castle, First Mansions',
+        passage:
+          'I thought of the soul as resembling a castle, formed of a single diamond or a very transparent crystal, and containing many rooms, just as in heaven there are many mansions.',
+        context: 'Opening image of the Interior Castle',
+      },
+      {
+        work: 'Life, Chapter 8',
+        passage:
+          'Mental prayer is nothing else than an intimate friendship, a frequent heart-to-heart conversation with Him by whom we know ourselves to be loved.',
+        context: 'Definition of mental prayer',
+      },
+      {
+        work: 'Interior Castle, Seventh Mansions',
+        passage:
+          'It is like rain falling from the heavens into a river or a spring; there is nothing but water there and it is impossible to divide or separate the water belonging to the river from that which fell from the heavens.',
+        context: 'Describing spiritual marriage',
+      },
+    ],
+    famousQuotes: [
+      'Prayer is nothing else than being on terms of friendship with God.',
+      'Let nothing disturb you, let nothing frighten you. All things pass away. God never changes.',
+      "We can only learn to know ourselves and do what we can—namely, surrender our will and fulfill God's will in us.",
+      'You pay God a compliment by asking great things of Him.',
+      'Christ has no body now but yours. No hands, no feet on earth but yours.',
+    ],
+    areasOfExpertise: [
+      'mystical theology',
+      'contemplative prayer',
+      'spiritual direction',
+      'interior life',
+      'union with God',
+      'discernment',
+      'Carmelite spirituality',
+    ],
+  },
+
+  johnOfTheCross: {
+    id: 'johnOfTheCross',
+    name: 'John of the Cross (San Juan de la Cruz)',
+    era: '1542–1591',
+    tradition: 'Christian Mysticism / Carmelite Spirituality',
+    description:
+      "Spanish Carmelite friar, mystic, poet, and Doctor of the Church. Collaborator with Teresa of Ávila in reforming the Carmelite order. His poetry and prose describe the soul's dark night and journey to transforming union with God through radical purification.",
+    keyTeachings: [
+      'The Dark Night of the Soul: Purification through spiritual desolation',
+      'Nada (Nothing): Let go of all attachments to reach Todo (Everything—God)',
+      'Union with God requires complete detachment from creatures',
+      'The Active and Passive Nights purify sense and spirit',
+      'Living Flame of Love: The Holy Spirit transforms the soul',
+      'Spiritual Betrothal and Marriage: Stages of mystical union',
+      'God communicates Himself most when we have nothing',
+    ],
+    keyConcepts: [
+      {
+        name: 'The Dark Night of the Soul',
+        explanation:
+          "The soul passes through dark nights of purification—active (our efforts) and passive (God's work). In these nights, God strips away attachments, consolations, and self-reliance to prepare the soul for union. The darkness is painful but redemptive.",
+        relatedTerms: [
+          'purification',
+          'spiritual aridity',
+          'passive night',
+          'purgation',
+        ],
+      },
+      {
+        name: 'Nada and Todo (Nothing and Everything)',
+        explanation:
+          '"To reach satisfaction in all, desire satisfaction in nothing. To come to possess all, desire to possess nothing." Only by emptying ourselves of all created things can we be filled with God, who is Everything.',
+        relatedTerms: ['detachment', 'nada', 'todo', 'emptiness', 'fullness'],
+      },
+      {
+        name: 'The Ascent of Mount Carmel',
+        explanation:
+          'The spiritual journey is an ascent up Mount Carmel to union with God. The path requires active purification of the senses and spirit, guided by faith, hope, and love.',
+        relatedTerms: [
+          'spiritual ascent',
+          'Mount Carmel',
+          'active purification',
+          'path',
+        ],
+      },
+      {
+        name: 'Transforming Union',
+        explanation:
+          'The highest stage of mystical life where the soul is so united with God that it is transformed into Him, while remaining distinct. The soul participates in the divine nature through love.',
+        relatedTerms: [
+          'spiritual marriage',
+          'deification',
+          'theosis',
+          'transformation',
+        ],
+      },
+      {
+        name: 'Living Flame of Love',
+        explanation:
+          'The Holy Spirit, experienced as a gentle, burning flame that wounds the soul with love. In transforming union, this flame ceaselessly communicates divine life.',
+        relatedTerms: ['Holy Spirit', 'divine fire', 'wound of love', 'flame'],
+      },
+    ],
+    notableWorks: [
+      'Dark Night of the Soul',
+      'Ascent of Mount Carmel',
+      'Spiritual Canticle',
+      'Living Flame of Love',
+      'Poetry (including "Dark Night" and "Spiritual Canticle")',
+    ],
+    textSources: [
+      {
+        id: 'john-cross-dark-night',
+        title: 'Dark Night of the Soul',
+        url: 'https://dn720303.ca.archive.org/0/items/darknightofsoul00sain/darknightofsoul00sain_djvu.txt',
+        format: 'txt',
+        description: 'Classic work on purification and union with God',
+      },
+      {
+        id: 'john-cross-ascent',
+        title: 'Ascent of Mount Carmel',
+        url: 'https://dn790007.ca.archive.org/0/items/ascentofmountcar00johnuoft/ascentofmountcar00johnuoft_djvu.txt',
+        format: 'txt',
+        description: 'Guide to the active purification of the soul',
+      },
+      {
+        id: 'john-cross-living-flame',
+        title: 'Living Flame of Love',
+        url: 'https://dn790001.ca.archive.org/0/items/a588512100johnuoft/a588512100johnuoft_djvu.txt',
+        format: 'txt',
+        description: "On the Holy Spirit's work in transforming union",
+      },
+    ],
+    keyExcerpts: [
+      {
+        work: 'Ascent of Mount Carmel, Book I',
+        passage:
+          'To reach satisfaction in all, desire its possession in nothing. To come to possess all, desire the possession of nothing.',
+        context: 'The paradox of nada and todo',
+      },
+      {
+        work: 'Dark Night, Book II',
+        passage:
+          'This dark night is an inflow of God into the soul, which purges it of its ignorances and imperfections, habitual, natural, and spiritual.',
+        context: 'The nature of the dark night',
+      },
+      {
+        work: 'Spiritual Canticle, Stanza 1',
+        passage:
+          'Where have You hidden, Beloved, and left me moaning? You fled like the stag after wounding me; I went out calling You, but You were gone.',
+        context: "The soul's longing for God",
+      },
+    ],
+    famousQuotes: [
+      'In the evening of life, we will be judged on love alone.',
+      'If you wish to be sure of the road you tread, close your eyes and walk in the dark.',
+      'The soul that is attached to anything, however much good there may be in it, will not arrive at the liberty of divine union.',
+      'Where there is no love, put love—and you will find love.',
+      'To reach satisfaction in all, desire satisfaction in nothing.',
+    ],
+    areasOfExpertise: [
+      'mystical theology',
+      'dark night',
+      'purification',
+      'detachment',
+      'contemplation',
+      'union with God',
+      'Carmelite spirituality',
+      'spiritual poetry',
     ],
   },
 };

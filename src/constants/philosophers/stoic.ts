@@ -221,6 +221,14 @@ export const stoicPhilosophers = {
         format: 'txt',
         description: 'Essay on the proper use of time',
       },
+      {
+        id: 'seneca-dialogues-complete',
+        title: 'Dialogues (Complete)',
+        url: 'https://ia904501.us.archive.org/27/items/seneca-dialogues-aubrey-stewart/seneca_dialogues_aubrey-stewart%20%281%29_djvu.txt',
+        format: 'txt',
+        description:
+          "Complete collection of Seneca's Dialogues translated by Aubrey Stewart, including On Anger, On Providence, On the Happy Life, To Marcia on Consolation, and all other dialogues",
+      },
     ],
     keyExcerpts: [
       {
