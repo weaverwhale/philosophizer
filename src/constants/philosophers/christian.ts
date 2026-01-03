@@ -289,7 +289,7 @@ export const christianPhilosophers = {
       {
         id: 'gregory-nyssa-great-catechism',
         title: 'The Great Catechism',
-        url: 'https://ia800206.us.archive.org/5/items/thecatecheticalo00greguoft/thecatecheticalo00greguoft.pdf',
+        url: 'https://www.documentacatholicaomnia.eu/03d/0330-0395,_Gregorius_Nyssenus,_Oratio_catechetica_magna_[Schaff],_EN.pdf',
         format: 'txt',
         description: 'Systematic presentation of Christian doctrine',
       },
