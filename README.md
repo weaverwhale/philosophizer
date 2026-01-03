@@ -21,6 +21,9 @@ _Conversational AI interface with philosophical wisdom_
 ![Search & Discovery](screens/ss2.png)
 _Semantic search over primary philosophical texts_
 
+![RAG Statistics](screens/ss3.png)
+_RAG indexed writers_
+
 ## Quick Start
 
 ### Development
@@ -58,13 +61,13 @@ The system automatically generates secure secrets, downloads GPU-accelerated mod
 
 ## Documentation
 
-| Guide                              | Description                                                                |
-| ---------------------------------- | -------------------------------------------------------------------------- |
-| **[DOCKER.md](DOCKER.md)**         | Choose the right Docker Compose config for your hardware (dev/GPU/DGX)    |
-| **[SETUP.md](SETUP.md)**           | Complete installation, configuration, RAG indexing, and admin workflows    |
-| **[DEPLOYMENT.md](DEPLOYMENT.md)** | Automated deployment, secret management, backup/restore procedures         |
-| **[PRODUCTION.md](PRODUCTION.md)** | Advanced security, enterprise secrets (Vault/AWS), GPU optimization        |
-| **[SECRETS.md](SECRETS.md)**       | Quick reference for manual secret generation (optional)                    |
+| Guide                              | Description                                                             |
+| ---------------------------------- | ----------------------------------------------------------------------- |
+| **[DOCKER.md](DOCKER.md)**         | Choose the right Docker Compose config for your hardware (dev/GPU/DGX)  |
+| **[SETUP.md](SETUP.md)**           | Complete installation, configuration, RAG indexing, and admin workflows |
+| **[DEPLOYMENT.md](DEPLOYMENT.md)** | Automated deployment, secret management, backup/restore procedures      |
+| **[PRODUCTION.md](PRODUCTION.md)** | Advanced security, enterprise secrets (Vault/AWS), GPU optimization     |
+| **[SECRETS.md](SECRETS.md)**       | Quick reference for manual secret generation (optional)                 |
 
 ## Key Technologies
 
