@@ -4,6 +4,14 @@ Agentic chat with tools and reasoning, using the wisdom of history's greatest ph
 
 Built with Bun, React, TypeScript, and PostgreSQL with pgvector for semantic search over primary source texts.
 
+## Screenshots
+
+![Chat Interface](screens/ss1.png)
+_Conversational AI interface with philosophical wisdom_
+
+![Search & Discovery](screens/ss2.png)
+_Semantic search over primary philosophical texts_
+
 ## Features
 
 - **AI Agent**: Multi-model support with streaming responses and tool calling
