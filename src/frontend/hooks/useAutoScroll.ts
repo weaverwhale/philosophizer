@@ -14,21 +14,42 @@ export function useAutoScroll<T>(
   const needsInitialScrollRef = useRef(false);
   const wasStreamingRef = useRef(false);
   const lastScrollHeightRef = useRef(0);
+  const isProgrammaticScrollRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = useCallback((instant = false) => {
     const container = scrollContainerRef.current;
     if (shouldAutoScrollRef.current && container) {
+      // Mark this as a programmatic scroll
+      isProgrammaticScrollRef.current = true;
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
       container.scrollTo({
         top: container.scrollHeight,
         behavior: instant ? 'instant' : 'smooth',
       });
       lastScrollHeightRef.current = container.scrollHeight;
+
+      // Reset the flag after scroll completes
+      scrollTimeoutRef.current = setTimeout(
+        () => {
+          isProgrammaticScrollRef.current = false;
+        },
+        instant ? 50 : 500
+      );
     }
   }, []);
 
   const handleScroll = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
+
+    // Ignore scroll events triggered by programmatic scrolling
+    if (isProgrammaticScrollRef.current) return;
 
     const distanceFromBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight;
@@ -116,6 +137,13 @@ export function useAutoScroll<T>(
     }
 
     wasStreamingRef.current = isCurrentlyStreaming;
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, [status, scrollToBottom]);
 
   return {
