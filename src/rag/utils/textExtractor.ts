@@ -23,14 +23,8 @@ export function cleanPDFText(text: string): string {
   cleaned = cleaned.replace(/^[-_=]+$/gm, ''); // lines of dashes/underscores
   cleaned = cleaned.replace(/^\s*\[.*?\]\s*$/gm, ''); // lines with just [text]
 
-  // Fix hyphenated words split across lines (preserve paragraph breaks)
-  cleaned = cleaned.replace(/(\w+)-\s*\n(?!\n)(\w+)/g, '$1$2');
-
-  // Normalize whitespace within lines
+  // Normalize whitespace within lines first
   cleaned = cleaned.replace(/[ \t]+/g, ' ');
-
-  // Remove lines that are now empty (from header/footer removal)
-  cleaned = cleaned.replace(/\n\s*\n\s*\n+/g, '\n\n');
 
   // Trim each line
   cleaned = cleaned
@@ -38,7 +32,19 @@ export function cleanPDFText(text: string): string {
     .map(line => line.trim())
     .join('\n');
 
-  // Normalize paragraph breaks (ensure double newlines between paragraphs)
+  // Fix hyphenated words split across lines (only when hyphen at end of line)
+  // This preserves paragraph breaks since we only join hyphenated words
+  cleaned = cleaned.replace(/(\w+)-\s*\n(\w+)/g, '$1$2');
+
+  // Detect paragraph breaks: sentence ending followed by new line with capital letter
+  // or line ending with punctuation followed by blank line
+  cleaned = cleaned.replace(/([.!?])\s*\n(?!\n)([A-Z])/g, '$1\n\n$2');
+
+  // Also treat lines that end without punctuation followed by a capital letter as potential paragraph breaks
+  // (common in PDFs with short paragraphs or quotes)
+  cleaned = cleaned.replace(/([a-z,;:])\s*\n([A-Z][a-z])/g, '$1\n\n$2');
+
+  // Normalize excessive whitespace (3+ newlines becomes 2)
   cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
 
   // Remove excessive spaces around punctuation
