@@ -26,7 +26,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-white dark:bg-gray-900 px-4">
+    <div className="min-h-dvh flex justify-center bg-white dark:bg-gray-900 px-4 py-23.25">
       <div className="max-w-md w-full space-y-8">
         <div>
           <Logo />
