@@ -2,6 +2,11 @@
 /**
  * Script to download and index philosopher texts into the vector store
  *
+ * Supports multiple text formats:
+ * - Plain text files (.txt)
+ * - PDF files (.pdf)
+ * - HTML pages
+ *
  * Usage:
  *   bun run src/rag/scripts/indexTexts.ts                    # Index all texts (resumes by default)
  *   bun run src/rag/scripts/indexTexts.ts --philosopher plato  # Index specific philosopher

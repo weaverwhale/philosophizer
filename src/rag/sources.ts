@@ -19,7 +19,7 @@ export interface TextSource {
   author: string;
   philosopher: string;
   url: string;
-  format: 'txt' | 'html';
+  format: 'txt' | 'html' | 'pdf';
   description?: string;
 }
 

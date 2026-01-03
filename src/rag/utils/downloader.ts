@@ -5,6 +5,7 @@
 import { mkdir, writeFile, exists } from 'fs/promises';
 import { join } from 'path';
 import type { TextSource } from '../sources';
+import { extractTextFromFile } from './textExtractor';
 
 const TEXTS_DIR = join(import.meta.dir, '..', 'texts');
 
@@ -78,7 +79,9 @@ export async function downloadText(
 ): Promise<{ success: boolean; path?: string; error?: string }> {
   await ensureTextsDir();
 
-  const filePath = join(TEXTS_DIR, `${source.id}.txt`);
+  // Determine file extension based on format
+  const ext = source.format === 'pdf' ? 'pdf' : 'txt';
+  const filePath = join(TEXTS_DIR, `${source.id}.${ext}`);
 
   // Check if already downloaded
   if (await exists(filePath)) {
@@ -100,17 +103,25 @@ export async function downloadText(
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    let text = await response.text();
+    // Handle PDF files differently from text files
+    if (source.format === 'pdf') {
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      await writeFile(filePath, buffer);
+      console.log(`✓ Downloaded: ${source.title} (${buffer.length} bytes)`);
+    } else {
+      let text = await response.text();
 
-    // Clean Gutenberg texts
-    if (source.url.includes('gutenberg.org')) {
-      text = cleanGutenbergText(text);
+      // Clean Gutenberg texts
+      if (source.url.includes('gutenberg.org')) {
+        text = cleanGutenbergText(text);
+      }
+
+      // Write to file
+      await writeFile(filePath, text, 'utf-8');
+      console.log(`✓ Downloaded: ${source.title} (${text.length} chars)`);
     }
 
-    // Write to file
-    await writeFile(filePath, text, 'utf-8');
-
-    console.log(`✓ Downloaded: ${source.title} (${text.length} chars)`);
     return { success: true, path: filePath };
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
@@ -144,32 +155,39 @@ export async function downloadTexts(
 }
 
 /**
- * Read a downloaded text file
+ * Read a downloaded text file (supports both PDF and text files)
  */
 export async function readDownloadedText(
   sourceId: string
 ): Promise<string | null> {
-  const filePath = join(TEXTS_DIR, `${sourceId}.txt`);
+  // Try PDF first, then text
+  const pdfPath = join(TEXTS_DIR, `${sourceId}.pdf`);
+  const txtPath = join(TEXTS_DIR, `${sourceId}.txt`);
 
-  if (!(await exists(filePath))) {
-    return null;
+  if (await exists(pdfPath)) {
+    return await extractTextFromFile(pdfPath);
+  } else if (await exists(txtPath)) {
+    return await extractTextFromFile(txtPath);
   }
 
-  const file = Bun.file(filePath);
-  return await file.text();
+  return null;
 }
 
 /**
- * Get the path to a downloaded text file
+ * Get the path to a downloaded text file (checks both PDF and text)
  */
 export function getTextPath(sourceId: string): string {
-  return join(TEXTS_DIR, `${sourceId}.txt`);
+  // Return PDF path if it exists, otherwise return txt path
+  const pdfPath = join(TEXTS_DIR, `${sourceId}.pdf`);
+  const txtPath = join(TEXTS_DIR, `${sourceId}.txt`);
+  return pdfPath; // Caller should use exists() to check
 }
 
 /**
- * Check if a text has been downloaded
+ * Check if a text has been downloaded (checks both PDF and text formats)
  */
 export async function isTextDownloaded(sourceId: string): Promise<boolean> {
-  const filePath = join(TEXTS_DIR, `${sourceId}.txt`);
-  return await exists(filePath);
+  const pdfPath = join(TEXTS_DIR, `${sourceId}.pdf`);
+  const txtPath = join(TEXTS_DIR, `${sourceId}.txt`);
+  return (await exists(pdfPath)) || (await exists(txtPath));
 }

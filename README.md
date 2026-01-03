@@ -119,6 +119,8 @@ This app uses **Hypothetical Question Embeddings (HQE)** for improved semantic s
 2. Creates embeddings for both content and questions
 3. Uses hybrid search (70% questions, 30% content) for better accuracy
 
+The RAG system supports multiple text formats: **plain text**, **HTML**, and **PDF** documents.
+
 ```bash
 # Index texts
 bun run rag:index
@@ -130,7 +132,7 @@ bun run rag:reset
 bun run rag:stats
 ```
 
-**📖 For detailed RAG workflows and embedding configuration, see [SETUP.md](SETUP.md).**
+**📖 For detailed RAG workflows, embedding configuration, and adding PDF sources, see [SETUP.md](SETUP.md).**
 
 ## Docker Hub Image
 

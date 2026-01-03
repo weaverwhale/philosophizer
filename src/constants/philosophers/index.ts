@@ -26,7 +26,7 @@ export interface TextSource {
   id: string;
   title: string;
   url: string;
-  format: 'txt' | 'html';
+  format: 'txt' | 'html' | 'pdf';
   description?: string;
 }
 

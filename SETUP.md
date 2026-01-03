@@ -167,7 +167,60 @@ bun run rag:index
 # Clear RAG index
 bun run rag:clear
 
-# Backup ChromaDB
+# View RAG statistics
+bun run rag:stats
+
+# Force reindex all texts
+bun run rag:force
+```
+
+### Adding Text Sources
+
+The RAG system supports multiple file formats for philosophical texts:
+
+- **Plain text** (`.txt`) - Project Gutenberg texts and plain documents
+- **HTML** - Web pages and HTML documents
+- **PDF** (`.pdf`) - PDF documents with extractable text
+
+#### Adding a PDF Source
+
+1. **Add the source definition** to the appropriate philosopher file in `src/constants/philosophers/`:
+
+```typescript
+textSources: [
+  {
+    id: 'philosopher-work-name',
+    title: 'Work Title',
+    url: 'https://example.com/path/to/document.pdf',
+    format: 'pdf', // Specify 'pdf' format
+    description: 'Brief description of the work',
+  },
+];
+```
+
+2. **Index the new source**:
+
+```bash
+# Index all new sources
+bun run rag:index
+
+# Or index a specific philosopher
+bun run rag:index --philosopher aristotle
+
+# Or index a specific source
+bun run rag:index --source philosopher-work-name
+```
+
+3. **Verify the indexing**:
+
+```bash
+bun run rag:stats
+```
+
+**📖 For detailed information about adding PDFs, see [docs/adding-pdfs.md](docs/adding-pdfs.md).**
+
+```bash
+# Backup ChromaDB (deprecated - using pgvector now)
 bun run chroma:backup
 ```
 
