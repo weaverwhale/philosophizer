@@ -213,20 +213,20 @@ export function chunkText(text: string, options: ChunkOptions = {}): string[] {
 
   // Split any paragraphs that are too large (> 2x chunk size)
   // This ensures we don't have massive single-paragraph chunks
-  const maxParagraphSize = Math.floor(opts.chunkSize * 2);
-  const processedParagraphs: string[] = [];
+  // const maxParagraphSize = Math.floor(opts.chunkSize * 2);
+  // const processedParagraphs: string[] = [];
 
-  for (const para of paragraphs) {
-    if (para.length > maxParagraphSize) {
-      // Split large paragraph into smaller pieces
-      const pieces = splitLargeParagraph(para, opts.chunkSize);
-      processedParagraphs.push(...pieces);
-    } else {
-      processedParagraphs.push(para);
-    }
-  }
+  // for (const para of paragraphs) {
+  //   if (para.length > maxParagraphSize) {
+  //     // Split large paragraph into smaller pieces
+  //     const pieces = splitLargeParagraph(para, opts.chunkSize);
+  //     processedParagraphs.push(...pieces);
+  //   } else {
+  //     processedParagraphs.push(para);
+  //   }
+  // }
 
-  paragraphs = processedParagraphs;
+  // paragraphs = processedParagraphs;
 
   // Merge very small paragraphs
   paragraphs = mergeParagraphs(paragraphs, opts.minChunkSize);

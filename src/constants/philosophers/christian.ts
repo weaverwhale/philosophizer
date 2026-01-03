@@ -279,13 +279,13 @@ export const christianPhilosophers = {
         format: 'txt',
         description: "Allegory of Moses' life as the soul's journey to God",
       },
-      {
-        id: 'gregory-nyssa-soul-resurrection',
-        title: 'On the Soul and Resurrection',
-        url: 'https://www.documentacatholicaomnia.eu/03d/0330-0395,_Gregorius_Nyssenus,_On_the_Soul_and_the_Resurrection_[Schaff],_EN.pdf',
-        format: 'pdf',
-        description: 'Dialogue on the nature of the soul and afterlife',
-      },
+      // {
+      //   id: 'gregory-nyssa-soul-resurrection',
+      //   title: 'On the Soul and Resurrection',
+      //   url: 'https://www.documentacatholicaomnia.eu/03d/0330-0395,_Gregorius_Nyssenus,_On_the_Soul_and_the_Resurrection_[Schaff],_EN.pdf',
+      //   format: 'pdf',
+      //   description: 'Dialogue on the nature of the soul and afterlife',
+      // },
       {
         id: 'gregory-nyssa-great-catechism',
         title: 'The Great Catechism',
