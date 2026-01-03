@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ChatInputProps {
   input: string;
@@ -17,11 +17,11 @@ export function ChatInput({
   selectedPhilosopher,
   philosopherName,
 }: ChatInputProps) {
-  const formRef = React.useRef<HTMLFormElement>(null);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize the textarea as the user types (up to a max height).
-  React.useEffect(() => {
+  useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';

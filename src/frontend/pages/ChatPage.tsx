@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { Messages } from '../components/messages/Messages';
@@ -48,7 +48,7 @@ export function ChatPage() {
   const [selectedPhilosopher, setSelectedPhilosopher] = useState<string | null>(
     null
   );
-  const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
 
   // Get random starter questions based on selected philosopher
   const randomQuestions = useMemo(() => {
