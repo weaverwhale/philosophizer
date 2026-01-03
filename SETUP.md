@@ -276,7 +276,12 @@ The published image includes:
 
 - PostgreSQL with pgvector extension
 - Database schema
-- Pre-loaded vector data
+- Pre-loaded vector data indexed with:
+  - **Embedding Model**: `text-embedding-nomic-embed-text-v1.5-embedding`
+  - **LLM Model** (for HQE question generation): `qwen/qwen3-1.7b`
+- Ollama - Local LLM & Embedding Server (Optional: if using LM Studio, or novel data)
+
+**Note**: If you use different models when querying, embeddings may not match properly. For best results, use the same embedding model that was used during indexing
 
 #### Workflow 3: Restore Backup to Local Database
 

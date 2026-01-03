@@ -17,7 +17,10 @@ services:
   # ==========================================================================
   # PostgreSQL Database with pgvector
   # ==========================================================================
-  # Use base image for local development, or use pre-loaded image with data:
+  # Pre-loaded image with vector data indexed using:
+  #   - Embedding: text-embedding-nomic-embed-text-v1.5-embedding
+  #   - LLM (HQE): qwen/qwen3-1.7b
+  # Use base image for local development:
   #   image: pgvector/pgvector:pg16
   postgres:
     image: mjweaver01/philosophizer-pgv-hqe:latest
