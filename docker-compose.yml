@@ -17,10 +17,10 @@ services:
   # ==========================================================================
   # PostgreSQL Database with pgvector
   # ==========================================================================
-  # Use base image for local development, or use pre-loaded image for production:
-  #   image: mjweaver01/philosophizer-pgvector:latest
+  # Use base image for local development, or use pre-loaded image with data:
+  #   image: pgvector/pgvector:pg16
   postgres:
-    image: pgvector/pgvector:pg16
+    image: mjweaver01/philosophizer-pgv-hqe:latest
     container_name: philosophizer-postgres
     restart: unless-stopped
     ports:
