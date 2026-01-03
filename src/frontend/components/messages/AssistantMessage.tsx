@@ -80,6 +80,11 @@ function MessagePart({ part, index }: MessagePartProps) {
     return null;
   }
 
+  // Handle reasoning/thinking parts (OpenAI o1/o3, Anthropic Claude)
+  if ((part.type === 'reasoning' || part.type === 'thinking') && part.text) {
+    return <ReasoningPart text={part.text} index={index} />;
+  }
+
   // Handle text parts
   if (part.type === 'text' && part.text) {
     return <TextPart text={part.text} index={index} />;
@@ -92,6 +97,17 @@ function MessagePart({ part, index }: MessagePartProps) {
 
   // Unknown part type - render as debug info
   return <UnknownPart part={part} index={index} />;
+}
+
+interface ReasoningPartProps {
+  text: string;
+  index: number;
+}
+
+function ReasoningPart({ text, index }: ReasoningPartProps) {
+  // Reasoning/thinking parts from models (OpenAI o1/o3, Anthropic Claude) are already separated
+  // Just render them in a ThinkBlock
+  return <ThinkBlock content={text} isStreaming={false} />;
 }
 
 interface TextPartProps {

@@ -54,6 +54,15 @@ function hasMessageContent(message: any): boolean {
         return true;
       }
 
+      // Check for reasoning/thinking content (OpenAI o1/o3, Anthropic Claude)
+      if (
+        (part.type === 'reasoning' || part.type === 'thinking') &&
+        part.text &&
+        part.text.trim().length > 0
+      ) {
+        return true;
+      }
+
       // Check for text content
       if (part.type === 'text' && part.text && part.text.trim().length > 0) {
         // Check if text has thinking blocks
