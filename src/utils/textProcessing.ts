@@ -6,40 +6,45 @@ export interface ProcessedText {
 
 /**
  * Extract think blocks and clean text from raw text content
+ * Handles both <think> tags (Qwen3) and <reasoning> tags (GPT-OSS via our transform)
  */
 export function processTextWithThinkBlocks(text: string): ProcessedText {
   const thinkBlocks: string[] = [];
+  let textWithoutThinks = text;
+  let hasOpenThink = false;
 
-  // First, extract completed think blocks
-  const completedThinkRegex = /<think>([\s\S]*?)<\/think>/g;
-  let match;
-  let textWithoutCompletedThinks = text;
+  // Process both <think> and <reasoning> tags
+  const tagNames = ['think', 'reasoning'];
 
-  while ((match = completedThinkRegex.exec(text)) !== null) {
-    thinkBlocks.push(match[1]?.trim() || '');
-  }
-
-  // Remove completed think blocks from text
-  textWithoutCompletedThinks = textWithoutCompletedThinks.replace(
-    /<think>[\s\S]*?<\/think>/g,
-    ''
-  );
-
-  // Check for open/incomplete think block (has opening tag but no closing tag)
-  const openThinkMatch = textWithoutCompletedThinks.match(/<think>([\s\S]*)$/);
-  const hasOpenThink = !!openThinkMatch;
-
-  if (openThinkMatch) {
-    thinkBlocks.push(openThinkMatch[1]?.trim() || '');
-    // Remove the open think block from text
-    textWithoutCompletedThinks = textWithoutCompletedThinks.replace(
-      /<think>[\s\S]*$/,
-      ''
+  for (const tagName of tagNames) {
+    // Extract completed blocks
+    const completedRegex = new RegExp(
+      `<${tagName}>([\\s\\S]*?)<\\/${tagName}>`,
+      'g'
     );
+    let match;
+
+    while ((match = completedRegex.exec(text)) !== null) {
+      thinkBlocks.push(match[1]?.trim() || '');
+    }
+
+    // Remove completed blocks from text
+    textWithoutThinks = textWithoutThinks.replace(completedRegex, '');
+
+    // Check for open/incomplete block (has opening tag but no closing tag)
+    const openRegex = new RegExp(`<${tagName}>([\\s\\S]*)$`);
+    const openMatch = textWithoutThinks.match(openRegex);
+
+    if (openMatch) {
+      thinkBlocks.push(openMatch[1]?.trim() || '');
+      hasOpenThink = true;
+      // Remove the open block from text
+      textWithoutThinks = textWithoutThinks.replace(openRegex, '');
+    }
   }
 
   // Unwrap other XML-like tags (keep content, remove tags)
-  const cleanText = textWithoutCompletedThinks
+  const cleanText = textWithoutThinks
     .replace(/<(\w+)>([\s\S]*?)<\/\1>/g, '$2')
     .trim();
 

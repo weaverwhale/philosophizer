@@ -7,6 +7,7 @@ import {
 } from '../constants/providers';
 import { createOpenAI } from '@ai-sdk/openai';
 import type { FetchFunction } from '@ai-sdk/provider-utils';
+import { transformReasoningToContent } from './reasoningTransform';
 
 export function createProvider(
   baseURL: string = AI_BASE_URL,
@@ -36,7 +37,15 @@ export function createProvider(
         }
       } catch (e) {}
     }
-    return fetch(url, options);
+
+    const response = await fetch(url, options);
+
+    // Transform reasoning chunks for streaming responses
+    if (options?.body && response.body) {
+      return transformReasoningToContent(response);
+    }
+
+    return response;
   }) as FetchFunction;
 
   return createOpenAI({
