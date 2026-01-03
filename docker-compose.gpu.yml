@@ -1,0 +1,225 @@
+# Philosophizer - GPU-Optimized Docker Compose Configuration
+#
+# This configuration is optimized for high-performance machines with GPU acceleration.
+# Works on: NVIDIA DGX, Workstations, Cloud GPU instances (AWS, GCP, Azure), and more.
+#
+# Prerequisites:
+#   - NVIDIA GPU(s) with 8GB+ VRAM
+#   - NVIDIA Container Toolkit installed
+#   - Docker Compose v2.3+ with GPU support
+#
+# Usage:
+#   docker compose -f docker-compose.gpu.yml up -d           # Start all services
+#   docker compose -f docker-compose.gpu.yml up -d --build   # Rebuild and start
+#   docker compose -f docker-compose.gpu.yml down            # Stop all services
+#   docker compose -f docker-compose.gpu.yml logs -f         # View logs
+#
+# First time setup:
+#   1. Deploy: docker compose -f docker-compose.gpu.yml up -d
+#   2. Secrets are auto-generated on first run and persisted to a Docker volume
+#   3. Wait for models to download: docker compose logs -f ollama-pull-embeddings ollama-pull-qwen
+#   4. PostgreSQL schema will be automatically initialized
+#   5. Index philosopher texts: docker compose exec app bun run rag:index
+#
+# Configuration:
+#   Create .env file to customize (optional):
+#     - OLLAMA_NUM_PARALLEL: Adjust for your GPU memory (default: 8)
+#     - OLLAMA_NUM_GPU: Number of GPUs to use (default: 1)
+#     - GPU memory, model selection, and more
+#
+# Security:
+#   - Secrets are automatically generated on first run using cryptographically secure methods
+#   - Secrets are persisted in a Docker volume (/app/secrets in container)
+#   - To view auto-generated secrets: docker compose exec app cat /app/secrets/.secrets
+#   - To manually set secrets: Create .env file (takes precedence over auto-generated)
+#   - See PRODUCTION.md for advanced secret management
+
+services:
+  # ==========================================================================
+  # PostgreSQL Database with pgvector
+  # ==========================================================================
+  postgres:
+    image: mjweaver01/philosophizer-pgv-hqe:latest
+    container_name: philosophizer-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-philosophizer}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-philosophizer_auto_generated_2024}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./src/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ==========================================================================
+  # Ollama - GPU-Accelerated LLM & Embedding Server
+  # ==========================================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: philosophizer-ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      # === Concurrency Configuration ===
+      # Adjust based on your GPU memory:
+      #   GPU Memory     Recommended OLLAMA_NUM_PARALLEL
+      #   -----------    ---------------------------
+      #   8-12GB         2-4
+      #   16-20GB        4-6
+      #   24-32GB        6-8
+      #   40GB+          8-12
+      #   80GB+          12-16
+      - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL:-8}
+
+      # Maximum number of models to keep loaded in VRAM
+      - OLLAMA_MAX_LOADED_MODELS=2
+
+      # === GPU Configuration ===
+      # Number of GPUs to use
+      # 1 = single GPU, 2+ = specific count, 99 = use all available
+      - OLLAMA_NUM_GPU=${OLLAMA_NUM_GPU:-1}
+
+      # === Performance Optimization ===
+      # Flash attention for faster inference (A100, H100, RTX 4090, etc.)
+      - OLLAMA_FLASH_ATTENTION=${OLLAMA_FLASH_ATTENTION:-1}
+
+      # Keep models in VRAM (don't unload after idle)
+      - OLLAMA_KEEP_ALIVE=-1
+
+      # Maximum VRAM usage (0.9 = 90%)
+      - OLLAMA_MAX_VRAM=${OLLAMA_MAX_VRAM:-0.9}
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              # Options: 1, 2, 3, all
+              count: ${OLLAMA_GPU_COUNT:-all}
+              capabilities: [gpu]
+
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ==========================================================================
+  # Model Initialization - Pull nomic-embed-text for embeddings
+  # ==========================================================================
+  ollama-pull-embeddings:
+    image: ollama/ollama:latest
+    container_name: philosophizer-ollama-pull-embeddings
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["ollama", "pull", "${EMBEDDING_MODEL:-nomic-embed-text}"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ==========================================================================
+  # Model Initialization - Pull LLM for chat
+  # ==========================================================================
+  ollama-pull-qwen:
+    image: ollama/ollama:latest
+    container_name: philosophizer-ollama-pull-qwen
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-pull-embeddings:
+        condition: service_completed_successfully
+    # Model selection:
+    #   qwen2.5:1.5b-instruct     - Default, fast, 1GB VRAM
+    #   qwen2.5:3b-instruct       - Better quality, 2GB VRAM
+    #   qwen2.5:7b-instruct       - High quality, 5GB VRAM
+    #   llama3.2:3b-instruct      - Alternative, 2GB VRAM
+    #   mistral:7b-instruct       - High quality, 5GB VRAM
+    entrypoint: ["ollama", "pull", "${LLM_MODEL:-qwen2.5:1.5b-instruct}"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ==========================================================================
+  # Philosophizer Application
+  # ==========================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: philosophizer-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-1738}:1738"
+    environment:
+      - NODE_ENV=production
+      - PORT=1738
+
+      # === Database Configuration ===
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-philosophizer_auto_generated_2024}@postgres:5432/${POSTGRES_DB:-philosophizer}
+
+      # === JWT Configuration ===
+      - JWT_SECRET=${JWT_SECRET:-}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+
+      # === LLM Configuration (Ollama) ===
+      - AI_BASE_URL=http://ollama:11434/v1
+      - LLM_MODEL=${LLM_MODEL:-qwen2.5:1.5b-instruct}
+      - AI_API_KEY=${AI_API_KEY:-ollama}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-ollama}
+      - SEARCH_MODEL=${SEARCH_MODEL:-qwen2.5:1.5b-instruct}
+
+      # === Embedding Configuration (Ollama) ===
+      - EMBEDDING_BASE_URL=http://ollama:11434/v1
+      - EMBEDDING_API_KEY=${EMBEDDING_API_KEY:-ollama}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text}
+
+    volumes:
+      # Persist auto-generated secrets across container restarts
+      - app-secrets:/app/secrets
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      ollama-pull-embeddings:
+        condition: service_completed_successfully
+      ollama-pull-qwen:
+        condition: service_completed_successfully
+
+# ==========================================================================
+# Persistent Volumes
+# ==========================================================================
+volumes:
+  postgres-data:
+    name: philosophizer-postgres-data
+  ollama-data:
+    name: philosophizer-ollama-data
+  app-secrets:
+    name: philosophizer-app-secrets

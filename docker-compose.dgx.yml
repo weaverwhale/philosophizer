@@ -1,0 +1,239 @@
+# Philosophizer - Docker Compose Configuration (NVIDIA DGX Optimized)
+#
+# This configuration is optimized for NVIDIA DGX systems with GPU acceleration
+# for running Ollama with concurrent connections.
+#
+# Prerequisites:
+#   - NVIDIA Container Toolkit installed on DGX
+#   - Docker Compose v2.3+ with GPU support
+#   - At least 16GB GPU VRAM (for both models loaded simultaneously)
+#
+# Usage:
+#   docker compose up -d           # Start all services
+#   docker compose up -d --build   # Rebuild and start
+#   docker compose down            # Stop all services
+#   docker compose logs -f         # View logs
+#   docker compose logs -f ollama  # Monitor model downloads
+#
+# First time setup:
+#   1. Deploy: docker compose -f docker-compose.dgx.yml up -d
+#   2. Secrets are auto-generated on first run and persisted to a Docker volume
+#   3. Wait for models to download: docker compose logs -f ollama-pull-embeddings ollama-pull-qwen
+#   4. PostgreSQL schema will be automatically initialized
+#   5. Index philosopher texts: docker compose exec app bun run rag:index
+#
+# Security:
+#   - Secrets are automatically generated on first run using cryptographically secure methods
+#   - Secrets are persisted in a Docker volume (/app/secrets in container)
+#   - To view auto-generated secrets: docker compose exec app cat /app/secrets/.secrets
+#   - To manually set secrets: Create .env file (takes precedence over auto-generated)
+#   - See PRODUCTION.md for advanced secret management (Vault, AWS Secrets Manager, etc.)
+#
+# Performance Tuning:
+#   - Adjust OLLAMA_NUM_PARALLEL based on GPU memory and expected load
+#   - Monitor GPU usage: nvidia-smi dmon -s u
+#   - For multi-GPU setups, consider running multiple Ollama instances
+
+services:
+  # ==========================================================================
+  # PostgreSQL Database with pgvector
+  # ==========================================================================
+  # Pre-loaded image with vector data indexed using:
+  #   - Embedding: text-embedding-nomic-embed-text-v1.5-embedding
+  #   - LLM (HQE): qwen/qwen3-1.7b
+  # Use base image for local development:
+  #   image: pgvector/pgvector:pg16
+  postgres:
+    image: mjweaver01/philosophizer-pgv-hqe:latest
+    container_name: philosophizer-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-philosophizer}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      # Password will be set by app container's entrypoint script
+      # If you prefer to set manually, create .env with POSTGRES_PASSWORD
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-philosophizer_auto_generated_2024}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./src/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ==========================================================================
+  # Ollama - GPU-Accelerated LLM & Embedding Server (NVIDIA DGX Optimized)
+  # ==========================================================================
+  # Running on NVIDIA DGX with GPU acceleration for concurrent inference
+  # Configured to handle multiple simultaneous requests efficiently
+  ollama:
+    image: ollama/ollama:latest
+    container_name: philosophizer-ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      # === Concurrency Configuration ===
+      # Number of parallel requests to process simultaneously
+      # Recommended values by GPU:
+      #   - A100 80GB: 12-16
+      #   - A100 40GB: 8-12
+      #   - V100 32GB: 6-8
+      #   - V100 16GB: 4-6
+      - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL:-8}
+
+      # Maximum number of models to keep loaded in VRAM
+      # Set to 2 to keep both Qwen3 and Nomic embeddings in memory
+      - OLLAMA_MAX_LOADED_MODELS=2
+
+      # === GPU Configuration ===
+      # Number of GPUs to use (99 = use all available GPUs)
+      # For single GPU: set to 1
+      # For multi-GPU: set to number of GPUs or 99 for all
+      - OLLAMA_NUM_GPU=${OLLAMA_NUM_GPU:-1}
+
+      # === Performance Optimization ===
+      # Enable flash attention for faster inference (requires compatible GPU)
+      - OLLAMA_FLASH_ATTENTION=1
+
+      # Keep models in VRAM (don't unload after idle time)
+      - OLLAMA_KEEP_ALIVE=-1
+
+      # Enable optimized memory management
+      - OLLAMA_MAX_VRAM=${OLLAMA_MAX_VRAM:-0.9} # Use up to 90% of GPU memory
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              # Use all available GPUs on the DGX
+              # Change to 'count: 1' if you want to use only one GPU
+              count: ${OLLAMA_GPU_COUNT:-all}
+              capabilities: [gpu]
+
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ==========================================================================
+  # Model Initialization - Pull nomic-embed-text for embeddings
+  # ==========================================================================
+  ollama-pull-embeddings:
+    image: ollama/ollama:latest
+    container_name: philosophizer-ollama-pull-embeddings
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["ollama", "pull", "nomic-embed-text"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ==========================================================================
+  # Model Initialization - Pull Qwen3 1.7B for chat
+  # ==========================================================================
+  ollama-pull-qwen:
+    image: ollama/ollama:latest
+    container_name: philosophizer-ollama-pull-qwen
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-pull-embeddings:
+        condition: service_completed_successfully
+    # Use the full precision model, or switch to q4_0 quantization for lower memory:
+    # entrypoint: ["ollama", "pull", "qwen2.5:1.5b-instruct-q4_0"]
+    entrypoint: ["ollama", "pull", "${QWEN_MODEL:-qwen2.5:1.5b-instruct}"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ==========================================================================
+  # Philosophizer Application
+  # ==========================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: philosophizer-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-1738}:1738"
+    environment:
+      - NODE_ENV=production
+      - PORT=1738
+
+      # === Database Configuration ===
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-philosophizer_auto_generated_2024}@postgres:5432/${POSTGRES_DB:-philosophizer}
+
+      # === JWT Configuration ===
+      # Will be auto-generated on first run if not set
+      # To manually set: Create .env file with JWT_SECRET=your-secret-here
+      - JWT_SECRET=${JWT_SECRET:-}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+
+      # === LLM Configuration (Ollama on DGX) ===
+      # Using internal Docker network to connect to Ollama
+      - AI_BASE_URL=http://ollama:11434/v1
+      - LLM_MODEL=${LLM_MODEL:-qwen2.5:1.5b-instruct}
+      - AI_API_KEY=${AI_API_KEY:-ollama} # Ollama doesn't require API key, but kept for compatibility
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-ollama}
+      - SEARCH_MODEL=${SEARCH_MODEL:-qwen2.5:1.5b-instruct}
+
+      # === Embedding Configuration (Ollama on DGX) ===
+      - EMBEDDING_BASE_URL=http://ollama:11434/v1
+      - EMBEDDING_API_KEY=${EMBEDDING_API_KEY:-ollama}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text}
+
+    volumes:
+      # Persist auto-generated secrets across container restarts
+      - app-secrets:/app/secrets
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      ollama-pull-embeddings:
+        condition: service_completed_successfully
+      ollama-pull-qwen:
+        condition: service_completed_successfully
+
+# ==========================================================================
+# Persistent Volumes
+# ==========================================================================
+volumes:
+  postgres-data:
+    name: philosophizer-postgres-data
+  ollama-data:
+    name: philosophizer-ollama-data
+  app-secrets:
+    name: philosophizer-app-secrets
+    # Stores auto-generated secrets (JWT_SECRET, POSTGRES_PASSWORD, etc.)
+    # Backup this volume for disaster recovery:
+    #   docker run --rm -v philosophizer-app-secrets:/secrets -v $(pwd):/backup alpine tar czf /backup/secrets-backup.tar.gz -C /secrets .
+    # Restore:
+    #   docker run --rm -v philosophizer-app-secrets:/secrets -v $(pwd):/backup alpine tar xzf /backup/secrets-backup.tar.gz -C /secrets
