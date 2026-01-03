@@ -289,7 +289,7 @@ export const christianPhilosophers = {
       {
         id: 'gregory-nyssa-great-catechism',
         title: 'The Great Catechism',
-        url: 'http://www.newhumanityinstitute.org/pdf-articles/Gregory-of-Nyssa-Great-Catechism-quotations-atonement.pdf',
+        url: 'https://ia800206.us.archive.org/5/items/thecatecheticalo00greguoft/thecatecheticalo00greguoft.pdf',
         format: 'txt',
         description: 'Systematic presentation of Christian doctrine',
       },
@@ -1833,14 +1833,14 @@ export const christianPhilosophers = {
       {
         id: 'teresa-interior-castle',
         title: 'The Interior Castle',
-        url: 'https://www.gutenberg.org/cache/epub/8120/pg8120.txt',
+        url: 'https://dn790008.ca.archive.org/0/items/interiorcastleor00tere/interiorcastleor00tere_djvu.txt',
         format: 'txt',
         description: 'Masterwork on the seven mansions of the soul',
       },
       {
         id: 'teresa-way-perfection',
         title: 'The Way of Perfection',
-        url: 'hhttps://dn790003.ca.archive.org/0/items/thewayofperfecti00tereuoft/thewayofperfecti00tereuoft_djvu.txt',
+        url: 'https://dn790003.ca.archive.org/0/items/thewayofperfecti00tereuoft/thewayofperfecti00tereuoft_djvu.txt',
         format: 'txt',
         description: 'Practical guide to prayer for her nuns',
       },
