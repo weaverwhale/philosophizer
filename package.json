@@ -19,7 +19,7 @@
     "postgres:reset-preloaded": "docker compose stop postgres && docker volume rm philosophizer-postgres-data && docker compose up -d postgres",
     "pgvector:backup": "./scripts/backup-pgvector.sh",
     "pgvector:restore": "./scripts/restore-pgvector.sh",
-    "pgvector:restore-remote": "docker run --rm -v $(pwd):/backup mjweaver01/philosophizer-pgv-hqe:latest cp /docker-entrypoint-initdb.d/02-data.sql /backup/pgvector-backup.sql && bun run pgvector:restore",
+    "pgvector:restore-remote": "docker pull mjweaver01/philosophizer-pgv-hqe:latest && docker run --rm -v $(pwd):/backup mjweaver01/philosophizer-pgv-hqe:latest cp /docker-entrypoint-initdb.d/02-data.sql /backup/pgvector-backup.sql && bun run pgvector:restore",
     "pgvector:publish": "./scripts/publish-pgvector.sh mjweaver01/philosophizer-pgv-hqe",
     "pgvector:bp": "bun run pgvector:backup && bun run pgvector:publish",
     "pgvector:pull": "docker pull mjweaver01/philosophizer-pgv-hqe:latest",
