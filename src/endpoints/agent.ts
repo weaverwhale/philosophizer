@@ -72,6 +72,7 @@ export const agent = {
       return createAgentUIStreamResponse({
         agent: agent as any,
         uiMessages: formattedMessages,
+        abortSignal: req.signal,
       });
     } catch (error) {
       console.error('[Agent] Stream error:', error);

@@ -97,8 +97,16 @@ export function transformReasoningToContent(response: Response): Response {
 
         controller.close();
       } catch (error) {
+        // Check if this is an abort error
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.log('[ReasoningTransform] Stream aborted by client');
+        }
         controller.error(error);
       }
+    },
+    cancel() {
+      // Clean up the reader when stream is cancelled
+      reader.cancel();
     },
   });
 

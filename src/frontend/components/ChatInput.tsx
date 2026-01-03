@@ -5,6 +5,7 @@ interface ChatInputProps {
   isProcessing: boolean;
   onInputChange: (value: string) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onStop?: () => void;
   selectedPhilosopher?: string | null;
   philosopherName?: string | null;
 }
@@ -14,6 +15,7 @@ export function ChatInput({
   isProcessing,
   onInputChange,
   onSubmit,
+  onStop,
   selectedPhilosopher,
   philosopherName,
 }: ChatInputProps) {
@@ -54,25 +56,46 @@ export function ChatInput({
           rows={1}
           className="w-full px-4 py-3 pr-12 bg-surface-secondary border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none overflow-y-auto no-scrollbar max-h-[240px]"
         />
-        <button
-          type="submit"
-          disabled={isProcessing || !input.trim()}
-          className="cursor-pointer absolute right-2 bottom-[6px] p-2 text-text-muted hover:text-text-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {isProcessing ? (
+          <button
+            type="button"
+            onClick={() => {
+              onStop?.();
+            }}
+            className="cursor-pointer absolute right-2 bottom-[6px] p-2 text-text-muted hover:text-red-500 transition-colors"
+            title="Stop generating"
           >
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="none"
+            >
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!input.trim()}
+            className="cursor-pointer absolute right-2 bottom-[6px] p-2 text-text-muted hover:text-text-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        )}
       </div>
     </form>
   );

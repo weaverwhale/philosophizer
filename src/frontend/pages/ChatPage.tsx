@@ -92,7 +92,7 @@ export function ChatPage() {
   } = useConversations();
 
   // Use the AI SDK's useChat hook
-  const { messages, sendMessage, setMessages, status } = useChat({
+  const { messages, sendMessage, setMessages, status, stop } = useChat({
     transport: new DefaultChatTransport({
       api: '/agent',
       headers: (): Record<string, string> => {
@@ -481,6 +481,7 @@ export function ChatPage() {
               isProcessing={isProcessing}
               onInputChange={setInput}
               onSubmit={handleSubmit}
+              onStop={stop}
               selectedPhilosopher={selectedPhilosopher}
               philosopherName={
                 selectedPhilosopher
