@@ -47,6 +47,75 @@ function splitByParagraphs(text: string): string[] {
 }
 
 /**
+ * Split a large paragraph into smaller pieces at sentence boundaries
+ * Used when a paragraph exceeds the maximum chunk size
+ */
+function splitLargeParagraph(paragraph: string, maxSize: number): string[] {
+  // If paragraph is small enough, return as is
+  if (paragraph.length <= maxSize) {
+    return [paragraph];
+  }
+
+  const pieces: string[] = [];
+  
+  // Try to split at sentence boundaries
+  // Match sentences ending with . ! ? followed by space or end
+  const sentences = paragraph.match(/[^.!?]+[.!?]+(?:\s+|$)/g) || [paragraph];
+  
+  let current = '';
+  
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
+    
+    // If single sentence is too large, we'll have to split it arbitrarily
+    if (trimmed.length > maxSize) {
+      if (current) {
+        pieces.push(current.trim());
+        current = '';
+      }
+      
+      // Split long sentence into chunks at word boundaries
+      const words = trimmed.split(/\s+/);
+      let sentencePiece = '';
+      
+      for (const word of words) {
+        if (sentencePiece.length + word.length + 1 > maxSize) {
+          if (sentencePiece) {
+            pieces.push(sentencePiece.trim());
+          }
+          sentencePiece = word;
+        } else {
+          sentencePiece = sentencePiece ? sentencePiece + ' ' + word : word;
+        }
+      }
+      
+      if (sentencePiece) {
+        current = sentencePiece;
+      }
+      continue;
+    }
+    
+    // Check if adding this sentence would exceed max size
+    const testLength = current.length + (current ? 1 : 0) + trimmed.length;
+    
+    if (testLength > maxSize && current) {
+      // Save current and start new with this sentence
+      pieces.push(current.trim());
+      current = trimmed;
+    } else {
+      // Add to current
+      current = current ? current + ' ' + trimmed : trimmed;
+    }
+  }
+  
+  if (current) {
+    pieces.push(current.trim());
+  }
+  
+  return pieces.filter(p => p.length > 0);
+}
+
+/**
  * Merge small paragraphs together until they reach minimum size
  */
 function mergeParagraphs(paragraphs: string[], minSize: number): string[] {
@@ -141,6 +210,23 @@ export function chunkText(text: string, options: ChunkOptions = {}): string[] {
 
   // Split into paragraphs
   let paragraphs = splitByParagraphs(text);
+  
+  // Split any paragraphs that are too large (> 1.5x chunk size)
+  // This ensures we don't have massive single-paragraph chunks
+  const maxParagraphSize = Math.floor(opts.chunkSize * 1.5);
+  const processedParagraphs: string[] = [];
+  
+  for (const para of paragraphs) {
+    if (para.length > maxParagraphSize) {
+      // Split large paragraph into smaller pieces
+      const pieces = splitLargeParagraph(para, opts.chunkSize);
+      processedParagraphs.push(...pieces);
+    } else {
+      processedParagraphs.push(para);
+    }
+  }
+  
+  paragraphs = processedParagraphs;
 
   // Merge very small paragraphs
   paragraphs = mergeParagraphs(paragraphs, opts.minChunkSize);
