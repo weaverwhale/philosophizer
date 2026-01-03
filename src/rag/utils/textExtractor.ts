@@ -6,9 +6,13 @@ import { PDFParse } from 'pdf-parse';
 
 /**
  * Cleans PDF text by removing common artifacts and normalizing whitespace
+ * while preserving paragraph structure for proper chunking
  */
 export function cleanPDFText(text: string): string {
   let cleaned = text;
+
+  // Normalize line endings first
+  cleaned = cleaned.replace(/\r\n/g, '\n');
 
   // Remove page numbers (various formats)
   cleaned = cleaned.replace(/\bPage\s+\d+\s+of\s+\d+\b/gi, '');
@@ -19,19 +23,44 @@ export function cleanPDFText(text: string): string {
   cleaned = cleaned.replace(/^[-_=]+$/gm, ''); // lines of dashes/underscores
   cleaned = cleaned.replace(/^\s*\[.*?\]\s*$/gm, ''); // lines with just [text]
 
-  // Fix hyphenated words split across lines
-  cleaned = cleaned.replace(/(\w+)-\s*\n\s*(\w+)/g, '$1$2');
+  // Fix hyphenated words split across lines (but preserve paragraph breaks)
+  cleaned = cleaned.replace(/(\w+)-\s*\n(?!\n)(\w+)/g, '$1$2');
 
-  // Normalize whitespace
-  cleaned = cleaned.replace(/[ \t]+/g, ' '); // multiple spaces/tabs to single space
-  cleaned = cleaned.replace(/\n{3,}/g, '\n\n'); // max 2 consecutive newlines
-  cleaned = cleaned.replace(/\r\n/g, '\n'); // normalize line endings
+  // Normalize whitespace within lines (but preserve newlines)
+  cleaned = cleaned.replace(/[ \t]+/g, ' ');
 
-  // Remove leading/trailing whitespace from lines
-  cleaned = cleaned
-    .split('\n')
-    .map(line => line.trim())
-    .join('\n');
+  // Remove empty lines created by header/footer removal, but preserve paragraph breaks
+  cleaned = cleaned.replace(/\n\s*\n\s*\n+/g, '\n\n');
+
+  // Process lines: trim each line but preserve paragraph structure
+  const lines = cleaned.split('\n');
+  const processedLines: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    const trimmed = line.trim();
+
+    // Keep empty lines (paragraph breaks) and non-empty lines
+    if (trimmed === '' && i > 0 && i < lines.length - 1) {
+      // Only keep empty line if it's between content (paragraph break)
+      const prevLine = lines[i - 1]?.trim();
+      const nextLine = lines[i + 1]?.trim();
+      if (prevLine && nextLine) {
+        processedLines.push('');
+      }
+    } else if (trimmed !== '') {
+      processedLines.push(trimmed);
+    }
+  }
+
+  cleaned = processedLines.join('\n');
+
+  // Ensure we have double newlines between paragraphs
+  // Single newlines within paragraphs should become spaces
+  cleaned = cleaned.replace(/([^\n])\n([^\n])/g, '$1 $2');
+
+  // Now normalize multiple newlines to exactly two (paragraph breaks)
+  cleaned = cleaned.replace(/\n{2,}/g, '\n\n');
 
   // Remove excessive spaces around punctuation
   cleaned = cleaned.replace(/\s+([.,;:!?])/g, '$1');
