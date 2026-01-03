@@ -22,7 +22,7 @@ _Conversational AI interface with philosophical wisdom_
 _Semantic search over primary philosophical texts_
 
 ![RAG Statistics](screens/ss3.png)
-_RAG indexed writers_
+_RAG statistics and indexed writers_
 
 ## Quick Start
 
