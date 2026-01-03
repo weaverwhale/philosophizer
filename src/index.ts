@@ -40,32 +40,6 @@ const server = Bun.serve({
   hostname: process.env.HOSTNAME ?? 'localhost', // Use '0.0.0.0' for network access
   idleTimeout: 120,
   routes: {
-    // PWA routes
-    '/manifest.json': {
-      GET: () => {
-        const manifestPath = path.join(
-          import.meta.dir,
-          'frontend',
-          'manifest.json'
-        );
-        const file = Bun.file(manifestPath);
-        return new Response(file, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'public, max-age=3600',
-          },
-        });
-      },
-    },
-    '/sw.js': {
-      GET: () => {
-        const swPath = path.join(import.meta.dir, 'frontend', 'sw.js');
-        const file = Bun.file(swPath);
-        return new Response(file, {
-          headers: { 'Content-Type': 'application/javascript' },
-        });
-      },
-    },
     // Frontend routes
     '/': indexPageHtml,
     '/about': indexPageHtml,
@@ -98,26 +72,42 @@ const server = Bun.serve({
     '/conversations': conversations,
     '/conversations/:id': conversation,
   },
-  async fetch(req) {
+  async fetch(req: Request) {
     const url = new URL(req.url);
 
-    // Handle icon files (both SVG and PNG)
-    if (url.pathname.startsWith('/icons/')) {
-      const iconPath = path.join(import.meta.dir, 'frontend', url.pathname);
-
-      if (existsSync(iconPath)) {
-        const file = Bun.file(iconPath);
-        const ext = iconPath.split('.').pop();
-        const contentType = ext === 'svg' ? 'image/svg+xml' : 'image/png';
-        return new Response(file, {
-          headers: { 'Content-Type': contentType },
-        });
+    // Serve static files from public directory
+    const publicPath = path.join(import.meta.dir, '..', 'public', url.pathname);
+    
+    if (existsSync(publicPath)) {
+      const file = Bun.file(publicPath);
+      const ext = publicPath.split('.').pop()?.toLowerCase();
+      
+      // Map file extensions to content types
+      const contentTypeMap: Record<string, string> = {
+        'svg': 'image/svg+xml',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'webp': 'image/webp',
+        'json': 'application/json',
+        'js': 'application/javascript',
+      };
+      
+      const contentType = contentTypeMap[ext || ''] || 'application/octet-stream';
+      const headers: Record<string, string> = { 'Content-Type': contentType };
+      
+      // Add cache control for static assets
+      if (['svg', 'png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext || '')) {
+        headers['Cache-Control'] = 'public, max-age=31536000, immutable';
+      } else if (ext === 'json' && url.pathname === '/manifest.json') {
+        headers['Cache-Control'] = 'public, max-age=3600';
       }
-      return new Response('Icon not found', { status: 404 });
+      
+      return new Response(file, { headers });
     }
 
-    // Let the router handle other routes
-    return undefined as any;
+    // Let the router handle all other routes
   },
   ...(process.env.NODE_ENV === 'production'
     ? {}
@@ -126,7 +116,7 @@ const server = Bun.serve({
           hmr: true,
         },
       }),
-});
+} as any);
 
 // Get local network IP address
 const getLocalIP = () => {

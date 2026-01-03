@@ -50,7 +50,7 @@ Alternatively, Chrome may show an automatic install banner at the bottom of the 
 
 ## PWA Architecture
 
-### Service Worker (`src/frontend/sw.js`)
+### Service Worker (`public/sw.js`)
 
 The service worker provides:
 
@@ -61,7 +61,7 @@ The service worker provides:
 - **Background sync**: Support for offline message queuing (optional)
 - **Push notifications**: Ready for notification support (optional)
 
-### Web App Manifest (`src/frontend/manifest.json`)
+### Web App Manifest (`public/manifest.json`)
 
 Defines the app's appearance and behavior:
 
@@ -71,7 +71,7 @@ Defines the app's appearance and behavior:
 - **Orientation**: Portrait-primary for mobile
 - **Categories**: Education, productivity, utilities
 
-### Icons (`src/frontend/icons/`)
+### Icons (`public/icons/`)
 
 All required icon sizes are generated:
 
@@ -184,7 +184,7 @@ When you update the service worker:
 **Solutions**:
 
 - Check `/icons/` path is accessible in browser
-- Verify icon files exist in `src/frontend/icons/`
+- Verify icon files exist in `public/icons/`
 - Check server is configured to serve icon files
 - Clear cache and reinstall the PWA
 

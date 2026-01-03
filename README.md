@@ -16,13 +16,13 @@ Built with Bun, React, TypeScript, and PostgreSQL with pgvector for semantic sea
 
 ## Screenshots
 
-![Chat Interface](screens/ss1.png)
+![Chat Interface](public/screens/ss1.png)
 _Conversational AI interface with philosophical wisdom_
 
-![Search & Discovery](screens/ss2.png)
+![Search & Discovery](public/screens/ss2.png)
 _Semantic search over primary philosophical texts_
 
-![RAG Statistics](screens/ss3.png)
+![RAG Statistics](public/screens/ss3.png)
 _RAG statistics and indexed writers_
 
 ## Quick Start
