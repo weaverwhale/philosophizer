@@ -286,13 +286,13 @@ export const christianPhilosophers = {
       //   format: 'pdf',
       //   description: 'Dialogue on the nature of the soul and afterlife',
       // },
-      {
-        id: 'gregory-nyssa-great-catechism',
-        title: 'The Great Catechism',
-        url: 'https://ia800206.us.archive.org/5/items/thecatecheticalo00greguoft/thecatecheticalo00greguoft.pdf',
-        format: 'txt',
-        description: 'Systematic presentation of Christian doctrine',
-      },
+      // {
+      //   id: 'gregory-nyssa-great-catechism',
+      //   title: 'The Great Catechism',
+      //   url: 'https://ia800206.us.archive.org/5/items/thecatecheticalo00greguoft/thecatecheticalo00greguoft.pdf',
+      //   format: 'txt',
+      //   description: 'Systematic presentation of Christian doctrine',
+      // },
       {
         id: 'gregory-nyssa-letters',
         title: 'The Letters',
