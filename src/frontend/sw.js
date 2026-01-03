@@ -41,6 +41,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Skip non-http(s) requests (chrome-extension, data:, blob:, etc.)
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
   // Skip API calls (handle them normally for fresh data)
   if (url.pathname.startsWith('/api/')) {
     return;

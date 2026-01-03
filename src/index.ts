@@ -1,5 +1,4 @@
 import indexPageHtml from './frontend/index.html';
-import manifest from './frontend/manifest.json';
 import { agent } from './endpoints/agent';
 import { rag } from './endpoints/rag';
 import { conversations, conversation } from './endpoints/conversations';
@@ -44,8 +43,17 @@ const server = Bun.serve({
     // PWA routes
     '/manifest.json': {
       GET: () => {
-        return new Response(JSON.stringify(manifest), {
-          headers: { 'Content-Type': 'application/json' },
+        const manifestPath = path.join(
+          import.meta.dir,
+          'frontend',
+          'manifest.json'
+        );
+        const file = Bun.file(manifestPath);
+        return new Response(file, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=3600',
+          },
         });
       },
     },
