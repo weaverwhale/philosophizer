@@ -1,11 +1,11 @@
 import phiLogo from '../phi.svg';
 
-export function Logo() {
+export function Logo({ width = 16, height = 16, className = '' }) {
   return (
     <img
       src={phiLogo}
       alt="Philosophizer"
-      className="logo-image w-16 h-16 mx-auto mb-4"
+      className={`logo-image w-${width} h-${height} mx-auto mb-4 ${className}`}
     />
   );
 }
