@@ -61,7 +61,8 @@ export function ToolCallDisplay({
   return (
     <details
       className={`my-3 first:mt-0 group rounded-lg ${containerClass}`}
-      open={!isCompleted}
+      // open={!isCompleted}
+      open={false}
     >
       <summary className="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:opacity-80">
         <svg
