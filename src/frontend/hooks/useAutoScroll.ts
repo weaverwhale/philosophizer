@@ -35,11 +35,12 @@ export function useAutoScroll<T>(
       lastScrollHeightRef.current = container.scrollHeight;
 
       // Reset the flag after scroll completes
+      // Use longer timeout for smooth scrolling to ensure it completes
       scrollTimeoutRef.current = setTimeout(
         () => {
           isProgrammaticScrollRef.current = false;
         },
-        instant ? 50 : 100
+        instant ? 50 : 250
       );
     }
   }, []);
@@ -48,19 +49,19 @@ export function useAutoScroll<T>(
     const container = scrollContainerRef.current;
     if (!container) return;
 
+    // Ignore scroll events during programmatic scrolling to prevent false positives
+    if (isProgrammaticScrollRef.current) {
+      return;
+    }
+
     const distanceFromBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight;
 
-    // If user scrolled significantly away from bottom, immediately disable auto-scroll
-    // This overrides the programmatic scroll flag to be more responsive to user intent
+    // If user scrolled significantly away from bottom, disable auto-scroll
     if (distanceFromBottom > AUTO_SCROLL_THRESHOLD) {
       shouldAutoScrollRef.current = false;
-      isProgrammaticScrollRef.current = false; // Clear this to ensure future user scrolls are detected
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-    } else if (!isProgrammaticScrollRef.current) {
-      // Only re-enable auto-scroll if this is a user action (not programmatic)
+    } else {
+      // Re-enable auto-scroll when user scrolls back near the bottom
       shouldAutoScrollRef.current = true;
     }
   }, []);
