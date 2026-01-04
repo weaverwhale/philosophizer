@@ -195,12 +195,12 @@ services:
       - JWT_SECRET=${JWT_SECRET:-}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
 
-      # === LLM Configuration (Ollama on DGX) ===
-      # Using internal Docker network to connect to Ollama
-      - AI_BASE_URL=http://ollama:11434/v1
+      # === LLM Configuration ===
+      # Uses Ollama container on DGX for local models OR cloud providers (OpenAI/Anthropic)
+      - LMSTUDIO_BASE_URL=http://ollama:11434/v1 # Point LMStudio provider to Ollama
       - LLM_MODEL=${LLM_MODEL:-qwen2.5:1.5b-instruct}
-      - AI_API_KEY=${AI_API_KEY:-ollama} # Ollama doesn't require API key, but kept for compatibility
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-ollama}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - SEARCH_MODEL=${SEARCH_MODEL:-qwen2.5:1.5b-instruct}
 
       # === Embedding Configuration (Ollama on DGX) ===

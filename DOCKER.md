@@ -254,6 +254,9 @@ OLLAMA_MAX_VRAM=0.9          # Max VRAM usage (90%)
 OLLAMA_FLASH_ATTENTION=1     # Enable flash attention
 OLLAMA_PORT=11434
 
+# LMStudio Provider - points to Ollama container
+LMSTUDIO_BASE_URL=http://ollama:11434/v1
+
 # Model Selection
 LLM_MODEL=qwen2.5:1.5b-instruct
 EMBEDDING_MODEL=nomic-embed-text
@@ -263,10 +266,8 @@ SEARCH_MODEL=qwen2.5:1.5b-instruct
 ### Development-Specific Variables (docker-compose.yml)
 
 ```bash
-# LM Studio (on host machine)
-AI_BASE_URL=http://host.docker.internal:1234/v1
+# Embedding service (LM Studio on host machine)
 EMBEDDING_BASE_URL=http://host.docker.internal:1234/v1
-AI_API_KEY=lm-studio
 EMBEDDING_API_KEY=lm-studio
 ```
 

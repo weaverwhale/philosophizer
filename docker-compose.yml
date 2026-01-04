@@ -104,12 +104,10 @@ services:
       # JWT Configuration
       - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
-      # LLM (chat) provider configuration - using LM Studio on host machine
-      - AI_BASE_URL=${AI_BASE_URL:-http://host.docker.internal:1234/v1}
+      # LLM (chat) provider configuration
       - LLM_MODEL=${LLM_MODEL}
-      # Accept either AI_API_KEY or OPENAI_API_KEY (not needed for LM Studio, but kept for compatibility)
-      - AI_API_KEY=${AI_API_KEY:-lm-studio}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - SEARCH_MODEL=${SEARCH_MODEL}
       # Embedding service - using LM Studio on host machine
       - EMBEDDING_BASE_URL=${EMBEDDING_BASE_URL:-http://host.docker.internal:1234/v1}

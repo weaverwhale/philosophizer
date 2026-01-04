@@ -9,6 +9,7 @@ import {
 import { philosopherQueryEndpoint } from './endpoints/philosopherQuery';
 import { textsEndpoint } from './endpoints/texts';
 import { signup, login, me } from './endpoints/auth';
+import { models } from './endpoints/models';
 import {
   getStats,
   clearRAG,
@@ -67,6 +68,7 @@ const server = Bun.serve({
     // API routes
     '/agent': agent,
     '/rag': rag,
+    '/api/models': models,
     '/api/philosophers': philosophersEndpoint,
     '/api/philosophers/:id': philosopherDetailEndpoint,
     '/api/ask-philosopher': philosopherQueryEndpoint,

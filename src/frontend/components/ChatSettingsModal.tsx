@@ -4,12 +4,15 @@ import {
   TRADITION_GROUP_MAP,
   TRADITION_GROUP_ORDER,
 } from '../../constants/traditions';
+import { ModelSelector } from './ModelSelector';
 
 interface ChatSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedPhilosopher: string | null;
   onSelectPhilosopher: (philosopherId: string | null) => void;
+  selectedModel: string | null;
+  onSelectModel: (modelId: string | null) => void;
   anchorRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
@@ -18,6 +21,8 @@ export function ChatSettingsModal({
   onClose,
   selectedPhilosopher,
   onSelectPhilosopher,
+  selectedModel,
+  onSelectModel,
   anchorRef,
 }: ChatSettingsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -125,6 +130,12 @@ export function ChatSettingsModal({
         {/* Content */}
         <div className="overflow-y-auto flex-1 p-4">
           <div className="space-y-4">
+            {/* Model Selection */}
+            <ModelSelector
+              selectedModel={selectedModel}
+              onSelectModel={onSelectModel}
+            />
+
             {/* Philosopher/Theologian Selection */}
             <div>
               <label className="block text-sm font-medium text-text mb-2">
@@ -207,11 +218,14 @@ export function ChatSettingsModal({
         {/* Footer */}
         <div className="p-4 border-t border-border flex gap-2">
           <button
-            onClick={() => onSelectPhilosopher(null)}
-            disabled={!selectedPhilosopher}
+            onClick={() => {
+              onSelectPhilosopher(null);
+              onSelectModel(null);
+            }}
+            disabled={!selectedPhilosopher && !selectedModel}
             className="flex-1 px-4 py-2 bg-surface-secondary border border-border text-text rounded-lg hover:bg-surface transition-colors font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Reset
+            Reset All
           </button>
           <button
             onClick={onClose}

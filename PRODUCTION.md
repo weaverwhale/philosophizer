@@ -50,12 +50,16 @@ JWT_EXPIRES_IN=7d
 NODE_ENV=production
 PORT=1738
 
-# LLM Configuration (Ollama on DGX)
-AI_BASE_URL=http://ollama:11434/v1
+# OpenAI API Key (if using OpenAI models)
+OPENAI_API_KEY=your-openai-api-key-here
+
+# Anthropic API Key (if using Anthropic models)
+ANTHROPIC_API_KEY=your-anthropic-api-key-here
+
+# LLM Configuration (for containerized Ollama)
+LMSTUDIO_BASE_URL=http://ollama:11434/v1  # Points to Ollama container
 LLM_MODEL=qwen2.5:1.5b-instruct
 SEARCH_MODEL=qwen2.5:1.5b-instruct
-AI_API_KEY=ollama
-OPENAI_API_KEY=ollama
 
 # Embeddings (Ollama on DGX)
 EMBEDDING_BASE_URL=http://ollama:11434/v1
@@ -82,6 +86,7 @@ docker compose up -d
 ```
 
 **Security checklist:**
+
 - ✅ Ensure `.env` is in `.gitignore`
 - ✅ Set file permissions: `chmod 600 .env`
 - ✅ Never commit `.env` to version control
@@ -164,6 +169,7 @@ ls -la .env  # Should show -rw------- (600)
 ### Prerequisites
 
 1. **NVIDIA Container Toolkit** installed:
+
 ```bash
 # Verify GPU access in Docker
 docker run --rm --gpus all nvidia/cuda:12.0-base nvidia-smi
@@ -354,4 +360,3 @@ chmod 600 .env
 - [ ] Set up SSL/TLS for public endpoints (if applicable)
 - [ ] Configured firewall rules
 - [ ] Set up regular secret rotation schedule
-

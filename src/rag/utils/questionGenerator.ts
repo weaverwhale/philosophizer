@@ -7,23 +7,26 @@ import { generateText } from 'ai';
 import { LLM_MODEL } from '../../constants/providers';
 import { QUESTION_GENERATION_PROMPT } from '../../constants/prompts';
 import { QUESTIONS_PER_CHUNK } from '../../constants/rag';
-import { createProvider } from '../../utils/providers';
+import { getModelProviderById } from '../../utils/providers';
 
 /**
  * Generate hypothetical questions for a text chunk
  */
 export async function generateQuestions(chunkText: string): Promise<string[]> {
   try {
-    const provider = createProvider();
+    const modelProvider = await getModelProviderById(LLM_MODEL);
 
-    if (!provider) {
-      throw new Error('Failed to initialize AI provider');
+    if (!modelProvider) {
+      throw new Error(`Model provider '${LLM_MODEL}' not found`);
+    }
+    if (!modelProvider.available) {
+      throw new Error(`Model provider '${LLM_MODEL}' is not available`);
     }
 
     const userPrompt = `Text:\n${chunkText}\n\nGenerate ${QUESTIONS_PER_CHUNK} questions that this text would answer:`;
 
     const result = await generateText({
-      model: provider.chat(LLM_MODEL),
+      model: modelProvider.model,
       messages: [
         { role: 'system', content: QUESTION_GENERATION_PROMPT },
         { role: 'user', content: userPrompt },

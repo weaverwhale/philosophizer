@@ -42,6 +42,7 @@ export function ChatPage() {
   const [selectedPhilosopher, setSelectedPhilosopher] = useState<string | null>(
     null
   );
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
 
   // Get random starter questions based on selected philosopher
@@ -98,6 +99,7 @@ export function ChatPage() {
       },
       body: () => ({
         philosopherId: selectedPhilosopher,
+        modelId: selectedModel,
       }),
     }),
     onError: err => {
@@ -515,6 +517,8 @@ export function ChatPage() {
           onClose={() => setSettingsOpen(false)}
           selectedPhilosopher={selectedPhilosopher}
           onSelectPhilosopher={setSelectedPhilosopher}
+          selectedModel={selectedModel}
+          onSelectModel={setSelectedModel}
           anchorRef={settingsButtonRef}
         />
       </div>

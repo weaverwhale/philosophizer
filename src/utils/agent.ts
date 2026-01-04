@@ -2,7 +2,7 @@ import { ToolLoopAgent, stepCountIs, type UIMessage } from 'ai';
 import { LLM_MODEL } from '../constants/providers';
 import { getSystemPrompt } from '../constants/prompts';
 import { createTools } from '../tools';
-import { createProvider } from './providers';
+import { getModelProviderById } from './providers';
 import { searchConversations, type ConversationMessage } from './conversations';
 
 function extractTextContent(message: UIMessage): string {
@@ -59,10 +59,23 @@ export async function createAgent(
   messages: UIMessage[],
   userId: string,
   conversationId?: string,
-  philosopherId?: string
+  philosopherId?: string,
+  modelId?: string
 ) {
-  const provider = createProvider();
+  // Determine which model to use
+  const targetModelId = modelId || LLM_MODEL;
+  const modelProvider = await getModelProviderById(targetModelId);
 
+  if (!modelProvider) {
+    throw new Error(`Model provider '${targetModelId}' not found`);
+  }
+  if (!modelProvider.available) {
+    throw new Error(
+      `Model provider '${targetModelId}' is not available. API key might be missing.`
+    );
+  }
+
+  // Build agent configuration
   const memoryContext = await getRelevantMemoryContext(
     userId,
     messages,
@@ -73,7 +86,7 @@ export async function createAgent(
   const tools = createTools(userId);
 
   return new ToolLoopAgent({
-    model: provider.chat(LLM_MODEL),
+    model: modelProvider.model,
     instructions: systemPrompt,
     tools,
     stopWhen: stepCountIs(15),
