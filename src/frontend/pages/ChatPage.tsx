@@ -99,24 +99,33 @@ export function ChatPage() {
     clearCurrentConversation,
   } = useConversations();
 
-  // Memoize transport to ensure it updates when selectedModel or selectedPhilosopher changes
+  // Use refs to capture latest values for the transport body
+  const selectedPhilosopherRef = useRef(selectedPhilosopher);
+  const selectedModelRef = useRef(selectedModel);
+
+  // Keep refs in sync with state
+  selectedPhilosopherRef.current = selectedPhilosopher;
+  selectedModelRef.current = selectedModel;
+
+  // Create transport once - body function reads from refs
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: '/agent',
         headers: (): Record<string, string> => {
           const token = localStorage.getItem('auth_token');
+          const headers: Record<string, string> = {};
           if (token) {
-            return { Authorization: `Bearer ${token}` };
+            headers.Authorization = `Bearer ${token}`;
           }
-          return {};
+          return headers;
         },
         body: () => ({
-          philosopherId: selectedPhilosopher,
-          modelId: selectedModel,
+          philosopherId: selectedPhilosopherRef.current,
+          modelId: selectedModelRef.current,
         }),
       }),
-    [selectedPhilosopher, selectedModel]
+    []
   );
 
   // Use the AI SDK's useChat hook
