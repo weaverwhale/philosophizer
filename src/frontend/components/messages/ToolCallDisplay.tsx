@@ -19,24 +19,32 @@ export function ToolCallDisplay({
   input,
   output,
 }: ToolCallDisplayProps) {
-  const displayToolName = formatToolName(toolName);
+  const displayToolName = toolName ? formatToolName(toolName) : '';
+  const hasValidToolName = displayToolName && displayToolName !== 'undefined';
+
   const containerClass = hasError
     ? 'bg-error-bg border border-error-border'
     : isCompleted
       ? 'bg-success-bg border border-success-border'
-      : 'bg-info-bg border border-info-border';
+      : !hasValidToolName
+        ? 'bg-bg-secondary border border-border'
+        : 'bg-info-bg border border-info-border';
 
   const textColorClass = hasError
     ? 'text-error-text'
     : isCompleted
       ? 'text-success-text'
-      : 'text-info-text';
+      : !hasValidToolName
+        ? 'text-text-muted'
+        : 'text-info-text';
 
   const iconColorClass = hasError
     ? 'text-error'
     : isCompleted
       ? 'text-success'
-      : 'text-info';
+      : !hasValidToolName
+        ? 'text-text-muted'
+        : 'text-info';
 
   const statusText = hasError
     ? 'Tool failed'
@@ -120,7 +128,9 @@ export function ToolCallDisplay({
             </svg>
           )}
           <span className={`font-medium ${textColorClass}`}>
-            {statusText}: {displayToolName}
+            {hasValidToolName
+              ? `${statusText}: ${displayToolName}`
+              : statusText}
           </span>
         </div>
       </summary>
