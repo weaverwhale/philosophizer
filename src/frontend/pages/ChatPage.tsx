@@ -124,19 +124,25 @@ export function ChatPage() {
 
   const isProcessing = status === 'submitted' || status === 'streaming';
 
-  // Load conversation from URL on mount
+  // Load conversation from URL on mount or when URL changes
   useEffect(() => {
     const loadFromUrl = async () => {
       const urlConversationId = getConversationIdFromUrl(id);
+
+      // If there's a conversation ID in the URL
       if (urlConversationId) {
-        const conversation = await loadConversation(urlConversationId);
-        if (conversation?.messages) {
-          const chatMessages = conversation.messages.map(msg => ({
-            id: msg.id,
-            role: msg.role,
-            parts: msg.parts || [{ type: 'text', text: msg.content }],
-          }));
-          setMessages(chatMessages as any);
+        // Only load if we don't already have this conversation
+        // This prevents reloading when we just created it and navigated to its URL
+        if (currentConversation?.id !== urlConversationId) {
+          const conversation = await loadConversation(urlConversationId);
+          if (conversation?.messages) {
+            const chatMessages = conversation.messages.map(msg => ({
+              id: msg.id,
+              role: msg.role,
+              parts: msg.parts || [{ type: 'text', text: msg.content }],
+            }));
+            setMessages(chatMessages as any);
+          }
         }
       }
       setInitialLoadDone(true);
@@ -173,13 +179,25 @@ export function ChatPage() {
   // Sync URL when conversation changes
   useEffect(() => {
     if (!initialLoadDone) return;
+
     const newPath = currentConversation?.id
       ? `/c/${currentConversation.id}`
       : '/';
-    if (window.location.pathname !== newPath) {
+
+    // Only navigate if the URL actually needs to change
+    // This prevents unnecessary navigation that would reload the conversation
+    const currentPath = window.location.pathname;
+    const currentId = id; // from useParams
+
+    // If we're creating a new conversation and not on that URL yet, navigate
+    if (currentConversation?.id && currentId !== currentConversation.id) {
       navigate(newPath, { replace: true });
     }
-  }, [currentConversation?.id, initialLoadDone, navigate]);
+    // If we're clearing and not on root, navigate to root
+    else if (!currentConversation && currentPath !== '/') {
+      navigate('/', { replace: true });
+    }
+  }, [currentConversation?.id, initialLoadDone, navigate, id]);
 
   // Convert useChat messages to conversation format for saving
   const convertMessagesForSaving = useCallback(() => {
