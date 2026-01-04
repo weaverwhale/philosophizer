@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { Messages } from '../components/messages/Messages';
@@ -27,20 +28,13 @@ function getRandomQuestions(questions: string[], limit: number): string[] {
 }
 
 // URL utilities
-function getConversationIdFromUrl(): string | null {
-  const path = window.location.pathname;
-  const match = path.match(/^\/c\/([a-f0-9-]+)$/i);
-  return match?.[1] ?? null;
-}
-
-function setConversationIdInUrl(id: string | null) {
-  const newPath = id ? `/c/${id}` : '/';
-  if (window.location.pathname !== newPath) {
-    window.history.pushState({}, '', newPath);
-  }
+function getConversationIdFromUrl(id?: string): string | null {
+  return id ?? null;
 }
 
 export function ChatPage() {
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
   const [input, setInput] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -133,7 +127,7 @@ export function ChatPage() {
   // Load conversation from URL on mount
   useEffect(() => {
     const loadFromUrl = async () => {
-      const urlConversationId = getConversationIdFromUrl();
+      const urlConversationId = getConversationIdFromUrl(id);
       if (urlConversationId) {
         const conversation = await loadConversation(urlConversationId);
         if (conversation?.messages) {
@@ -148,12 +142,12 @@ export function ChatPage() {
       setInitialLoadDone(true);
     };
     loadFromUrl();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle browser back/forward
   useEffect(() => {
     const handlePopState = async () => {
-      const urlConversationId = getConversationIdFromUrl();
+      const urlConversationId = getConversationIdFromUrl(id);
       if (urlConversationId) {
         const conversation = await loadConversation(urlConversationId);
         if (conversation?.messages) {
@@ -174,13 +168,18 @@ export function ChatPage() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [loadConversation, setMessages, clearCurrentConversation]);
+  }, [id, loadConversation, setMessages, clearCurrentConversation]);
 
   // Sync URL when conversation changes
   useEffect(() => {
     if (!initialLoadDone) return;
-    setConversationIdInUrl(currentConversation?.id || null);
-  }, [currentConversation?.id, initialLoadDone]);
+    const newPath = currentConversation?.id
+      ? `/c/${currentConversation.id}`
+      : '/';
+    if (window.location.pathname !== newPath) {
+      navigate(newPath, { replace: true });
+    }
+  }, [currentConversation?.id, initialLoadDone, navigate]);
 
   // Convert useChat messages to conversation format for saving
   const convertMessagesForSaving = useCallback(() => {

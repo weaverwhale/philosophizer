@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminHeader } from '../components/admin/AdminHeader';
 import { SystemPrompts } from '../components/admin/SystemPrompts';
@@ -50,6 +51,7 @@ interface DockerImage {
 
 export function AdminPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [backups, setBackups] = useState<BackupFile[]>([]);
   const [dockerImages, setDockerImages] = useState<DockerImage[]>([]);
@@ -66,7 +68,7 @@ export function AdminPage() {
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      window.location.href = '/login';
+      navigate('/login', { replace: true });
       return;
     }
 
@@ -79,13 +81,13 @@ export function AdminPage() {
       .then(data => {
         if (!data.user?.isAdmin) {
           alert('Access denied: Admin privileges required');
-          window.location.href = '/';
+          navigate('/', { replace: true });
         }
       })
       .catch(() => {
-        window.location.href = '/login';
+        navigate('/login', { replace: true });
       });
-  }, []);
+  }, [navigate]);
 
   // Load initial data
   useEffect(() => {
@@ -255,7 +257,14 @@ export function AdminPage() {
 
   const handleDownloadBackup = (filename: string) => {
     const token = localStorage.getItem('auth_token');
-    window.location.href = `/admin/backups/${filename}?token=${token}`;
+    // For file downloads, we need to use a regular link or fetch with blob
+    // Using a temporary link element to trigger download
+    const link = document.createElement('a');
+    link.href = `/admin/backups/${filename}?token=${token}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (loading) {

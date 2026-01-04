@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router';
 import { ChatPage } from './pages/ChatPage';
 import { AboutPage } from './pages/AboutPage';
 import { SearchPage } from './pages/SearchPage';
@@ -33,43 +33,30 @@ if ('serviceWorker' in navigator) {
 }
 
 function App() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  // Route based on path
-  if (currentPath === '/login') {
-    return <LoginPage />;
-  }
-
-  if (currentPath === '/signup') {
-    return <SignupPage />;
-  }
-
-  // All other routes require authentication
   return (
-    <ProtectedRoute>
-      {currentPath === '/about' && <AboutPage />}
-      {currentPath === '/search' && <SearchPage />}
-      {currentPath === '/admin' && <AdminPage />}
-      {/* Default to chat interface (handles / and /c/:id) */}
-      {currentPath !== '/about' &&
-        currentPath !== '/search' &&
-        currentPath !== '/admin' && <ChatPage />}
-    </ProtectedRoute>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<ChatPage />} />
+            <Route path="/c/:id" element={<ChatPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
+
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <AuthProvider>
-    <App />
-  </AuthProvider>
-);
+root.render(<App />);

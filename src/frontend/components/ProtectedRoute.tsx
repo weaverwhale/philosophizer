@@ -1,23 +1,12 @@
-import { useEffect } from 'react';
+import { Navigate, Outlet } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from './Logo';
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute() {
   const { loading: authLoading, isAuthenticated } = useAuth();
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      window.location.href = '/login';
-    }
-  }, [authLoading, isAuthenticated]);
-
-  // Show loading state if not authenticated (loading or redirecting)
-  if (!isAuthenticated) {
+  // Show loading state while checking authentication
+  if (authLoading) {
     return (
       <div className="py-23.25">
         <Logo />
@@ -25,5 +14,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  return <>{children}</>;
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Render child routes
+  return <Outlet />;
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import type { Conversation } from '../hooks/useConversations';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -24,12 +25,13 @@ export function ConversationSidebar({
   onRenameConversation,
 }: ConversationSidebarProps) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/login';
+    navigate('/login', { replace: true });
   };
 
   const handleStartEdit = (conversation: Conversation) => {

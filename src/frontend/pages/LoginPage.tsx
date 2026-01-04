@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from '../components/Logo';
 
@@ -8,6 +9,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,8 +18,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      // Redirect to home page
-      window.location.href = '/';
+      // Navigate to home page
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -35,12 +37,12 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
-            <a
-              href="/signup"
+            <Link
+              to="/signup"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
               create a new account
-            </a>
+            </Link>
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

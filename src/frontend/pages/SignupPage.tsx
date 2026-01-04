@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from '../components/Logo';
 
@@ -9,6 +10,7 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +30,8 @@ export default function SignupPage() {
 
     try {
       await signup(email, password);
-      // Redirect to home page
-      window.location.href = '/';
+      // Navigate to home page
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Signup failed');
     } finally {
@@ -47,12 +49,12 @@ export default function SignupPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
               sign in to existing account
-            </a>
+            </Link>
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
