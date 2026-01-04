@@ -58,6 +58,8 @@ export function ToolCallDisplay({
     !(typeof output === 'string' && output.trim() === '') &&
     !(typeof output === 'string' && output.trim() === 'undefined');
 
+  if (!hasValidToolName) return null;
+
   return (
     <details
       className={`my-3 first:mt-0 group rounded-lg ${containerClass}`}
