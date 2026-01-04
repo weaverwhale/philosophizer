@@ -25,11 +25,11 @@ export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  flex items-center gap-2 p-3 font-medium transition-all whitespace-nowrap cursor-pointer
+                  flex items-center gap-2 p-3 font-medium whitespace-nowrap cursor-pointer
                   ${
                     activeTab === tab.id
                       ? 'text-primary border-b-2 border-primary bg-background'
-                      : 'text-text-muted hover:text-text hover:bg-surface-hover'
+                      : 'text-text-muted border-b-2 border-transparent hover:text-text hover:bg-surface-hover'
                   }
                 `}
               >

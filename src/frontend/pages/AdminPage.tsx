@@ -268,8 +268,8 @@ export function AdminPage() {
 
   const tabs: Tab[] = [
     {
-      id: 'overview',
-      label: 'Overview',
+      id: 'database-statistics',
+      label: 'Database Statistics',
       icon: '📊',
       content: (
         <>
