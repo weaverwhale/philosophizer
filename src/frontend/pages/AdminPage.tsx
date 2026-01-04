@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import {
-  AdminHeader,
-  SystemPrompts,
-  DatabaseStats,
-  RagManagement,
-  BackupManagement,
-  RestorePublish,
-  DockerImages,
-  OperationLogs,
-} from '../components/admin';
+import { AdminHeader } from '../components/admin/AdminHeader';
+import { SystemPrompts } from '../components/admin/SystemPrompts';
+import { DatabaseStats } from '../components/admin/DatabaseStats';
+import { RagManagement } from '../components/admin/RagManagement';
+import { BackupManagement } from '../components/admin/BackupManagement';
+import { RestorePublish } from '../components/admin/RestorePublish';
+import { DockerImages } from '../components/admin/DockerImages';
+import { OperationLogs } from '../components/admin/OperationLogs';
+import { Tabs } from '../components/admin/Tabs';
+import type { Tab } from '../components/admin/Tabs';
 
 interface AdminStats {
   rag: {
@@ -60,6 +60,7 @@ export function AdminPage() {
   const [selectedBackup, setSelectedBackup] = useState('');
   const [dockerImageName, setDockerImageName] = useState('');
   const [dockerRepo, setDockerRepo] = useState('');
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Check if user is admin
   useEffect(() => {
@@ -265,18 +266,27 @@ export function AdminPage() {
     );
   }
 
-  return (
-    <div className="flex flex-col h-dvh bg-background overflow-hidden">
-      <AdminHeader userEmail={user?.email} />
-
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+  const tabs: Tab[] = [
+    {
+      id: 'overview',
+      label: 'Overview',
+      icon: '📊',
+      content: (
+        <>
           <DatabaseStats
             stats={stats}
             refreshing={refreshing}
             loading={loading}
           />
-
+        </>
+      ),
+    },
+    {
+      id: 'rag',
+      label: 'RAG Management',
+      icon: '🧠',
+      content: (
+        <>
           <RagManagement
             operationInProgress={operationInProgress}
             refreshing={refreshing}
@@ -284,7 +294,21 @@ export function AdminPage() {
             onClear={handleClearRAG}
             onRefresh={loadStats}
           />
-
+          {operationLogs && (
+            <OperationLogs
+              operationLogs={operationLogs}
+              operationInProgress={operationInProgress}
+            />
+          )}
+        </>
+      ),
+    },
+    {
+      id: 'backups',
+      label: 'Backups & Docker',
+      icon: '💾',
+      content: (
+        <>
           <BackupManagement
             backups={backups}
             operationInProgress={operationInProgress}
@@ -305,14 +329,32 @@ export function AdminPage() {
 
           <DockerImages dockerImages={dockerImages} dockerRepo={dockerRepo} />
 
+          {operationLogs && (
+            <OperationLogs
+              operationLogs={operationLogs}
+              operationInProgress={operationInProgress}
+            />
+          )}
+        </>
+      ),
+    },
+    {
+      id: 'prompts',
+      label: 'System Prompts',
+      icon: '📝',
+      content: (
+        <>
           <SystemPrompts />
+        </>
+      ),
+    },
+  ];
 
-          <OperationLogs
-            operationLogs={operationLogs}
-            operationInProgress={operationInProgress}
-          />
-        </div>
-      </div>
+  return (
+    <div className="flex flex-col h-dvh bg-background overflow-hidden">
+      <AdminHeader userEmail={user?.email} />
+
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }

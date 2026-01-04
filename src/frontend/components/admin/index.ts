@@ -6,4 +6,5 @@ export { BackupManagement } from './BackupManagement';
 export { RestorePublish } from './RestorePublish';
 export { DockerImages } from './DockerImages';
 export { OperationLogs } from './OperationLogs';
-
+export { Tabs } from './Tabs';
+export type { Tab } from './Tabs';
