@@ -1,4 +1,4 @@
-import { Actions, Action } from '../ui/Action';
+import { Actions, Action } from './Action';
 
 interface MessageActionsProps {
   onRegenerate?: () => void;

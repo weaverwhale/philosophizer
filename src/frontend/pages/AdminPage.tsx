@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { ThemeToggle } from '../components/ThemeToggle';
+import {
+  AdminHeader,
+  SystemPrompts,
+  DatabaseStats,
+  RagManagement,
+  BackupManagement,
+  RestorePublish,
+  DockerImages,
+  OperationLogs,
+} from '../components/admin';
 
 interface AdminStats {
   rag: {
@@ -39,91 +48,13 @@ interface DockerImage {
   url: string;
 }
 
-interface PromptData {
-  prompt: string;
-  tokenCount: number;
-  characterCount: number;
-  philosopherId: string;
-  philosopherName: string;
-  availablePhilosophers: Array<{
-    id: string;
-    name: string;
-    tradition: string;
-  }>;
-  timestamp: string;
-}
-
-// Helper function to format size strings and convert to appropriate units
-// (e.g., "1349 MB" -> "1.32 GB", "1234 KB" -> "1.21 MB")
-function formatSize(size: string): string {
-  if (!size) return size;
-
-  // Parse the size string to extract number and unit
-  const match = size.match(/^([\d.]+)\s*(kb|mb|gb|tb|bytes?)\s*$/i);
-  if (!match || !match[1] || !match[2]) {
-    // If parsing fails, just uppercase the units
-    return size
-      .replace(/\bkb\b/gi, 'KB')
-      .replace(/\bmb\b/gi, 'MB')
-      .replace(/\bgb\b/gi, 'GB')
-      .replace(/\btb\b/gi, 'TB')
-      .replace(/\bbytes?\b/gi, 'Bytes');
-  }
-
-  let value = parseFloat(match[1]);
-  let unit = match[2].toLowerCase();
-
-  // Convert to bytes first for easier conversion
-  let bytes = 0;
-  switch (unit) {
-    case 'tb':
-      bytes = value * 1024 * 1024 * 1024 * 1024;
-      break;
-    case 'gb':
-      bytes = value * 1024 * 1024 * 1024;
-      break;
-    case 'mb':
-      bytes = value * 1024 * 1024;
-      break;
-    case 'kb':
-      bytes = value * 1024;
-      break;
-    case 'byte':
-    case 'bytes':
-      bytes = value;
-      break;
-  }
-
-  // Convert to the most appropriate unit
-  const formatValue = (val: number) => {
-    const formatted = val.toFixed(2);
-    // Remove trailing zeros and decimal point if not needed
-    return formatted.replace(/\.?0+$/, '');
-  };
-
-  if (bytes >= 1024 * 1024 * 1024 * 1024) {
-    return formatValue(bytes / (1024 * 1024 * 1024 * 1024)) + ' TB';
-  } else if (bytes >= 1024 * 1024 * 1024) {
-    return formatValue(bytes / (1024 * 1024 * 1024)) + ' GB';
-  } else if (bytes >= 1024 * 1024) {
-    return formatValue(bytes / (1024 * 1024)) + ' MB';
-  } else if (bytes >= 1024) {
-    return formatValue(bytes / 1024) + ' KB';
-  } else {
-    return bytes.toFixed(0) + ' Bytes';
-  }
-}
-
 export function AdminPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [backups, setBackups] = useState<BackupFile[]>([]);
   const [dockerImages, setDockerImages] = useState<DockerImage[]>([]);
-  const [promptData, setPromptData] = useState<PromptData | null>(null);
-  const [selectedPhilosopher, setSelectedPhilosopher] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingPrompt, setLoadingPrompt] = useState(false);
   const [operationLogs, setOperationLogs] = useState('');
   const [operationInProgress, setOperationInProgress] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState('');
@@ -203,25 +134,6 @@ export function AdminPage() {
       setDockerRepo(data.repository || '');
     } catch (error) {
       console.error('Failed to load Docker images:', error);
-    }
-  };
-
-  const loadPrompt = async (philosopherId?: string) => {
-    try {
-      setLoadingPrompt(true);
-      const token = localStorage.getItem('auth_token');
-      const url = philosopherId
-        ? `/admin/prompts?philosopherId=${philosopherId}`
-        : '/admin/prompts';
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setPromptData(data);
-    } catch (error) {
-      console.error('Failed to load prompt:', error);
-    } finally {
-      setLoadingPrompt(false);
     }
   };
 
@@ -355,505 +267,50 @@ export function AdminPage() {
 
   return (
     <div className="flex flex-col h-dvh bg-background overflow-hidden">
-      {/* Header */}
-      <header className="border-b border-border bg-surface sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a
-              href="/"
-              className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-              title="Back to chat"
-            >
-              ←
-            </a>
-            <h1 className="text-2xl font-bold text-text">Admin Panel</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-text-muted">{user?.email}</span>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <AdminHeader userEmail={user?.email} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          {/* Database Statistics Section */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-text mb-4">
-              Database Statistics
-            </h2>
-            {!stats && !loading && (
-              <div className="text-text-muted text-sm">
-                Failed to load statistics. Try refreshing.
-              </div>
-            )}
-            {stats && (
-              <div
-                className={`relative ${refreshing ? 'opacity-60' : ''} transition-opacity`}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-surface border border-border rounded-lg p-4">
-                    <div className="text-text-muted text-sm">
-                      Total RAG Chunks
-                    </div>
-                    <div className="text-3xl font-bold text-text mt-1">
-                      {stats.rag.totalChunks.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="bg-surface border border-border rounded-lg p-4">
-                    <div className="text-text-muted text-sm">Philosophers</div>
-                    <div className="text-3xl font-bold text-text mt-1">
-                      {Object.keys(stats.rag.byPhilosopher).length}
-                    </div>
-                  </div>
-                  <div className="bg-surface border border-border rounded-lg p-4">
-                    <div className="text-text-muted text-sm">Users</div>
-                    <div className="text-3xl font-bold text-text mt-1">
-                      {stats.database.users}
-                    </div>
-                  </div>
-                  <div className="bg-surface border border-border rounded-lg p-4">
-                    <div className="text-text-muted text-sm">Conversations</div>
-                    <div className="text-3xl font-bold text-text mt-1">
-                      {stats.database.conversations}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+          <DatabaseStats
+            stats={stats}
+            refreshing={refreshing}
+            loading={loading}
+          />
 
-            {stats && (
-              <div
-                className={`mt-4 bg-surface border border-border rounded-lg p-4 ${refreshing ? 'opacity-60' : ''} transition-opacity`}
-              >
-                <h3 className="text-md font-semibold text-text mb-3">
-                  Database Sizes
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <div className="text-text-muted">Total Database</div>
-                    <div className="text-text font-medium">
-                      {formatSize(stats.database.sizes.total_size)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-text-muted">RAG Chunks Table</div>
-                    <div className="text-text font-medium">
-                      {formatSize(stats.database.sizes.chunks_table_size)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-text-muted">Conversations Table</div>
-                    <div className="text-text font-medium">
-                      {formatSize(
-                        stats.database.sizes.conversations_table_size
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-text-muted">Users Table</div>
-                    <div className="text-text font-medium">
-                      {formatSize(stats.database.sizes.users_table_size)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+          <RagManagement
+            operationInProgress={operationInProgress}
+            refreshing={refreshing}
+            onReseed={handleReseedRAG}
+            onClear={handleClearRAG}
+            onRefresh={loadStats}
+          />
 
-            {stats && Object.keys(stats.rag.byPhilosopher).length > 0 && (
-              <div
-                className={`mt-4 bg-surface border border-border rounded-lg p-4 ${refreshing ? 'opacity-60' : ''} transition-opacity`}
-              >
-                <h3 className="text-md font-semibold text-text mb-3">
-                  Chunks by Philosopher
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
-                  {Object.entries(stats.rag.byPhilosopher)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([name, count]) => (
-                      <div key={name} className="flex justify-between">
-                        <span className="text-text-muted">{name}</span>
-                        <span className="text-text font-medium">{count}</span>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
-          </section>
+          <BackupManagement
+            backups={backups}
+            operationInProgress={operationInProgress}
+            onCreateBackup={handleCreateBackup}
+            onDownloadBackup={handleDownloadBackup}
+          />
 
-          {/* RAG Management Section */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-text mb-4">
-              RAG Management
-            </h2>
-            <div className="bg-surface border border-border rounded-lg p-4">
-              <div className="flex gap-3 mb-4">
-                <button
-                  onClick={handleReseedRAG}
-                  disabled={true}
-                  //disabled={operationInProgress}
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                >
-                  Re-seed Database
-                </button>
-                <button
-                  onClick={handleClearRAG}
-                  disabled={true}
-                  //disabled={operationInProgress}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                >
-                  Clear RAG Data
-                </button>
-                <button
-                  onClick={loadStats}
-                  disabled={operationInProgress || refreshing}
-                  className="px-4 py-2 bg-surface border border-border text-text rounded-md hover:bg-surface-hover disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                >
-                  <svg
-                    className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  {refreshing ? 'Refreshing...' : 'Refresh Stats'}
-                </button>
-              </div>
-              <div className="text-xs text-text-muted">
-                <p>
-                  <strong>Re-seed:</strong> Clear and re-index all philosopher
-                  texts. Takes 5-10 minutes.
-                </p>
-                <p className="mt-1">
-                  <strong>Clear:</strong> Remove all RAG data from the database.
-                  Use before restoring a backup.
-                </p>
-              </div>
-            </div>
-          </section>
+          <RestorePublish
+            backups={backups}
+            selectedBackup={selectedBackup}
+            dockerImageName={dockerImageName}
+            operationInProgress={operationInProgress}
+            onSelectedBackupChange={setSelectedBackup}
+            onDockerImageNameChange={setDockerImageName}
+            onRestore={handleRestoreBackup}
+            onPublish={handlePublishDocker}
+          />
 
-          {/* Backup Management Section */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-text mb-4">
-              Backup Management
-            </h2>
-            <div className="bg-surface border border-border rounded-lg p-4">
-              <div className="mb-4">
-                <button
-                  onClick={handleCreateBackup}
-                  disabled={operationInProgress}
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                >
-                  Create New Backup
-                </button>
-              </div>
+          <DockerImages dockerImages={dockerImages} dockerRepo={dockerRepo} />
 
-              {backups.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Filename
-                        </th>
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Size
-                        </th>
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Created
-                        </th>
-                        <th className="text-right py-2 text-text-muted font-medium">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {backups.map(backup => (
-                        <tr
-                          key={backup.filename}
-                          className="border-b border-border"
-                        >
-                          <td className="py-2 text-text">{backup.filename}</td>
-                          <td className="py-2 text-text">
-                            {backup.sizeFormatted}
-                          </td>
-                          <td className="py-2 text-text">
-                            {new Date(backup.created).toLocaleString()}
-                          </td>
-                          <td className="py-2 text-right">
-                            <button
-                              onClick={() =>
-                                handleDownloadBackup(backup.filename)
-                              }
-                              className="text-primary hover:text-primary/80 text-sm transition-colors"
-                            >
-                              Download
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-text-muted text-sm">
-                  No backup files found. Create a backup to get started.
-                </div>
-              )}
-            </div>
-          </section>
+          <SystemPrompts />
 
-          {/* Restore & Publish Section */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-text mb-4">
-              Restore & Publish
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Restore */}
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <h3 className="text-md font-semibold text-text mb-3">
-                  Restore from Backup
-                </h3>
-                <select
-                  value={selectedBackup}
-                  onChange={e => setSelectedBackup(e.target.value)}
-                  className="w-full mb-3 px-3 py-2 bg-background border border-border rounded-md text-text"
-                  disabled={operationInProgress || backups.length === 0}
-                >
-                  <option value="">Select a backup file...</option>
-                  {backups.map(backup => (
-                    <option key={backup.filename} value={backup.filename}>
-                      {backup.filename} ({backup.sizeFormatted})
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleRestoreBackup}
-                  disabled={operationInProgress || !selectedBackup}
-                  className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                >
-                  Restore Backup
-                </button>
-              </div>
-
-              {/* Publish to Docker Hub */}
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <h3 className="text-md font-semibold text-text mb-3">
-                  Publish to Docker Hub
-                </h3>
-                <input
-                  type="text"
-                  value={dockerImageName}
-                  onChange={e => setDockerImageName(e.target.value)}
-                  placeholder="username/philosophizer-pgvector:latest"
-                  className="w-full mb-3 px-3 py-2 bg-background border border-border rounded-md text-text"
-                  disabled={operationInProgress}
-                />
-                <button
-                  onClick={handlePublishDocker}
-                  disabled={operationInProgress || !dockerImageName}
-                  className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                >
-                  Publish Docker Image
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Docker Hub Images Section */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-text mb-4">
-              Published Docker Images
-            </h2>
-            <div className="bg-surface border border-border rounded-lg p-4">
-              {dockerRepo && (
-                <div className="mb-4">
-                  <span className="text-sm text-text-muted">Repository: </span>
-                  <a
-                    href={dockerImages[0]?.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:text-primary/80"
-                  >
-                    {dockerRepo}
-                  </a>
-                </div>
-              )}
-
-              {dockerImages.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Tag
-                        </th>
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Size
-                        </th>
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Architectures
-                        </th>
-                        <th className="text-left py-2 text-text-muted font-medium">
-                          Last Updated
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dockerImages.map(image => (
-                        <tr key={image.tag} className="border-b border-border">
-                          <td className="py-2 text-text font-medium">
-                            {image.tag}
-                          </td>
-                          <td className="py-2 text-text">
-                            {image.sizeFormatted}
-                          </td>
-                          <td className="py-2 text-text text-xs">
-                            {image.architectures.join(', ')}
-                          </td>
-                          <td className="py-2 text-text">
-                            {new Date(image.lastUpdated).toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-text-muted text-sm">
-                  No Docker images found. Configure DOCKER_HUB_USERNAME and
-                  DOCKER_HUB_REPO environment variables to view published
-                  images.
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Operation Logs Section */}
-          {operationLogs && (
-            <section className="mb-8">
-              <h2 className="text-xl font-semibold text-text mb-4">
-                Operation Logs
-              </h2>
-              <div className="bg-gray-900 border border-border rounded-lg p-4 overflow-x-auto">
-                <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap">
-                  {operationLogs}
-                </pre>
-                {operationInProgress && (
-                  <div className="mt-2 text-yellow-400 text-xs">
-                    Operation in progress...
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Prompt Viewer Section */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-text mb-4">
-              System Prompts
-            </h2>
-            <div className="bg-surface border border-border rounded-lg p-4">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-text mb-2">
-                  Select Philosopher (or Default)
-                </label>
-                <div className="flex gap-3">
-                  <select
-                    value={selectedPhilosopher}
-                    onChange={e => setSelectedPhilosopher(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-background border border-border rounded-md text-text"
-                    disabled={loadingPrompt}
-                  >
-                    <option value="">Default (All Philosophers)</option>
-                    {promptData?.availablePhilosophers
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map(phil => (
-                        <option key={phil.id} value={phil.id}>
-                          {phil.name} ({phil.tradition})
-                        </option>
-                      ))}
-                  </select>
-                  <button
-                    onClick={() => loadPrompt(selectedPhilosopher || undefined)}
-                    disabled={loadingPrompt}
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loadingPrompt ? 'Loading...' : 'Load Prompt'}
-                  </button>
-                </div>
-              </div>
-
-              {promptData && (
-                <div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="bg-background border border-border rounded-lg p-3">
-                      <div className="text-text-muted text-sm">Token Count</div>
-                      <div className="text-2xl font-bold text-text mt-1">
-                        {promptData.tokenCount.toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="bg-background border border-border rounded-lg p-3">
-                      <div className="text-text-muted text-sm">
-                        Character Count
-                      </div>
-                      <div className="text-2xl font-bold text-text mt-1">
-                        {promptData.characterCount.toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="bg-background border border-border rounded-lg p-3">
-                      <div className="text-text-muted text-sm">
-                        Selected Prompt
-                      </div>
-                      <div className="text-lg font-bold text-text mt-1 truncate">
-                        {promptData.philosopherName}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-md font-semibold text-text">
-                        Prompt Content
-                      </h3>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(promptData.prompt);
-                          alert('Prompt copied to clipboard!');
-                        }}
-                        className="text-sm text-primary hover:text-primary/80 transition-colors"
-                      >
-                        Copy to Clipboard
-                      </button>
-                    </div>
-                    <div className="bg-gray-900 border border-border rounded-lg p-4 overflow-x-auto max-h-96 overflow-y-auto">
-                      <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap">
-                        {promptData.prompt}
-                      </pre>
-                    </div>
-                  </div>
-
-                  <div className="mt-2 text-xs text-text-muted">
-                    Last updated:{' '}
-                    {new Date(promptData.timestamp).toLocaleString()}
-                  </div>
-                </div>
-              )}
-
-              {!promptData && !loadingPrompt && (
-                <div className="text-text-muted text-sm text-center py-8">
-                  Select a philosopher and click "Load Prompt" to view the
-                  system prompt and token count.
-                </div>
-              )}
-            </div>
-          </section>
+          <OperationLogs
+            operationLogs={operationLogs}
+            operationInProgress={operationInProgress}
+          />
         </div>
       </div>
     </div>
