@@ -15,7 +15,7 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Tab Headers */}
       <div className="border-b border-border bg-surface">
         <div className="max-w-6xl mx-auto">
