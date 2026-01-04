@@ -1,6 +1,6 @@
 // Service Worker for Philosophizer PWA
-const CACHE_NAME = 'philosophizer-v1';
-const RUNTIME_CACHE = 'philosophizer-runtime-v1';
+const CACHE_NAME = 'philosophizer-v2';
+const RUNTIME_CACHE = 'philosophizer-runtime-v2';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = ['/', '/index.html', '/phi.svg', '/manifest.json'];
@@ -46,8 +46,15 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Skip API calls (handle them normally for fresh data)
-  if (url.pathname.startsWith('/api/')) {
+  // Skip all backend API/data endpoints (never cache database calls)
+  if (
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/auth/') ||
+    url.pathname.startsWith('/agent') ||
+    url.pathname.startsWith('/rag') ||
+    url.pathname.startsWith('/conversations') ||
+    url.pathname.startsWith('/admin/')
+  ) {
     return;
   }
 
