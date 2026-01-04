@@ -39,6 +39,67 @@ interface DockerImage {
   url: string;
 }
 
+// Helper function to format size strings and convert to appropriate units
+// (e.g., "1349 MB" -> "1.32 GB", "1234 KB" -> "1.21 MB")
+function formatSize(size: string): string {
+  if (!size) return size;
+
+  // Parse the size string to extract number and unit
+  const match = size.match(/^([\d.]+)\s*(kb|mb|gb|tb|bytes?)\s*$/i);
+  if (!match || !match[1] || !match[2]) {
+    // If parsing fails, just uppercase the units
+    return size
+      .replace(/\bkb\b/gi, 'KB')
+      .replace(/\bmb\b/gi, 'MB')
+      .replace(/\bgb\b/gi, 'GB')
+      .replace(/\btb\b/gi, 'TB')
+      .replace(/\bbytes?\b/gi, 'Bytes');
+  }
+
+  let value = parseFloat(match[1]);
+  let unit = match[2].toLowerCase();
+
+  // Convert to bytes first for easier conversion
+  let bytes = 0;
+  switch (unit) {
+    case 'tb':
+      bytes = value * 1024 * 1024 * 1024 * 1024;
+      break;
+    case 'gb':
+      bytes = value * 1024 * 1024 * 1024;
+      break;
+    case 'mb':
+      bytes = value * 1024 * 1024;
+      break;
+    case 'kb':
+      bytes = value * 1024;
+      break;
+    case 'byte':
+    case 'bytes':
+      bytes = value;
+      break;
+  }
+
+  // Convert to the most appropriate unit
+  const formatValue = (val: number) => {
+    const formatted = val.toFixed(2);
+    // Remove trailing zeros and decimal point if not needed
+    return formatted.replace(/\.?0+$/, '');
+  };
+
+  if (bytes >= 1024 * 1024 * 1024 * 1024) {
+    return formatValue(bytes / (1024 * 1024 * 1024 * 1024)) + ' TB';
+  } else if (bytes >= 1024 * 1024 * 1024) {
+    return formatValue(bytes / (1024 * 1024 * 1024)) + ' GB';
+  } else if (bytes >= 1024 * 1024) {
+    return formatValue(bytes / (1024 * 1024)) + ' MB';
+  } else if (bytes >= 1024) {
+    return formatValue(bytes / 1024) + ' KB';
+  } else {
+    return bytes.toFixed(0) + ' Bytes';
+  }
+}
+
 export function AdminPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -336,25 +397,27 @@ export function AdminPage() {
                   <div>
                     <div className="text-text-muted">Total Database</div>
                     <div className="text-text font-medium">
-                      {stats.database.sizes.total_size}
+                      {formatSize(stats.database.sizes.total_size)}
                     </div>
                   </div>
                   <div>
                     <div className="text-text-muted">RAG Chunks Table</div>
                     <div className="text-text font-medium">
-                      {stats.database.sizes.chunks_table_size}
+                      {formatSize(stats.database.sizes.chunks_table_size)}
                     </div>
                   </div>
                   <div>
                     <div className="text-text-muted">Conversations Table</div>
                     <div className="text-text font-medium">
-                      {stats.database.sizes.conversations_table_size}
+                      {formatSize(
+                        stats.database.sizes.conversations_table_size
+                      )}
                     </div>
                   </div>
                   <div>
                     <div className="text-text-muted">Users Table</div>
                     <div className="text-text font-medium">
-                      {stats.database.sizes.users_table_size}
+                      {formatSize(stats.database.sizes.users_table_size)}
                     </div>
                   </div>
                 </div>
