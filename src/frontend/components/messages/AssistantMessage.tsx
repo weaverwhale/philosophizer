@@ -75,8 +75,8 @@ interface MessagePartProps {
 }
 
 function MessagePart({ part, index }: MessagePartProps) {
-  // Skip step-start parts
-  if (part.type === 'step-start') {
+  // Skip step-start parts and dynamic-tool parts
+  if (part.type === 'step-start' || part.type === 'dynamic-tool') {
     return null;
   }
 
