@@ -19,6 +19,7 @@ import {
   restoreBackup,
   publishDocker,
   getDockerImages,
+  getPrompts,
 } from './endpoints/admin';
 import { initializeAgent } from './utils/agent';
 import { testConnection } from './db/connection';
@@ -54,6 +55,7 @@ const server = Bun.serve({
     '/auth/me': { GET: me },
     // Admin routes
     '/admin/stats': { GET: getStats },
+    '/admin/prompts': { GET: getPrompts },
     '/admin/rag/clear': { POST: clearRAG },
     '/admin/rag/reseed': { POST: reseedRAG },
     '/admin/backup': { POST: createBackup },
@@ -77,33 +79,34 @@ const server = Bun.serve({
 
     // Serve static files from public directory
     const publicPath = path.join(import.meta.dir, '..', 'public', url.pathname);
-    
+
     if (existsSync(publicPath)) {
       const file = Bun.file(publicPath);
       const ext = publicPath.split('.').pop()?.toLowerCase();
-      
+
       // Map file extensions to content types
       const contentTypeMap: Record<string, string> = {
-        'svg': 'image/svg+xml',
-        'png': 'image/png',
-        'jpg': 'image/jpeg',
-        'jpeg': 'image/jpeg',
-        'gif': 'image/gif',
-        'webp': 'image/webp',
-        'json': 'application/json',
-        'js': 'application/javascript',
+        svg: 'image/svg+xml',
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        gif: 'image/gif',
+        webp: 'image/webp',
+        json: 'application/json',
+        js: 'application/javascript',
       };
-      
-      const contentType = contentTypeMap[ext || ''] || 'application/octet-stream';
+
+      const contentType =
+        contentTypeMap[ext || ''] || 'application/octet-stream';
       const headers: Record<string, string> = { 'Content-Type': contentType };
-      
+
       // Add cache control for static assets
       if (['svg', 'png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext || '')) {
         headers['Cache-Control'] = 'public, max-age=31536000, immutable';
       } else if (ext === 'json' && url.pathname === '/manifest.json') {
         headers['Cache-Control'] = 'public, max-age=3600';
       }
-      
+
       return new Response(file, { headers });
     }
 

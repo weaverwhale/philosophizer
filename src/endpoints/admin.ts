@@ -11,6 +11,8 @@ import { addChunks } from '../rag/utils/vectorStore';
 import { generateQuestions } from '../rag/utils/questionGenerator';
 import { embed, embedMany } from 'ai';
 import { EMBEDDING_MODEL } from '../utils/providers';
+import { getSystemPrompt } from '../constants/prompts';
+import { PHILOSOPHERS } from '../constants/philosophers';
 
 const PROJECT_ROOT = join(import.meta.dir, '..', '..');
 
@@ -780,9 +782,79 @@ function formatBytes(bytes: number): string {
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
 
+/**
+ * Helper function to estimate token count
+ * Uses a rough approximation: 1 token ≈ 4 characters for English text
+ * This is a reasonable approximation for GPT models
+ */
+function estimateTokenCount(text: string): number {
+  // Remove extra whitespace and normalize
+  const normalized = text.trim();
+  // Rough approximation: 1 token ≈ 4 characters
+  // This is fairly accurate for English text with GPT models
+  return Math.ceil(normalized.length / 4);
+}
+
+/**
+ * GET /admin/prompts - Get all available prompts with token counts
+ */
+export const getPrompts = async (req: Request) => {
+  const authResult = await requireAdmin(req);
+  if (authResult instanceof Response) return authResult;
+
+  try {
+    const url = new URL(req.url);
+    const philosopherId = url.searchParams.get('philosopherId') || undefined;
+
+    // Generate the appropriate system prompt
+    const systemPrompt = getSystemPrompt(philosopherId);
+    const tokenCount = estimateTokenCount(systemPrompt);
+
+    // Get list of available philosophers
+    const availablePhilosophers = Object.entries(PHILOSOPHERS).map(
+      ([id, phil]) => ({
+        id,
+        name: phil.name,
+        tradition: phil.tradition,
+      })
+    );
+
+    return new Response(
+      JSON.stringify({
+        prompt: systemPrompt,
+        tokenCount,
+        characterCount: systemPrompt.length,
+        philosopherId: philosopherId || 'default',
+        philosopherName: philosopherId
+          ? PHILOSOPHERS[philosopherId]?.name || 'Unknown'
+          : 'Default (All Philosophers)',
+        availablePhilosophers,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Get prompts error:', error);
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : String(error),
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+};
+
 // Export all endpoints
 export const admin = {
   '/admin/stats': { GET: getStats },
+  '/admin/prompts': { GET: getPrompts },
   '/admin/rag/clear': { POST: clearRAG },
   '/admin/rag/reseed': { POST: reseedRAG },
   '/admin/backup': { POST: createBackup },
