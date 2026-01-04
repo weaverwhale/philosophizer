@@ -42,8 +42,21 @@ export function ChatPage() {
   const [selectedPhilosopher, setSelectedPhilosopher] = useState<string | null>(
     null
   );
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(() => {
+    // Load saved model preference from localStorage
+    const saved = localStorage.getItem('selected_model');
+    return saved || null;
+  });
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Save model selection to localStorage when it changes
+  useEffect(() => {
+    if (selectedModel) {
+      localStorage.setItem('selected_model', selectedModel);
+    } else {
+      localStorage.removeItem('selected_model');
+    }
+  }, [selectedModel]);
 
   // Get random starter questions based on selected philosopher
   const randomQuestions = useMemo(() => {
@@ -86,22 +99,29 @@ export function ChatPage() {
     clearCurrentConversation,
   } = useConversations();
 
+  // Memoize transport to ensure it updates when selectedModel or selectedPhilosopher changes
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: '/agent',
+        headers: (): Record<string, string> => {
+          const token = localStorage.getItem('auth_token');
+          if (token) {
+            return { Authorization: `Bearer ${token}` };
+          }
+          return {};
+        },
+        body: () => ({
+          philosopherId: selectedPhilosopher,
+          modelId: selectedModel,
+        }),
+      }),
+    [selectedPhilosopher, selectedModel]
+  );
+
   // Use the AI SDK's useChat hook
   const { messages, sendMessage, setMessages, status, stop } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/agent',
-      headers: (): Record<string, string> => {
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-          return { Authorization: `Bearer ${token}` };
-        }
-        return {};
-      },
-      body: () => ({
-        philosopherId: selectedPhilosopher,
-        modelId: selectedModel,
-      }),
-    }),
+    transport,
     onError: err => {
       const errorText =
         err instanceof Error ? err.message : 'An unexpected error occurred';

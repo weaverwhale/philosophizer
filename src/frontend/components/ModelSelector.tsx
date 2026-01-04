@@ -64,18 +64,9 @@ export function ModelSelector({
           className="w-full px-3 py-2 bg-surface-secondary border border-border rounded-lg text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer appearance-none pr-8"
           disabled={disabled || loading}
         >
-          <option
-            value={modelsData?.defaultModel || ''}
-            selected={!selectedModel}
-          >
-            Default Model
-          </option>
+          <option value="">Default Model</option>
           {modelsData?.models.map(model => (
-            <option
-              key={model.id}
-              value={model.id}
-              selected={model.id === modelsData.defaultModel}
-            >
+            <option key={model.id} value={model.id}>
               {model.name}
               {model.costPerToken &&
                 ` ($${model.costPerToken.prompt}/$${model.costPerToken.completion} per 1M tokens)`}
