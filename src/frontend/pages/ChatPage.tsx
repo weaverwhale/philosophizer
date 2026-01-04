@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport } from 'ai';
 import { Messages } from '../components/messages/Messages';
+import { useChatTransport } from '../hooks/useChatTransport';
 import {
   STARTER_QUESTIONS,
   QUESTIONS_BY_TRADITION,
@@ -99,34 +99,11 @@ export function ChatPage() {
     clearCurrentConversation,
   } = useConversations();
 
-  // Use refs to capture latest values for the transport body
-  const selectedPhilosopherRef = useRef(selectedPhilosopher);
-  const selectedModelRef = useRef(selectedModel);
-
-  // Keep refs in sync with state
-  selectedPhilosopherRef.current = selectedPhilosopher;
-  selectedModelRef.current = selectedModel;
-
-  // Create transport once - body function reads from refs
-  const transport = useMemo(
-    () =>
-      new DefaultChatTransport({
-        api: '/agent',
-        headers: (): Record<string, string> => {
-          const token = localStorage.getItem('auth_token');
-          const headers: Record<string, string> = {};
-          if (token) {
-            headers.Authorization = `Bearer ${token}`;
-          }
-          return headers;
-        },
-        body: () => ({
-          philosopherId: selectedPhilosopherRef.current,
-          modelId: selectedModelRef.current,
-        }),
-      }),
-    []
-  );
+  // Create transport that dynamically uses current model/philosopher selections
+  const transport = useChatTransport({
+    selectedModel,
+    selectedPhilosopher,
+  });
 
   // Use the AI SDK's useChat hook
   const { messages, sendMessage, setMessages, status, stop } = useChat({
