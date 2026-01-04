@@ -62,7 +62,7 @@ export function AdminPage() {
   const [selectedBackup, setSelectedBackup] = useState('');
   const [dockerImageName, setDockerImageName] = useState('');
   const [dockerRepo, setDockerRepo] = useState('');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('database-statistics');
 
   // Check if user is admin
   useEffect(() => {
