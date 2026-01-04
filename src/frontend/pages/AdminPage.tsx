@@ -9,8 +9,8 @@ import { BackupManagement } from '../components/admin/BackupManagement';
 import { RestorePublish } from '../components/admin/RestorePublish';
 import { DockerImages } from '../components/admin/DockerImages';
 import { OperationLogs } from '../components/admin/OperationLogs';
-import { Tabs } from '../components/admin/Tabs';
-import type { Tab } from '../components/admin/Tabs';
+import { Tabs, type Tab } from '../components/admin/Tabs';
+import { Logo } from '../components/Logo';
 
 interface AdminStats {
   rag: {
@@ -269,8 +269,8 @@ export function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-text">Loading admin panel...</div>
+      <div className="py-23.25">
+        <Logo />
       </div>
     );
   }

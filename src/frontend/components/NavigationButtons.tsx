@@ -27,7 +27,7 @@ export const AboutButton = () => (
   <Link
     to="/about"
     className="flex items-center justify-center w-9 h-9 bg-surface border border-border hover:bg-surface-secondary text-text-muted hover:text-text rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-    title="About - View indexed philosophers"
+    title="View indexed philosophers"
   >
     <svg
       width="16"
@@ -76,7 +76,7 @@ export const AdminButton = () => {
     <Link
       to="/admin"
       className="flex items-center justify-center w-9 h-9 bg-surface border border-red-600 text-red-600  rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-600 cursor-pointer"
-      title="Admin Panel"
+      title="Admin panel"
     >
       <svg
         width="16"
