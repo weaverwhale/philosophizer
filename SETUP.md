@@ -374,17 +374,17 @@ All merge operations include:
 
 ### Conversations
 
-- `GET /conversations` - List user's conversations (requires auth)
-- `POST /conversations` - Create new conversation (requires auth)
-- `GET /conversations/:id` - Get conversation (requires auth)
-- `PUT /conversations/:id` - Update conversation (requires auth)
-- `DELETE /conversations/:id` - Delete conversation (requires auth)
+- `GET /api/conversations` - List user's conversations (requires auth)
+- `POST /api/conversations` - Create new conversation (requires auth)
+- `GET /api/conversations/:id` - Get conversation (requires auth)
+- `PUT /api/conversations/:id` - Update conversation (requires auth)
+- `DELETE /api/conversations/:id` - Delete conversation (requires auth)
 
 ### AI
 
-- `POST /agent` - Chat with AI agent (requires auth)
-- `POST /rag` - Query philosophical texts
-- `GET /rag` - Get RAG statistics
+- `POST /api/agent` - Chat with AI agent (requires auth)
+- `POST /api/rag` - Query philosophical texts
+- `GET /api/rag` - Get RAG statistics
 
 ### Philosophers
 

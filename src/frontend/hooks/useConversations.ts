@@ -36,7 +36,7 @@ export function useConversations() {
   const fetchConversations = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/conversations', {
+      const response = await fetch('/api/conversations', {
         headers: getAuthHeaders(),
       });
       if (!response.ok) throw new Error('Failed to fetch conversations');
@@ -60,7 +60,7 @@ export function useConversations() {
     async (title?: string): Promise<Conversation | null> => {
       try {
         setIsLoading(true);
-        const response = await fetch('/conversations', {
+        const response = await fetch('/api/conversations', {
           method: 'POST',
           headers: getAuthHeaders(),
           body: JSON.stringify({ title: title || 'New Conversation' }),
@@ -86,7 +86,7 @@ export function useConversations() {
     async (id: string): Promise<Conversation | null> => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/conversations/${id}`, {
+        const response = await fetch(`/api/conversations/${id}`, {
           headers: getAuthHeaders(),
         });
         if (!response.ok) throw new Error('Failed to load conversation');
@@ -111,7 +111,7 @@ export function useConversations() {
 
       try {
         const response = await fetch(
-          `/conversations/${currentConversation.id}`,
+          `/api/conversations/${currentConversation.id}`,
           {
             method: 'PUT',
             headers: getAuthHeaders(),
@@ -139,7 +139,7 @@ export function useConversations() {
   const updateTitle = useCallback(
     async (id: string, title: string): Promise<boolean> => {
       try {
-        const response = await fetch(`/conversations/${id}`, {
+        const response = await fetch(`/api/conversations/${id}`, {
           method: 'PUT',
           headers: getAuthHeaders(),
           body: JSON.stringify({ title }),
@@ -167,7 +167,7 @@ export function useConversations() {
   const deleteConversation = useCallback(
     async (id: string): Promise<boolean> => {
       try {
-        const response = await fetch(`/conversations/${id}`, {
+        const response = await fetch(`/api/conversations/${id}`, {
           method: 'DELETE',
           headers: getAuthHeaders(),
         });

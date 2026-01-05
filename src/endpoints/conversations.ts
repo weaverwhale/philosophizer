@@ -12,8 +12,8 @@ import { requireAuth } from '../middleware/auth';
 /**
  * Conversations endpoint
  *
- * GET  /conversations         - List all conversations
- * POST /conversations         - Create a new conversation
+ * GET  /api/conversations         - List all conversations
+ * POST /api/conversations         - Create a new conversation
  */
 export const conversations = {
   GET: async (req: Request) => {
@@ -74,9 +74,9 @@ export const conversations = {
 /**
  * Single conversation endpoint
  *
- * GET    /conversations/:id - Get a conversation with messages
- * PUT    /conversations/:id - Update conversation (title or messages)
- * DELETE /conversations/:id - Delete a conversation
+ * GET    /api/conversations/:id - Get a conversation with messages
+ * PUT    /api/conversations/:id - Update conversation (title or messages)
+ * DELETE /api/conversations/:id - Delete a conversation
  */
 export const conversation = {
   GET: async (req: Request) => {

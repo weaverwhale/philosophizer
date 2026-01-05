@@ -26,7 +26,7 @@ export function useChatTransport({
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
-        api: '/agent',
+        api: '/api/agent',
         headers: (): Record<string, string> => {
           const token = localStorage.getItem('auth_token');
           const headers: Record<string, string> = {};

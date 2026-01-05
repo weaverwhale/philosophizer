@@ -306,7 +306,7 @@ export function AboutPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch('/philosophers');
+        const response = await fetch('/api/philosophers');
         if (!response.ok) throw new Error('Failed to fetch philosophers');
         const json = await response.json();
         setData(json);

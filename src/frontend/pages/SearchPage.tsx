@@ -131,7 +131,7 @@ export function SearchPage() {
   useEffect(() => {
     async function fetchPhilosophers() {
       try {
-        const response = await fetch('/philosophers');
+        const response = await fetch('/api/philosophers');
         if (response.ok) {
           const data = await response.json();
           setPhilosophers(data);
@@ -207,7 +207,7 @@ export function SearchPage() {
       requestBody.questionWeight = questionWeight;
       requestBody.contentWeight = contentWeight;
 
-      const response = await fetch('/rag', {
+      const response = await fetch('/api/rag', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),

@@ -66,15 +66,15 @@ const server = Bun.serve({
     '/admin/publish': { POST: publishDocker },
     '/admin/docker/images': { GET: getDockerImages },
     // API routes
-    '/agent': agent,
-    '/rag': rag,
-    '/models': models,
-    '/philosophers': philosophersEndpoint,
-    '/philosophers/:id': philosopherDetailEndpoint,
-    '/ask-philosopher': philosopherQueryEndpoint,
-    '/texts/:sourceId': textsEndpoint,
-    '/conversations': conversations,
-    '/conversations/:id': conversation,
+    '/api/agent': agent,
+    '/api/rag': rag,
+    '/api/models': models,
+    '/api/philosophers': philosophersEndpoint,
+    '/api/philosophers/:id': philosopherDetailEndpoint,
+    '/api/ask-philosopher': philosopherQueryEndpoint,
+    '/api/texts/:sourceId': textsEndpoint,
+    '/api/conversations': conversations,
+    '/api/conversations/:id': conversation,
   },
   async fetch(req: Request) {
     const url = new URL(req.url);
@@ -140,7 +140,9 @@ const localIP = getLocalIP();
 const isNetworkAccessible = server.hostname === '0.0.0.0';
 
 console.log(`\n💻 Web UI:`);
-console.log(`    http://localhost:${server.port}        - Main chat interface`);
+console.log(
+  `    http://localhost:${server.port}           - Main chat interface`
+);
 if (isNetworkAccessible) {
   console.log(
     `    http://${localIP}:${server.port}        - Network access (from other devices)`
@@ -161,29 +163,29 @@ console.log('  GET  /auth/me               - Get current user');
 
 console.log('\n🤖 AI:');
 console.log(
-  '  POST /agent                 - Agent with tools & conversation history'
+  '  POST /api/agent                 - Agent with tools & conversation history'
 );
 
 console.log('\n📚 RAG:');
-console.log('  POST /rag                   - Query vector store');
-console.log('  GET  /rag                   - Collection statistics');
+console.log('  POST /api/rag                   - Query vector store');
+console.log('  GET  /api/rag                   - Collection statistics');
 
 console.log('\n🗣️  Conversations (auth required):');
-console.log('  GET    /conversations       - List all');
-console.log('  POST   /conversations       - Create new');
-console.log('  GET    /conversations/:id   - Get with messages');
-console.log('  PUT    /conversations/:id   - Update title/messages');
-console.log('  DELETE /conversations/:id   - Delete');
+console.log('  GET    /api/conversations       - List all');
+console.log('  POST   /api/conversations       - Create new');
+console.log('  GET    /api/conversations/:id   - Get with messages');
+console.log('  PUT    /api/conversations/:id   - Update title/messages');
+console.log('  DELETE /api/conversations/:id   - Delete');
 
 console.log('\n🧙 Philosophers:');
-console.log('  GET  /philosophers          - List all');
-console.log('  GET  /philosophers/:id      - Get details');
+console.log('  GET  /api/philosophers          - List all');
+console.log('  GET  /api/philosophers/:id      - Get details');
 console.log(
-  '  POST /ask-philosopher       - Query one or more (body: {philosopherId: "plato" | ["plato","aristotle"], topic: "..."})'
+  '  POST /api/ask-philosopher       - Query one or more (body: {philosopherId: "plato" | ["plato","aristotle"], topic: "..."})'
 );
 console.log(
-  '  GET  /ask-philosopher       - Query via params (?philosopherId=plato,aristotle&topic=...)'
+  '  GET  /api/ask-philosopher       - Query via params (?philosopherId=plato,aristotle&topic=...)'
 );
 
 console.log('\n📄 Texts:');
-console.log('  GET  /texts/:sourceId       - Download source file');
+console.log('  GET  /api/texts/:sourceId       - Download source file');

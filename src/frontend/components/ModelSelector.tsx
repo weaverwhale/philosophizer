@@ -33,7 +33,7 @@ export function ModelSelector({
     const fetchModels = async () => {
       setLoading(true);
       try {
-        const response = await fetch('/models?available=true');
+        const response = await fetch('/api/models?available=true');
         if (response.ok) {
           const data = await response.json();
           setModelsData(data);
