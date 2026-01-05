@@ -99,12 +99,14 @@ export const AdminButton = () => {
 
 export const NavigationButtons = ({
   children,
+  hideChatButton = false,
 }: {
   children?: React.ReactNode;
+  hideChatButton?: boolean;
 }) => (
   <div className="flex items-center gap-2">
     {children}
-    <ChatButton />
+    {!hideChatButton && <ChatButton />}
     <SearchButton />
     <AboutButton />
     <AdminButton />

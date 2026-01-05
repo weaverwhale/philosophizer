@@ -475,8 +475,9 @@ export function ChatPage() {
             <div className="flex items-center gap-2">
               <MenuButton />
             </div>
-            <NavigationButtons>
+            <NavigationButtons hideChatButton={messages.length > 0}>
               <SettingsButton />
+              {messages.length > 0 && <Clear />}
             </NavigationButtons>
           </div>
         </div>
