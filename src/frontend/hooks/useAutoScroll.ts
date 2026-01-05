@@ -122,7 +122,8 @@ export function useAutoScroll<T>(
 
   // Handle message updates (smooth scroll during streaming)
   useEffect(() => {
-    if (isStreamingRef.current) {
+    // Only auto-scroll during streaming if user hasn't scrolled away
+    if (isStreamingRef.current && shouldAutoScrollRef.current) {
       scrollToBottom(false);
     }
   }, [dependency, scrollToBottom]);
@@ -136,12 +137,15 @@ export function useAutoScroll<T>(
     if (wasStreamingRef.current && !isCurrentlyStreaming) {
       isStreamingRef.current = false;
 
-      // Wait for MessageActions buttons to render, then scroll
-      requestAnimationFrame(() => {
+      // Only scroll to show buttons if user hasn't scrolled away
+      if (shouldAutoScrollRef.current) {
+        // Wait for MessageActions buttons to render, then scroll
         requestAnimationFrame(() => {
-          scrollToBottom(false);
+          requestAnimationFrame(() => {
+            scrollToBottom(false);
+          });
         });
-      });
+      }
     }
 
     wasStreamingRef.current = isCurrentlyStreaming;
