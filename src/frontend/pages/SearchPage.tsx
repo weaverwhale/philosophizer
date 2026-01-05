@@ -143,6 +143,19 @@ export function SearchPage() {
     fetchPhilosophers();
   }, []);
 
+  // Reset resultsQuery when advanced filters change to allow re-submission
+  useEffect(() => {
+    setResultsQuery('');
+  }, [
+    philosopherFilter,
+    sourceIdFilter,
+    minScoreFilter,
+    useHQE,
+    useMetadataBoosting,
+    questionWeight,
+    contentWeight,
+  ]);
+
   const performSearch = useCallback(async () => {
     if (isSearchingRef.current) {
       return;
@@ -153,8 +166,9 @@ export function SearchPage() {
       return;
     }
 
-    // Skip if search params haven't changed
-    if (resultsQuery === searchQuery.trim()) {
+    // Skip if search query hasn't changed and we already have results
+    // (resultsQuery is reset when filters change, so this allows re-search)
+    if (resultsQuery === searchQuery.trim() && results.length > 0) {
       return;
     }
 
@@ -220,6 +234,8 @@ export function SearchPage() {
     }
   }, [
     searchQuery,
+    resultsQuery,
+    results.length,
     philosopherFilter,
     sourceIdFilter,
     minScoreFilter,
