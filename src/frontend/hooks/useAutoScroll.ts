@@ -16,6 +16,7 @@ export function useAutoScroll<T>(
   const lastScrollHeightRef = useRef(0);
   const isProgrammaticScrollRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const userInteractedRef = useRef(false);
 
   const scrollToBottom = useCallback((instant = false) => {
     const container = scrollContainerRef.current;
@@ -34,13 +35,13 @@ export function useAutoScroll<T>(
       });
       lastScrollHeightRef.current = container.scrollHeight;
 
-      // Reset the flag after scroll completes
-      // Use longer timeout for smooth scrolling to ensure it completes
+      // Reset the flag after scroll animation completes
+      // Smooth scrolls need more time to complete
       scrollTimeoutRef.current = setTimeout(
         () => {
           isProgrammaticScrollRef.current = false;
         },
-        instant ? 50 : 250
+        instant ? 10 : 300
       );
     }
   }, []);
@@ -49,27 +50,56 @@ export function useAutoScroll<T>(
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Ignore scroll events during programmatic scrolling to prevent false positives
-    if (isProgrammaticScrollRef.current) {
-      return;
-    }
-
     const distanceFromBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight;
 
     // If user scrolled significantly away from bottom, disable auto-scroll
     if (distanceFromBottom > AUTO_SCROLL_THRESHOLD) {
-      shouldAutoScrollRef.current = false;
-    } else {
+      // If user actively interacted (wheel/touch), override programmatic scroll
+      if (userInteractedRef.current || !isProgrammaticScrollRef.current) {
+        shouldAutoScrollRef.current = false;
+        // Cancel any pending programmatic scroll
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
+        isProgrammaticScrollRef.current = false;
+      }
+    } else if (!isProgrammaticScrollRef.current) {
       // Re-enable auto-scroll when user scrolls back near the bottom
       shouldAutoScrollRef.current = true;
     }
+
+    // Reset user interaction flag after handling
+    userInteractedRef.current = false;
+  }, []);
+
+  const handleUserInteraction = useCallback(() => {
+    userInteractedRef.current = true;
   }, []);
 
   const enableAutoScroll = useCallback(() => {
     shouldAutoScrollRef.current = true;
     isStreamingRef.current = true;
   }, []);
+
+  // Detect user scroll interactions (wheel, touch)
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('wheel', handleUserInteraction, {
+      passive: true,
+    });
+    container.addEventListener('touchmove', handleUserInteraction, {
+      passive: true,
+    });
+
+    return () => {
+      container.removeEventListener('wheel', handleUserInteraction);
+      container.removeEventListener('touchmove', handleUserInteraction);
+    };
+  }, [handleUserInteraction]);
 
   // Detect conversation changes
   useEffect(() => {
@@ -128,10 +158,15 @@ export function useAutoScroll<T>(
     }
   }, [dependency, scrollToBottom]);
 
-  // Handle streaming completion - scroll when buttons appear
+  // Handle streaming state changes
   useEffect(() => {
     const isCurrentlyStreaming =
       status === 'submitted' || status === 'streaming';
+
+    // Detect when streaming starts
+    if (!wasStreamingRef.current && isCurrentlyStreaming) {
+      isStreamingRef.current = true;
+    }
 
     // Detect when streaming just finished
     if (wasStreamingRef.current && !isCurrentlyStreaming) {
