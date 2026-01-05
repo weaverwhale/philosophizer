@@ -26,6 +26,106 @@ import {
 // ============================================================================
 
 /**
+ * Common stop words to filter out from queries for better semantic search
+ */
+const STOP_WORDS = new Set([
+  'the',
+  'a',
+  'an',
+  'and',
+  'or',
+  'but',
+  'in',
+  'on',
+  'at',
+  'to',
+  'for',
+  'of',
+  'with',
+  'by',
+  'from',
+  'as',
+  'is',
+  'was',
+  'are',
+  'were',
+  'been',
+  'be',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+  'will',
+  'would',
+  'should',
+  'could',
+  'may',
+  'might',
+  'must',
+  'can',
+  'this',
+  'that',
+  'these',
+  'those',
+  'i',
+  'you',
+  'he',
+  'she',
+  'it',
+  'we',
+  'they',
+  'what',
+  'which',
+  'who',
+  'when',
+  'where',
+  'why',
+  'how',
+  'all',
+  'each',
+  'every',
+  'both',
+  'few',
+  'more',
+  'most',
+  'other',
+  'some',
+  'such',
+  'no',
+  'nor',
+  'not',
+  'only',
+  'own',
+  'same',
+  'so',
+  'than',
+  'too',
+  'very',
+  'just',
+  'etc',
+  'vs',
+  'via',
+]);
+
+/**
+ * Remove stop words from a query to improve semantic search quality
+ * Preserves important philosophical terms and proper nouns
+ */
+function removeStopWords(query: string): string {
+  const words = query.toLowerCase().split(/\s+/);
+  const filtered = words.filter(word => {
+    // Remove punctuation for comparison
+    const cleaned = word.replace(/[^\w]/g, '');
+    return cleaned.length > 0 && !STOP_WORDS.has(cleaned);
+  });
+
+  // If filtering removes everything, return original (better than empty)
+  return filtered.length > 0 ? filtered.join(' ') : query;
+}
+
+/**
  * Query the RAG system for relevant passages with expanded context
  * Uses query augmentation and adjacent chunk retrieval for better results
  */
@@ -39,10 +139,13 @@ async function queryRAG(
       return { found: false, passages: '' };
     }
 
-    // Query for relevant passages
+    // Remove stop words for better semantic search
+    const filteredTopic = removeStopWords(topic);
+
+    // Query for relevant passages using filtered topic
     const results = await queryPhilosopher(
       philosopherKey,
-      topic,
+      filteredTopic,
       PHILOSOPHER_QUERY_LIMIT
     );
 
@@ -52,7 +155,11 @@ async function queryRAG(
 
     // Format the results with expanded context for high-relevance matches
     let passages = `\n### 📚 Relevant Passages from Primary Sources\n`;
-    passages += `*Query: "${topic}" — Found ${results.length} relevant passages*\n`;
+    passages += `*Query: "${topic}"`;
+    if (filteredTopic !== topic.toLowerCase()) {
+      passages += ` (filtered: "${filteredTopic}")`;
+    }
+    passages += ` — Found ${results.length} relevant passages*\n`;
 
     for (const result of results) {
       const relevancePercent = (result.relevanceScore * 100).toFixed(0);
