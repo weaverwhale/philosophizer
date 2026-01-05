@@ -5,11 +5,7 @@ import { PhilosopherMultiSelect } from '../components/PhilosopherMultiSelect';
 
 import type { RagQueryResponse } from '../../endpoints/rag';
 import type { QueryResult } from '../../rag/utils/vectorStore';
-import {
-  ChatButton,
-  AboutButton,
-  AdminButton,
-} from '../components/NavigationButtons';
+import { NavigationButtons } from '../components/NavigationButtons';
 
 interface PhilosophersData {
   philosophers: Array<{
@@ -264,12 +260,7 @@ export function SearchPage() {
           <div className="flex items-center gap-4">
             <h1 className="text-lg font-semibold text-text">Search Database</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <ChatButton />
-            <AboutButton />
-            <AdminButton />
-            <ThemeToggle />
-          </div>
+          <NavigationButtons />
         </div>
       </div>
 

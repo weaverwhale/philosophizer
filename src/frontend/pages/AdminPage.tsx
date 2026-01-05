@@ -362,7 +362,6 @@ export function AdminPage() {
   return (
     <div className="flex flex-col h-dvh bg-background overflow-hidden">
       <AdminHeader userEmail={user?.email} />
-
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );

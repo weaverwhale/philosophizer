@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
+import { ThemeToggle } from './ThemeToggle';
 
 export const SearchButton = () => (
   <Link
@@ -95,3 +96,18 @@ export const AdminButton = () => {
     </Link>
   );
 };
+
+export const NavigationButtons = ({
+  children,
+}: {
+  children?: React.ReactNode;
+}) => (
+  <div className="flex items-center gap-2">
+    {children}
+    <ChatButton />
+    <SearchButton />
+    <AboutButton />
+    <AdminButton />
+    <ThemeToggle />
+  </div>
+);

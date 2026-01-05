@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { NavigationButtons } from '../components/NavigationButtons';
 import { LoadingLogo } from '../components/Logo';
-import {
-  SearchButton,
-  ChatButton,
-  AdminButton,
-} from '../components/NavigationButtons';
 
 interface TextSourceWithStatus {
   id: string;
@@ -344,12 +339,7 @@ export function AboutPage() {
               Philosophers & Theologians
             </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <ChatButton />
-            <SearchButton />
-            <AdminButton />
-            <ThemeToggle />
-          </div>
+          <NavigationButtons />
         </div>
       </div>
 

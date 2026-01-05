@@ -8,18 +8,13 @@ import {
   QUESTIONS_BY_TRADITION,
 } from '../../constants/questions';
 import { TRADITION_GROUP_MAP } from '../../constants/traditions';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { ChatInput } from '../components/ChatInput';
 import { ConversationSidebar } from '../components/ConversationSidebar';
 import { ChatSettingsModal } from '../components/ChatSettingsModal';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useConversations } from '../hooks/useConversations';
 import { PHILOSOPHERS } from '../../constants/philosophers';
-import {
-  SearchButton,
-  AboutButton,
-  AdminButton,
-} from '../components/NavigationButtons';
+import { NavigationButtons } from '../components/NavigationButtons';
 
 // Utility to shuffle and limit questions
 function getRandomQuestions(questions: string[], limit: number): string[] {
@@ -480,14 +475,9 @@ export function ChatPage() {
             <div className="flex items-center gap-2">
               <MenuButton />
             </div>
-            <div className="flex items-center gap-3">
-              {messages.length > 0 && <Clear />}
+            <NavigationButtons>
               <SettingsButton />
-              <SearchButton />
-              <AboutButton />
-              <AdminButton />
-              <ThemeToggle />
-            </div>
+            </NavigationButtons>
           </div>
         </div>
 
