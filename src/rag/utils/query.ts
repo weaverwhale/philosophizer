@@ -20,6 +20,17 @@ export async function queryPhilosopher(
 }
 
 /**
+ * Query multiple philosophers' texts for relevant passages
+ */
+export async function queryPhilosophers(
+  philosophers: string[],
+  topic: string,
+  limit: number = 5
+): Promise<QueryResult[]> {
+  return queryPassages(topic, { philosopher: philosophers, limit });
+}
+
+/**
  * Query all philosophers for relevant passages
  */
 export async function queryAllPhilosophers(

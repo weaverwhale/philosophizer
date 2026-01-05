@@ -59,7 +59,7 @@ function PhilosopherCard({
   useEffect(() => {
     if (isExpanded && !detail) {
       setLoading(true);
-      fetch(`/api/philosophers/${philosopher.id}`)
+      fetch(`/philosophers/${philosopher.id}`)
         .then(res => res.json())
         .then(data => {
           setDetail(data);
@@ -306,7 +306,7 @@ export function AboutPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch('/api/philosophers');
+        const response = await fetch('/philosophers');
         if (!response.ok) throw new Error('Failed to fetch philosophers');
         const json = await response.json();
         setData(json);

@@ -68,11 +68,11 @@ const server = Bun.serve({
     // API routes
     '/agent': agent,
     '/rag': rag,
-    '/api/models': models,
-    '/api/philosophers': philosophersEndpoint,
-    '/api/philosophers/:id': philosopherDetailEndpoint,
-    '/api/ask-philosopher': philosopherQueryEndpoint,
-    '/api/texts/:sourceId': textsEndpoint,
+    '/models': models,
+    '/philosophers': philosophersEndpoint,
+    '/philosophers/:id': philosopherDetailEndpoint,
+    '/ask-philosopher': philosopherQueryEndpoint,
+    '/texts/:sourceId': textsEndpoint,
     '/conversations': conversations,
     '/conversations/:id': conversation,
   },
@@ -154,48 +154,36 @@ console.log(
   `    http://localhost:${server.port}/c/:id     - Conversation by ID`
 );
 
-console.log('\n🔐 Auth Endpoints:');
-console.log('  POST /auth/signup           - Create a new user account');
-console.log('  POST /auth/login            - Authenticate a user');
+console.log('\n🔐 Auth:');
+console.log('  POST /auth/signup           - Create account');
+console.log('  POST /auth/login            - Login');
 console.log('  GET  /auth/me               - Get current user');
 
-console.log('\n🤖 AI Endpoints:');
+console.log('\n🤖 AI:');
 console.log(
-  '  POST /agent                 - Agent with tools and conversation history'
+  '  POST /agent                 - Agent with tools & conversation history'
 );
 
-console.log('\n📚 RAG Endpoints:');
-console.log(
-  '  POST /rag                   - Query vector store for relevant passages'
-);
-console.log('  GET  /rag                   - Get collection statistics');
+console.log('\n📚 RAG:');
+console.log('  POST /rag                   - Query vector store');
+console.log('  GET  /rag                   - Collection statistics');
 
-console.log('\n🗣️  Conversation Endpoints:');
+console.log('\n🗣️  Conversations (auth required):');
+console.log('  GET    /conversations       - List all');
+console.log('  POST   /conversations       - Create new');
+console.log('  GET    /conversations/:id   - Get with messages');
+console.log('  PUT    /conversations/:id   - Update title/messages');
+console.log('  DELETE /conversations/:id   - Delete');
+
+console.log('\n🧙 Philosophers:');
+console.log('  GET  /philosophers          - List all');
+console.log('  GET  /philosophers/:id      - Get details');
 console.log(
-  '  GET  /conversations         - List all conversations (auth required)'
+  '  POST /ask-philosopher       - Query one or more (body: {philosopherId: "plato" | ["plato","aristotle"], topic: "..."})'
 );
 console.log(
-  '  POST /conversations         - Create a new conversation (auth required)'
-);
-console.log(
-  '  GET  /conversations/:id     - Get a conversation with messages (auth required)'
-);
-console.log(
-  '  PUT  /conversations/:id     - Update conversation title or messages (auth required)'
-);
-console.log(
-  '  DELETE /conversations/:id   - Delete a conversation (auth required)'
+  '  GET  /ask-philosopher       - Query via params (?philosopherId=plato,aristotle&topic=...)'
 );
 
-console.log('\n🧙 Philosopher Endpoints:');
-console.log('  GET  /api/philosophers      - List all indexed philosophers');
-console.log('  GET  /api/philosophers/:id  - Get philosopher details');
-console.log(
-  '  POST /api/ask-philosopher   - Ask a philosopher a question (simulates tool call)'
-);
-console.log(
-  '  GET  /api/ask-philosopher   - Ask a philosopher a question (via query params)'
-);
-
-console.log('\n📄 Text Endpoints:');
-console.log('  GET  /api/texts/:sourceId   - Download a text source file');
+console.log('\n📄 Texts:');
+console.log('  GET  /texts/:sourceId       - Download source file');

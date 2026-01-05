@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { LoadingLogo } from '../components/Logo';
+import { PhilosopherMultiSelect } from '../components/PhilosopherMultiSelect';
 
 import type { RagQueryResponse } from '../../endpoints/rag';
 import type { QueryResult } from '../../rag/utils/vectorStore';
@@ -53,7 +54,7 @@ function ResultCard({ result, query }: { result: QueryResult; query: string }) {
     return content.substring(0, maxLength) + '...';
   };
 
-  const downloadUrl = `/api/texts/${result.sourceId}`;
+  const downloadUrl = `/texts/${result.sourceId}`;
   const truncatedContent = truncateContent(result.content);
   const relevancePercent = (result.relevanceScore * 100).toFixed(1);
 
@@ -113,7 +114,7 @@ export function SearchPage() {
   const [elapsed, setElapsed] = useState<number | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [philosopherFilter, setPhilosopherFilter] = useState<string>('');
+  const [philosopherFilter, setPhilosopherFilter] = useState<string[]>([]);
   const [sourceIdFilter, setSourceIdFilter] = useState<string>('');
   const [minScoreFilter, setMinScoreFilter] = useState<number>(0.3);
   const [useHQE, setUseHQE] = useState<boolean>(true);
@@ -130,7 +131,7 @@ export function SearchPage() {
   useEffect(() => {
     async function fetchPhilosophers() {
       try {
-        const response = await fetch('/api/philosophers');
+        const response = await fetch('/philosophers');
         if (response.ok) {
           const data = await response.json();
           setPhilosophers(data);
@@ -166,7 +167,7 @@ export function SearchPage() {
     try {
       const requestBody: {
         query: string;
-        philosopher?: string;
+        philosopher?: string | string[];
         sourceId?: string;
         limit?: number;
         minScore?: number;
@@ -179,7 +180,12 @@ export function SearchPage() {
         limit: 20,
       };
 
-      if (philosopherFilter) requestBody.philosopher = philosopherFilter;
+      if (philosopherFilter.length > 0) {
+        requestBody.philosopher =
+          philosopherFilter.length === 1
+            ? philosopherFilter[0]
+            : philosopherFilter;
+      }
       if (sourceIdFilter.trim()) requestBody.sourceId = sourceIdFilter.trim();
       if (minScoreFilter > 0) requestBody.minScore = minScoreFilter;
       requestBody.useHQE = useHQE;
@@ -316,20 +322,15 @@ export function SearchPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-text mb-2">
-                      Philosopher
+                      Philosophers
                     </label>
-                    <select
-                      value={philosopherFilter}
-                      onChange={e => setPhilosopherFilter(e.target.value)}
-                      className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="">All Philosophers</option>
-                      {philosophers?.philosophers.map(p => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
+                    {philosophers && (
+                      <PhilosopherMultiSelect
+                        philosophers={philosophers.philosophers}
+                        selected={philosopherFilter}
+                        onChange={setPhilosopherFilter}
+                      />
+                    )}
                   </div>
 
                   <div>
@@ -473,10 +474,29 @@ export function SearchPage() {
 
           {!loading && !error && results.length > 0 && (
             <>
-              <div className="text-sm text-text-muted mb-4">
-                Found {results.length} result{results.length !== 1 ? 's' : ''}
-                {resultsQuery && ` for "${resultsQuery.trim()}"`}
-                {elapsed !== null && ` in ${elapsed}ms`}
+              <div className="mb-4">
+                <div className="text-sm text-text-muted">
+                  Found {results.length} result{results.length !== 1 ? 's' : ''}
+                  {resultsQuery && ` for "${resultsQuery.trim()}"`}
+                  {elapsed !== null && ` in ${elapsed}ms`}
+                </div>
+                {philosopherFilter.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {philosopherFilter.map(id => {
+                      const philosopher = philosophers?.philosophers.find(
+                        p => p.id === id
+                      );
+                      return philosopher ? (
+                        <span
+                          key={id}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                        >
+                          {philosopher.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
               </div>
               <div className="grid gap-4">
                 {results.map(result => (

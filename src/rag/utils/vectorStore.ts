@@ -169,7 +169,7 @@ export interface QueryResult {
 }
 
 export interface QueryOptions {
-  philosopher?: string;
+  philosopher?: string | string[]; // Single philosopher or array of philosophers
   sourceId?: string;
   limit?: number;
   minScore?: number;
@@ -215,9 +215,20 @@ export async function queryPassages(
   let paramIndex = 1;
 
   if (philosopher) {
-    conditions.push(`philosopher = $${paramIndex}`);
-    params.push(philosopher);
-    paramIndex++;
+    if (Array.isArray(philosopher)) {
+      // Multiple philosophers: use IN clause
+      const placeholders = philosopher
+        .map((_, i) => `$${paramIndex + i}`)
+        .join(', ');
+      conditions.push(`philosopher IN (${placeholders})`);
+      params.push(...philosopher);
+      paramIndex += philosopher.length;
+    } else {
+      // Single philosopher
+      conditions.push(`philosopher = $${paramIndex}`);
+      params.push(philosopher);
+      paramIndex++;
+    }
   }
 
   if (sourceId) {
