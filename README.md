@@ -7,7 +7,7 @@ Built with Bun, React, TypeScript, and PostgreSQL with pgvector for semantic sea
 ## Features
 
 - **AI Agent**: Multi-model support with streaming responses and tool calling
-- **RAG Search**: HQE (Hypothetical Question Embeddings) for improved semantic search over philosophical texts
+- **Advanced RAG**: HQE embeddings with BM25 scoring, term proximity analysis, and intelligent deduplication for superior search relevance
 - **Authentication**: Secure JWT-based user authentication
 - **Conversations**: Save and manage chat history
 - **PWA Support**: Install on mobile devices and desktops for an app-like experience
@@ -77,7 +77,7 @@ The system automatically generates secure secrets, downloads GPU-accelerated mod
 - **Frontend**: React 19, TypeScript, TailwindCSS 4
 - **Backend**: Vercel AI SDK v6 (beta), Zod validation
 - **Database**: PostgreSQL 16 with pgvector
-- **RAG**: HQE (Hypothetical Question Embeddings)
+- **RAG**: HQE embeddings + BM25 re-ranking + proximity scoring + deduplication
 - **Auth**: JWT with bcrypt
 - **Markdown**: Streamdown (optimized for streaming)
 
