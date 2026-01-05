@@ -33,8 +33,8 @@ Edit `.env` and set:
 #### 3. Start Services with Docker
 
 ```bash
-# Start PostgreSQL, ChromaDB, and Ollama
-docker compose up -d postgres chroma ollama
+# Start PostgreSQL with pgvector and Ollama
+docker compose up -d postgres ollama
 
 # Or use the npm script
 bun run postgres
@@ -86,15 +86,8 @@ Edit `.env` and set:
 - `DATABASE_URL` - Your PostgreSQL connection string
 - `JWT_SECRET` - A strong secret key for JWT tokens (generate with `openssl rand -base64 32`)
 - `OPENAI_API_KEY` - Your OpenAI API key
-- `CHROMA_URL` - Your ChromaDB URL (default: http://localhost:8000)
 
-#### 4. Start ChromaDB (if not already running)
-
-```bash
-bun run chroma
-```
-
-#### 5. Start the Development Server
+#### 4. Start the Development Server
 
 ```bash
 bun run dev
@@ -109,19 +102,23 @@ The server will start at http://localhost:1738
 3. You'll be automatically logged in and redirected to the chat interface
 4. Start chatting with the philosopher AI!
 
-## Existing Data Migration
+## Data Management
 
-If you have existing conversations in ChromaDB, they won't have a `userId` associated with them. You have two options:
+The application uses PostgreSQL with the pgvector extension to store:
 
-**Option 1: Clear all conversations**
+- User accounts and authentication data
+- Conversations and messages
+- Philosophical text embeddings (RAG system)
+
+To clear the RAG index and re-index philosophical texts:
 
 ```bash
-# This will delete all existing conversations
+# Clear all indexed texts
 bun run rag:clear
-```
 
-**Option 2: Keep existing conversations (they won't be visible)**
-Existing conversations without a `userId` will simply not be visible to any user. They'll remain in ChromaDB but won't be accessible through the UI.
+# Re-index all texts
+bun run rag:index
+```
 
 ## Troubleshooting
 
@@ -130,11 +127,6 @@ Existing conversations without a `userId` will simply not be visible to any user
 - Ensure PostgreSQL is running: `pg_isready`
 - Check your `DATABASE_URL` in `.env`
 - Verify database exists: `psql -l | grep philosophizer`
-
-### ChromaDB Issues
-
-- Ensure ChromaDB is running: `curl http://localhost:8000/api/v1/heartbeat`
-- Check ChromaDB logs: `docker logs chroma`
 
 ### Authentication Issues
 
@@ -219,16 +211,11 @@ bun run rag:stats
 
 **📖 For detailed information about adding PDFs, see [docs/adding-pdfs.md](docs/adding-pdfs.md).**
 
-```bash
-# Backup ChromaDB (deprecated - using pgvector now)
-bun run chroma:backup
-```
-
 ## Vector Data Backup & Merge Workflows
 
 ### Overview
 
-The vector database contains philosopher text chunks with embeddings. You can backup, restore, and selectively merge this data across environments while preserving user data (conversations, messages, etc.).
+The PostgreSQL database with pgvector extension contains philosopher text chunks with embeddings. You can backup, restore, and selectively merge this data across environments while preserving user data (conversations, messages, etc.).
 
 ### Backup Vector Data
 

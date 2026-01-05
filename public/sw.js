@@ -5,6 +5,18 @@ const RUNTIME_CACHE = 'philosophizer-runtime-v2';
 // Assets to cache on install
 const PRECACHE_ASSETS = ['/', '/index.html', '/phi.svg', '/manifest.json'];
 
+// API endpoints that should never be cached
+const API_PREFIXES = [
+  '/auth/',
+  '/agent',
+  '/rag',
+  '/conversations',
+  '/admin/',
+  '/models',
+  '/philosophers',
+  '/texts',
+];
+
 // Install event - cache essential assets
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -47,14 +59,7 @@ self.addEventListener('fetch', event => {
   }
 
   // Skip all backend API/data endpoints (never cache database calls)
-  if (
-    url.pathname.startsWith('/api/') ||
-    url.pathname.startsWith('/auth/') ||
-    url.pathname.startsWith('/agent') ||
-    url.pathname.startsWith('/rag') ||
-    url.pathname.startsWith('/conversations') ||
-    url.pathname.startsWith('/admin/')
-  ) {
+  if (API_PREFIXES.some(prefix => url.pathname.startsWith(prefix))) {
     return;
   }
 

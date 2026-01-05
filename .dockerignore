@@ -39,5 +39,4 @@ coverage/
 
 # Backup files
 *.bak
-# Note: chroma-backup.tar.gz is NOT ignored - needed for Dockerfile.chroma builds
 
