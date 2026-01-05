@@ -48,6 +48,7 @@ export function ChatPage() {
     return saved || null;
   });
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const isLoadingMessagesRef = useRef(false);
 
   // Save model selection to localStorage when it changes
   useEffect(() => {
@@ -142,6 +143,7 @@ export function ChatPage() {
         // Only load if we don't already have this conversation
         // This prevents reloading when we just created it and navigated to its URL
         if (currentConversation?.id !== urlConversationId) {
+          isLoadingMessagesRef.current = true;
           const conversation = await loadConversation(urlConversationId);
           if (conversation?.messages) {
             const chatMessages = conversation.messages.map(msg => ({
@@ -151,6 +153,10 @@ export function ChatPage() {
             }));
             setMessages(chatMessages as any);
           }
+          // Reset the flag after a short delay to allow the effect to run
+          setTimeout(() => {
+            isLoadingMessagesRef.current = false;
+          }, 100);
         }
       }
       setInitialLoadDone(true);
@@ -163,6 +169,7 @@ export function ChatPage() {
     const handlePopState = async () => {
       const urlConversationId = getConversationIdFromUrl(id);
       if (urlConversationId) {
+        isLoadingMessagesRef.current = true;
         const conversation = await loadConversation(urlConversationId);
         if (conversation?.messages) {
           const chatMessages = conversation.messages.map(msg => ({
@@ -174,6 +181,9 @@ export function ChatPage() {
         } else {
           setMessages([]);
         }
+        setTimeout(() => {
+          isLoadingMessagesRef.current = false;
+        }, 100);
       } else {
         setMessages([]);
         clearCurrentConversation();
@@ -225,7 +235,14 @@ export function ChatPage() {
   // Auto-save messages when they change (debounced)
   const messageIds = messages.map(m => m.id).join(',');
   useEffect(() => {
-    if (!currentConversation || messages.length === 0 || isProcessing) return;
+    // Skip auto-save if we're loading messages from the database
+    if (
+      !currentConversation ||
+      messages.length === 0 ||
+      isProcessing ||
+      isLoadingMessagesRef.current
+    )
+      return;
 
     const timeout = setTimeout(() => {
       saveMessages(convertMessagesForSaving());
@@ -298,6 +315,7 @@ export function ChatPage() {
   };
 
   const handleSelectConversation = async (id: string) => {
+    isLoadingMessagesRef.current = true;
     const conversation = await loadConversation(id);
     if (conversation?.messages) {
       // Convert saved messages back to useChat format
@@ -310,6 +328,9 @@ export function ChatPage() {
     } else {
       setMessages([]);
     }
+    setTimeout(() => {
+      isLoadingMessagesRef.current = false;
+    }, 100);
   };
 
   const handleDeleteConversation = async (id: string) => {
