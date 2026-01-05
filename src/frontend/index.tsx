@@ -18,17 +18,27 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(link);
 }
 
-// Register Service Worker for PWA
+// Register Service Worker for PWA - DISABLED
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', () => {
+//     navigator.serviceWorker
+//       .register('/sw.js')
+//       .then(registration => {
+//         console.log('SW registered: ', registration);
+//       })
+//       .catch(registrationError => {
+//         console.log('SW registration failed: ', registrationError);
+//       });
+//   });
+// }
+
+// Unregister any existing service workers
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then(registration => {
-        console.log('SW registered: ', registration);
-      })
-      .catch(registrationError => {
-        console.log('SW registration failed: ', registrationError);
-      });
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    for (const registration of registrations) {
+      registration.unregister();
+      console.log('Service worker unregistered');
+    }
   });
 }
 
