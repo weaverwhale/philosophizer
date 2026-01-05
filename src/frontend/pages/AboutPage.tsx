@@ -54,7 +54,7 @@ function PhilosopherCard({
   useEffect(() => {
     if (isExpanded && !detail) {
       setLoading(true);
-      fetch(`/philosophers/${philosopher.id}`)
+      fetch(`/api/philosophers/${philosopher.id}`)
         .then(res => res.json())
         .then(data => {
           setDetail(data);

@@ -6,16 +6,7 @@ const RUNTIME_CACHE = 'philosophizer-runtime-v2';
 const PRECACHE_ASSETS = ['/', '/index.html', '/phi.svg', '/manifest.json'];
 
 // API endpoints that should never be cached
-const API_PREFIXES = [
-  '/auth/',
-  '/agent',
-  '/rag',
-  '/conversations',
-  '/admin/',
-  '/models',
-  '/philosophers',
-  '/texts',
-];
+const API_PREFIXES = ['/auth/', '/api/'];
 
 // Install event - cache essential assets
 self.addEventListener('install', event => {
