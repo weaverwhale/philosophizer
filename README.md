@@ -67,6 +67,7 @@ The system automatically generates secure secrets, downloads GPU-accelerated mod
 | **[PWA.md](PWA.md)**               | Progressive Web App installation, offline support, and mobile setup     |
 | **[DOCKER.md](DOCKER.md)**         | Choose the right Docker Compose config for your hardware (dev/GPU/DGX)  |
 | **[SETUP.md](SETUP.md)**           | Complete installation, configuration, RAG indexing, and admin workflows |
+| **[BACKUP.md](BACKUP.md)**         | Automated database backups with GitHub Actions (free, 2-minute setup)   |
 | **[DEPLOYMENT.md](DEPLOYMENT.md)** | Automated deployment, secret management, backup/restore procedures      |
 | **[PRODUCTION.md](PRODUCTION.md)** | Advanced security, enterprise secrets (Vault/AWS), GPU optimization     |
 | **[SECRETS.md](SECRETS.md)**       | Quick reference for manual secret generation (optional)                 |

@@ -6,3 +6,6 @@ dist/
 src/rag/texts
 *backup*.tar.gz
 pgvector-*.sql*
+backups/
+*.sql
+*.sql.gz

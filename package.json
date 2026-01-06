@@ -28,7 +28,11 @@
     "rag:clear": "bun run src/rag/indexTexts.ts --clear",
     "rag:stats": "bun run src/rag/indexTexts.ts --stats",
     "rag:force": "bun run src/rag/indexTexts.ts --force",
-    "rag:test": "bun run src/rag/testChunking.ts"
+    "rag:test": "bun run src/rag/testChunking.ts",
+    "backup:local": "./scripts/backup-database.sh",
+    "backup:remote": "./scripts/backup-database.sh --remote \"$DATABASE_URL\"",
+    "restore:local": "./scripts/restore-database.sh",
+    "restore:remote": "./scripts/restore-database.sh"
   },
   "devDependencies": {
     "@types/bun": "latest",
