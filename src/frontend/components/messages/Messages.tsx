@@ -14,8 +14,8 @@ interface MessagesProps {
   starterQuestions: string[];
   onStarterQuestion: (question: string) => void;
   onRegenerateLastMessage?: () => void;
-  selectedPhilosopher?: string | null;
-  philosopherName?: string | null;
+  selectedPhilosophers?: string[];
+  philosopherNames?: string[];
 }
 
 // Helper function to check if we should show the thinking indicator
@@ -101,8 +101,7 @@ export function Messages({
   starterQuestions,
   onStarterQuestion,
   onRegenerateLastMessage,
-  selectedPhilosopher,
-  philosopherName,
+  philosopherNames = [],
 }: MessagesProps) {
   const isStreaming = status === 'submitted' || status === 'streaming';
 
@@ -115,8 +114,7 @@ export function Messages({
         <EmptyState
           starterQuestions={starterQuestions}
           onStarterQuestion={onStarterQuestion}
-          selectedPhilosopher={selectedPhilosopher}
-          philosopherName={philosopherName}
+          philosopherNames={philosopherNames}
         />
       )}
 

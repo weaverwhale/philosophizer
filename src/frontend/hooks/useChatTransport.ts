@@ -3,7 +3,7 @@ import { DefaultChatTransport } from 'ai';
 
 interface UseChatTransportOptions {
   selectedModel: string | null;
-  selectedPhilosopher: string | null;
+  selectedPhilosophers: string[];
 }
 
 /**
@@ -12,15 +12,15 @@ interface UseChatTransportOptions {
  */
 export function useChatTransport({
   selectedModel,
-  selectedPhilosopher,
+  selectedPhilosophers,
 }: UseChatTransportOptions) {
   // Use refs to capture latest values
   const selectedModelRef = useRef(selectedModel);
-  const selectedPhilosopherRef = useRef(selectedPhilosopher);
+  const selectedPhilosophersRef = useRef(selectedPhilosophers);
 
   // Keep refs in sync with props
   selectedModelRef.current = selectedModel;
-  selectedPhilosopherRef.current = selectedPhilosopher;
+  selectedPhilosophersRef.current = selectedPhilosophers;
 
   // Create transport once - body function reads from refs
   const transport = useMemo(
@@ -35,10 +35,19 @@ export function useChatTransport({
           }
           return headers;
         },
-        body: () => ({
-          philosopherId: selectedPhilosopherRef.current,
-          modelId: selectedModelRef.current,
-        }),
+        body: () => {
+          const philosophers = selectedPhilosophersRef.current;
+          return {
+            // Send array if multiple, single string if one, null if none
+            philosopherIds:
+              philosophers.length === 0
+                ? null
+                : philosophers.length === 1
+                  ? philosophers[0]
+                  : philosophers,
+            modelId: selectedModelRef.current,
+          };
+        },
       }),
     []
   );

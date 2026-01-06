@@ -6,8 +6,8 @@ interface ChatInputProps {
   onInputChange: (value: string) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onStop?: () => void;
-  selectedPhilosopher?: string | null;
-  philosopherName?: string | null;
+  selectedPhilosophers?: string[];
+  philosopherNames?: string[];
 }
 
 export function ChatInput({
@@ -16,8 +16,7 @@ export function ChatInput({
   onInputChange,
   onSubmit,
   onStop,
-  selectedPhilosopher,
-  philosopherName,
+  philosopherNames = [],
 }: ChatInputProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -49,8 +48,10 @@ export function ChatInput({
           onChange={e => onInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            selectedPhilosopher && philosopherName
-              ? `Ask ${philosopherName} anything...`
+            philosopherNames.length > 0
+              ? philosopherNames.length === 1
+                ? `Ask ${philosopherNames[0]} anything...`
+                : `Ask ${philosopherNames.join(', ')} anything...`
               : 'Ask anything...'
           }
           rows={1}

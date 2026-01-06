@@ -34,8 +34,8 @@ export function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
-  const [selectedPhilosopher, setSelectedPhilosopher] = useState<string | null>(
-    null
+  const [selectedPhilosophers, setSelectedPhilosophers] = useState<string[]>(
+    []
   );
   const [selectedModel, setSelectedModel] = useState<string | null>(() => {
     // Load saved model preference from localStorage
@@ -54,23 +54,34 @@ export function ChatPage() {
     }
   }, [selectedModel]);
 
-  // Get random starter questions based on selected philosopher
+  // Get random starter questions based on selected philosophers
   const randomQuestions = useMemo(() => {
     let questionsPool: string[] = [];
 
-    if (selectedPhilosopher) {
-      // If a philosopher is selected, get tradition-specific questions
-      const philosopher = PHILOSOPHERS[selectedPhilosopher];
-      if (philosopher) {
-        // Map the philosopher's tradition to a display group
-        const displayGroup = TRADITION_GROUP_MAP[philosopher.tradition];
+    if (selectedPhilosophers.length > 0) {
+      // If philosophers are selected, combine questions from all their traditions
+      const traditions = new Set<string>();
 
-        // Get questions for that tradition, or fall back to general
-        if (displayGroup && QUESTIONS_BY_TRADITION[displayGroup]) {
-          questionsPool = QUESTIONS_BY_TRADITION[displayGroup];
-        } else {
-          questionsPool = STARTER_QUESTIONS;
+      for (const philId of selectedPhilosophers) {
+        const philosopher = PHILOSOPHERS[philId];
+        if (philosopher) {
+          const displayGroup = TRADITION_GROUP_MAP[philosopher.tradition];
+          if (displayGroup) {
+            traditions.add(displayGroup);
+          }
         }
+      }
+
+      // Combine questions from all selected traditions
+      for (const tradition of traditions) {
+        if (QUESTIONS_BY_TRADITION[tradition]) {
+          questionsPool.push(...QUESTIONS_BY_TRADITION[tradition]);
+        }
+      }
+
+      // If no tradition-specific questions found, use general questions
+      if (questionsPool.length === 0) {
+        questionsPool = STARTER_QUESTIONS;
       }
     } else {
       // If no philosopher selected, combine all questions from all traditions
@@ -81,7 +92,7 @@ export function ChatPage() {
     }
 
     return getRandomQuestions(questionsPool, 15);
-  }, [selectedPhilosopher]);
+  }, [selectedPhilosophers]);
 
   // Conversation management
   const {
@@ -98,7 +109,7 @@ export function ChatPage() {
   // Create transport that dynamically uses current model/philosopher selections
   const transport = useChatTransport({
     selectedModel,
-    selectedPhilosopher,
+    selectedPhilosophers,
   });
 
   // Use the AI SDK's useChat hook
@@ -495,12 +506,9 @@ export function ChatPage() {
               starterQuestions={randomQuestions}
               onStarterQuestion={handleStarterQuestion}
               onRegenerateLastMessage={handleRegenerateLastMessage}
-              selectedPhilosopher={selectedPhilosopher}
-              philosopherName={
-                selectedPhilosopher
-                  ? PHILOSOPHERS[selectedPhilosopher]?.name
-                  : null
-              }
+              philosopherNames={selectedPhilosophers
+                .map(id => PHILOSOPHERS[id]?.name)
+                .filter((name): name is string => !!name)}
             />
           </div>
         </div>
@@ -519,12 +527,9 @@ export function ChatPage() {
               onInputChange={setInput}
               onSubmit={handleSubmit}
               onStop={stop}
-              selectedPhilosopher={selectedPhilosopher}
-              philosopherName={
-                selectedPhilosopher
-                  ? PHILOSOPHERS[selectedPhilosopher]?.name
-                  : null
-              }
+              philosopherNames={selectedPhilosophers
+                .map(id => PHILOSOPHERS[id]?.name)
+                .filter((name): name is string => !!name)}
             />
           </div>
         </div>
@@ -533,8 +538,8 @@ export function ChatPage() {
         <ChatSettingsModal
           isOpen={settingsOpen}
           onClose={() => setSettingsOpen(false)}
-          selectedPhilosopher={selectedPhilosopher}
-          onSelectPhilosopher={setSelectedPhilosopher}
+          selectedPhilosophers={selectedPhilosophers}
+          onSelectPhilosophers={setSelectedPhilosophers}
           selectedModel={selectedModel}
           onSelectModel={setSelectedModel}
           anchorRef={settingsButtonRef}

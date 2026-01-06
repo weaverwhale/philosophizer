@@ -71,7 +71,7 @@ const server = Bun.serve({
     '/api/models': models,
     '/api/philosophers': philosophersEndpoint,
     '/api/philosophers/:id': philosopherDetailEndpoint,
-    '/api/ask-philosopher': philosopherQueryEndpoint,
+    '/api/ask': philosopherQueryEndpoint,
     '/api/texts/:sourceId': textsEndpoint,
     '/api/conversations': conversations,
     '/api/conversations/:id': conversation,
@@ -180,12 +180,8 @@ console.log('  DELETE /api/conversations/:id   - Delete');
 console.log('\n🧙 Philosophers:');
 console.log('  GET  /api/philosophers          - List all');
 console.log('  GET  /api/philosophers/:id      - Get details');
-console.log(
-  '  POST /api/ask-philosopher       - Query one or more (body: {philosopherId: "plato" | ["plato","aristotle"], topic: "..."})'
-);
-console.log(
-  '  GET  /api/ask-philosopher       - Query via params (?philosopherId=plato,aristotle&topic=...)'
-);
+console.log('  GET  /api/ask                   - Query via params');
+console.log('  POST /api/ask                   - Query via body');
 
 console.log('\n📄 Texts:');
 console.log('  GET  /api/texts/:sourceId       - Download source file');

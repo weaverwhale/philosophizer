@@ -5,12 +5,13 @@ import {
   TRADITION_GROUP_ORDER,
 } from '../../constants/traditions';
 import { ModelSelector } from './ModelSelector';
+import { PhilosopherMultiSelect } from './PhilosopherMultiSelect';
 
 interface ChatSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedPhilosopher: string | null;
-  onSelectPhilosopher: (philosopherId: string | null) => void;
+  selectedPhilosophers: string[];
+  onSelectPhilosophers: (philosopherIds: string[]) => void;
   selectedModel: string | null;
   onSelectModel: (modelId: string | null) => void;
   anchorRef?: React.RefObject<HTMLButtonElement | null>;
@@ -19,8 +20,8 @@ interface ChatSettingsModalProps {
 export function ChatSettingsModal({
   isOpen,
   onClose,
-  selectedPhilosopher,
-  onSelectPhilosopher,
+  selectedPhilosophers,
+  onSelectPhilosophers,
   selectedModel,
   onSelectModel,
   anchorRef,
@@ -56,35 +57,17 @@ export function ChatSettingsModal({
     }
   }, [isOpen, anchorRef]);
 
-  // Build grouped philosophers from the PHILOSOPHERS constant
-  const grouped = useMemo(() => {
-    const groups: Record<string, Array<{ id: string; name: string }>> = {};
-
-    for (const [id, philosopher] of Object.entries(PHILOSOPHERS)) {
-      const displayGroup =
-        TRADITION_GROUP_MAP[philosopher.tradition] || philosopher.tradition;
-
-      if (!groups[displayGroup]) {
-        groups[displayGroup] = [];
-      }
-
-      groups[displayGroup].push({
-        id,
-        name: philosopher.name,
-      });
-    }
-
-    // Sort philosophers within each group by name
-    for (const group in groups) {
-      groups[group]!.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return groups;
+  // Build a flat list of philosophers for the multi-select component
+  const philosophersList = useMemo(() => {
+    return Object.entries(PHILOSOPHERS).map(([id, philosopher]) => ({
+      id,
+      name: philosopher.name,
+    }));
   }, []);
 
-  const selectedPhilosopherName = selectedPhilosopher
-    ? PHILOSOPHERS[selectedPhilosopher]?.name
-    : null;
+  const selectedPhilosopherNames = selectedPhilosophers
+    .map(id => PHILOSOPHERS[id]?.name)
+    .filter(Boolean);
 
   if (!isOpen) return null;
 
@@ -139,52 +122,20 @@ export function ChatSettingsModal({
             {/* Philosopher/Theologian Selection */}
             <div>
               <label className="block text-sm font-medium text-text mb-2">
-                Select a focus
+                Select philosophers/theologians
               </label>
               <p className="text-xs text-text-muted mb-3">
-                Select a specific philosopher/theologian to focus the
-                conversation, or choose "All" for multi-perspective insights.
+                Select specific philosophers/theologians to focus the
+                conversation, or leave empty for multi-perspective insights.
               </p>
-              <div className="relative">
-                <select
-                  value={selectedPhilosopher || ''}
-                  onChange={e => onSelectPhilosopher(e.target.value || null)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border rounded-lg text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer appearance-none pr-8"
-                >
-                  <option value="">All Philosophers/Theologians</option>
-                  {TRADITION_GROUP_ORDER.map(groupName => {
-                    const phils = grouped[groupName];
-                    if (!phils || phils.length === 0) return null;
-
-                    return (
-                      <optgroup key={groupName} label={groupName}>
-                        {phils.map(phil => (
-                          <option key={phil.id} value={phil.id}>
-                            {phil.name}
-                          </option>
-                        ))}
-                      </optgroup>
-                    );
-                  })}
-                </select>
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </div>
-              </div>
+              <PhilosopherMultiSelect
+                philosophers={philosophersList}
+                selected={selectedPhilosophers}
+                onChange={onSelectPhilosophers}
+              />
 
               {/* Current Selection Display */}
-              {selectedPhilosopherName && (
+              {selectedPhilosopherNames.length > 0 && (
                 <div className="mt-3 p-3 bg-surface-secondary border border-border rounded-lg">
                   <div className="flex items-start gap-2">
                     <svg
@@ -201,11 +152,16 @@ export function ChatSettingsModal({
                     </svg>
                     <div>
                       <p className="text-sm font-medium text-text">
-                        {selectedPhilosopherName}
+                        {selectedPhilosopherNames.join(', ')}
                       </p>
                       <p className="text-xs text-text-muted mt-1">
-                        All responses will primarily reflect{' '}
-                        {selectedPhilosopherName}'s perspective and teachings.
+                        Responses will reflect the perspective
+                        {selectedPhilosopherNames.length > 1 ? 's' : ''} of the
+                        selected{' '}
+                        {selectedPhilosopherNames.length > 1
+                          ? 'thinkers'
+                          : 'thinker'}
+                        .
                       </p>
                     </div>
                   </div>
@@ -219,10 +175,10 @@ export function ChatSettingsModal({
         <div className="p-4 border-t border-border flex gap-2">
           <button
             onClick={() => {
-              onSelectPhilosopher(null);
+              onSelectPhilosophers([]);
               onSelectModel(null);
             }}
-            disabled={!selectedPhilosopher && !selectedModel}
+            disabled={selectedPhilosophers.length === 0 && !selectedModel}
             className="flex-1 px-4 py-2 bg-surface-secondary border border-border text-text rounded-lg hover:bg-surface transition-colors font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Reset All

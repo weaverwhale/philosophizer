@@ -804,10 +804,18 @@ export const getPrompts = async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    const philosopherId = url.searchParams.get('philosopherId') || undefined;
+    const philosopherIdsParam = url.searchParams.get('philosopherIds');
+
+    // Parse philosopher IDs - can be comma-separated string or single ID
+    let philosopherIds: string | string[] | undefined;
+    if (philosopherIdsParam) {
+      const ids = philosopherIdsParam.split(',').filter(id => id.trim());
+      philosopherIds =
+        ids.length === 1 ? ids[0] : ids.length > 1 ? ids : undefined;
+    }
 
     // Generate the appropriate system prompt
-    const systemPrompt = getSystemPrompt(philosopherId);
+    const systemPrompt = getSystemPrompt(philosopherIds);
     const tokenCount = estimateTokenCount(systemPrompt);
 
     // Get list of available philosophers
@@ -819,15 +827,26 @@ export const getPrompts = async (req: Request) => {
       })
     );
 
+    // Format philosopher name(s) for display
+    let philosopherName: string;
+    if (!philosopherIds) {
+      philosopherName = 'Default (All Philosophers)';
+    } else if (typeof philosopherIds === 'string') {
+      philosopherName = PHILOSOPHERS[philosopherIds]?.name || 'Unknown';
+    } else {
+      const names = philosopherIds
+        .map(id => PHILOSOPHERS[id]?.name)
+        .filter(Boolean);
+      philosopherName = names.length > 0 ? names.join(', ') : 'Unknown';
+    }
+
     return new Response(
       JSON.stringify({
         prompt: systemPrompt,
         tokenCount,
         characterCount: systemPrompt.length,
-        philosopherId: philosopherId || 'default',
-        philosopherName: philosopherId
-          ? PHILOSOPHERS[philosopherId]?.name || 'Unknown'
-          : 'Default (All Philosophers)',
+        philosopherId: philosopherIds || 'default',
+        philosopherName,
         availablePhilosophers,
         timestamp: new Date().toISOString(),
       }),

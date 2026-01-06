@@ -59,7 +59,7 @@ export async function createAgent(
   messages: UIMessage[],
   userId: string,
   conversationId?: string,
-  philosopherId?: string,
+  philosopherIds?: string | string[],
   modelId?: string
 ) {
   // Determine which model to use
@@ -82,7 +82,7 @@ export async function createAgent(
     conversationId
   );
 
-  const systemPrompt = getSystemPrompt(philosopherId) + memoryContext;
+  const systemPrompt = getSystemPrompt(philosopherIds) + memoryContext;
   const tools = createTools(userId);
 
   return new ToolLoopAgent({

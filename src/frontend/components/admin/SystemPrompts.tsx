@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { PhilosopherMultiSelect } from '../PhilosopherMultiSelect';
 
 interface PromptData {
   prompt: string;
@@ -16,16 +17,38 @@ interface PromptData {
 
 export function SystemPrompts() {
   const [promptData, setPromptData] = useState<PromptData | null>(null);
-  const [selectedPhilosopher, setSelectedPhilosopher] = useState<string>('');
+  const [selectedPhilosophers, setSelectedPhilosophers] = useState<string[]>(
+    []
+  );
   const [loadingPrompt, setLoadingPrompt] = useState(false);
+  const [philosophers, setPhilosophers] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
 
-  const loadPrompt = async (philosopherId?: string) => {
+  // Fetch philosophers list on mount
+  useEffect(() => {
+    const fetchPhilosophers = async () => {
+      try {
+        const response = await fetch('/api/philosophers');
+        if (response.ok) {
+          const data = await response.json();
+          setPhilosophers(data.philosophers);
+        }
+      } catch (error) {
+        console.error('Failed to fetch philosophers:', error);
+      }
+    };
+    fetchPhilosophers();
+  }, []);
+
+  const loadPrompt = async (philosopherIds?: string[]) => {
     try {
       setLoadingPrompt(true);
       const token = localStorage.getItem('auth_token');
-      const url = philosopherId
-        ? `/admin/prompts?philosopherId=${philosopherId}`
-        : '/admin/prompts';
+      const url =
+        philosopherIds && philosopherIds.length > 0
+          ? `/admin/prompts?philosopherIds=${philosopherIds.join(',')}`
+          : '/admin/prompts';
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -44,32 +67,30 @@ export function SystemPrompts() {
       <div className="bg-surface border border-border rounded-lg p-4">
         <div className="mb-4">
           <label className="block text-sm font-medium text-text mb-2">
-            Select Philosopher (or Default)
+            Select Philosophers (or leave empty for default)
           </label>
           <div className="flex gap-3">
-            <select
-              value={selectedPhilosopher}
-              onChange={e => setSelectedPhilosopher(e.target.value)}
-              className="flex-1 px-3 py-2 bg-background border border-border rounded-md text-text"
-              disabled={loadingPrompt}
-            >
-              <option value="">Default (All Philosophers)</option>
-              {promptData?.availablePhilosophers
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map(phil => (
-                  <option key={phil.id} value={phil.id}>
-                    {phil.name} ({phil.tradition})
-                  </option>
-                ))}
-            </select>
+            <div className="flex-1">
+              <PhilosopherMultiSelect
+                philosophers={philosophers}
+                selected={selectedPhilosophers}
+                onChange={setSelectedPhilosophers}
+              />
+            </div>
             <button
-              onClick={() => loadPrompt(selectedPhilosopher || undefined)}
+              onClick={() => loadPrompt(selectedPhilosophers)}
               disabled={loadingPrompt}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors shrink-0"
             >
               {loadingPrompt ? 'Loading...' : 'Load Prompt'}
             </button>
           </div>
+          {selectedPhilosophers.length > 0 && (
+            <p className="text-xs text-text-muted mt-2">
+              {selectedPhilosophers.length} philosopher
+              {selectedPhilosophers.length !== 1 ? 's' : ''} selected
+            </p>
+          )}
         </div>
 
         {promptData && (
@@ -133,4 +154,3 @@ export function SystemPrompts() {
     </section>
   );
 }
-

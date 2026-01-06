@@ -130,11 +130,36 @@ function generateResearchToolsList(): string {
   return output;
 }
 
-export function getSystemPrompt(philosopherId?: string): string {
-  // If a specific philosopher is selected, create a focused prompt
-  if (philosopherId) {
-    const philosopher = PHILOSOPHERS[philosopherId];
-    if (philosopher) {
+export function getSystemPrompt(philosopherIds?: string | string[]): string {
+  // Convert single philosopher to array for consistent handling
+  const ids = philosopherIds
+    ? Array.isArray(philosopherIds)
+      ? philosopherIds
+      : [philosopherIds]
+    : [];
+
+  // If specific philosophers are selected, create a focused prompt
+  if (ids.length > 0) {
+    const philosophers = ids
+      .map(id => {
+        const data = PHILOSOPHERS[id];
+        return data ? { id, data } : null;
+      })
+      .filter(
+        (p): p is { id: string; data: (typeof PHILOSOPHERS)[string] } =>
+          p !== null
+      );
+
+    if (philosophers.length === 0) {
+      // Invalid philosopher IDs, fall through to default prompt
+    } else if (philosophers.length === 1) {
+      // Single philosopher - use focused prompt
+      const first = philosophers[0];
+      if (!first) {
+        // Should never happen, but makes TypeScript happy
+        return getSystemPrompt();
+      }
+      const { id, data: philosopher } = first;
       return `
 You are channeling the wisdom and perspective of ${philosopher.name}, ${philosopher.era}.
 
@@ -144,16 +169,16 @@ You are channeling the wisdom and perspective of ${philosopher.name}, ${philosop
 ${philosopher.description}
 
 **Key Teachings:**
-${philosopher.keyTeachings.map(t => `- ${t}`).join('\n')}
+${philosopher.keyTeachings.map((t: string) => `- ${t}`).join('\n')}
 
 **Areas of Expertise:**
-${philosopher.areasOfExpertise.map(a => `- ${a}`).join('\n')}
+${philosopher.areasOfExpertise.map((a: string) => `- ${a}`).join('\n')}
 
 **Key Concepts:**
-${philosopher.keyConcepts.map(c => `- **${c.name}**: ${c.explanation}`).join('\n')}
+${philosopher.keyConcepts.map((c: { name: string; explanation: string }) => `- **${c.name}**: ${c.explanation}`).join('\n')}
 
 **Available Tools:**
-You have access to the **${philosopherId}** tool which provides:
+You have access to the **${id}** tool which provides:
 - Detailed teachings and concepts from ${philosopher.name}
 - Key excerpts from their major works
 - Famous quotes and primary source texts
@@ -163,7 +188,7 @@ You also have access to research tools (webSearch, readUrl, wikipedia, newsSearc
 
 **Response Style:**
 - Answer all questions primarily from ${philosopher.name}'s perspective and teachings
-- Use the ${philosopherId} tool to gather deep insights from their works
+- Use the ${id} tool to gather deep insights from their works
 - Reference their key concepts and teachings frequently
 - Include relevant quotes and excerpts to let ${philosopher.name} speak directly
 - If the question goes beyond ${philosopher.name}'s areas of expertise, acknowledge this and still provide their perspective while noting the limitations
@@ -171,7 +196,7 @@ You also have access to research tools (webSearch, readUrl, wikipedia, newsSearc
 
 **Example Approach:**
 When asked about [topic], you would:
-1. Call the ${philosopherId} tool with the relevant query
+1. Call the ${id} tool with the relevant query
 2. Present ${philosopher.name}'s teaching on this topic
 3. Include key quotes or excerpts from their works
 4. Apply their philosophical framework to the user's specific question
@@ -179,6 +204,63 @@ When asked about [topic], you would:
 
 Remember: You are speaking primarily through ${philosopher.name}'s voice and wisdom. Stay true to their teachings and perspective.
 `;
+    } else {
+      // Multiple philosophers - create a multi-perspective prompt
+      const names = philosophers.map(p => p.data.name).join(', ');
+      const lastIndex = names.lastIndexOf(', ');
+      const formattedNames =
+        lastIndex > -1
+          ? names.substring(0, lastIndex) +
+            ' and' +
+            names.substring(lastIndex + 1)
+          : names;
+
+      let prompt = `
+You are offering wisdom from multiple philosophical perspectives: ${formattedNames}.
+
+**MULTI-PERSPECTIVE APPROACH**: All responses should draw from the combined wisdom of these thinkers, showing how their different perspectives illuminate the question from various angles.
+
+**Selected Philosophers:**
+
+`;
+
+      for (const { id, data: philosopher } of philosophers) {
+        prompt += `
+### ${philosopher.name} (${philosopher.era})
+**Tradition**: ${philosopher.tradition}
+**About**: ${philosopher.description}
+**Key Teachings**: ${philosopher.keyTeachings.slice(0, 3).join('; ')}
+**Areas of Expertise**: ${philosopher.areasOfExpertise.join(', ')}
+**Tool**: Use the **${id}** tool to access their detailed teachings, quotes, and primary texts
+
+`;
+      }
+
+      prompt += `
+**Available Tools:**
+${philosophers.map(p => `- **${p.id}**: Access ${p.data.name}'s teachings, concepts, quotes, and primary source texts`).join('\n')}
+
+You also have access to research tools (webSearch, readUrl, wikipedia, newsSearch) to provide additional context when needed.
+
+**Response Style:**
+- Present multiple perspectives on the user's question, showing how each thinker would approach it
+- Use the philosopher tools to gather deep insights from their respective works
+- Compare and contrast their viewpoints, highlighting agreements and disagreements
+- Include relevant quotes and excerpts to let each thinker speak in their own voice
+- Show how their different frameworks can complement each other or reveal tensions
+- Help the user see the richness that comes from considering multiple philosophical traditions
+
+**Example Approach:**
+When asked about [topic], you would:
+1. Call each philosopher's tool with queries relevant to their expertise
+2. Present each thinker's perspective on the topic
+3. Include key quotes or excerpts from their works
+4. Compare and synthesize their insights
+5. Help the user understand how different philosophical frameworks illuminate different aspects of the question
+
+Remember: You are weaving together multiple voices and traditions. Show respect for each perspective while helping the user see the value in considering multiple viewpoints.
+`;
+      return prompt;
     }
   }
 

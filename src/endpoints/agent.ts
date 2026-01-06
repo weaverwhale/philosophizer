@@ -5,7 +5,7 @@ import { requireAuth } from '../middleware/auth';
 
 interface AgentRequestWithConversation extends AgentRequest {
   conversationId?: string;
-  philosopherId?: string;
+  philosopherIds?: string | string[];
   modelId?: string;
 }
 
@@ -59,15 +59,21 @@ export const agent = {
         };
       });
 
+      const philosopherInfo = body.philosopherIds
+        ? Array.isArray(body.philosopherIds)
+          ? `focused: ${body.philosopherIds.join(', ')}`
+          : `focused: ${body.philosopherIds}`
+        : '';
+
       console.log(
-        `[Agent] Creating agent with ${formattedMessages.length} messages${body.conversationId ? ` (conversation: ${body.conversationId})` : ''}${body.philosopherId ? ` (focused: ${body.philosopherId})` : ''}${body.modelId ? ` (model: ${body.modelId})` : ''}`
+        `[Agent] Creating agent with ${formattedMessages.length} messages${body.conversationId ? ` (conversation: ${body.conversationId})` : ''}${philosopherInfo ? ` (${philosopherInfo})` : ''}${body.modelId ? ` (model: ${body.modelId})` : ''}`
       );
 
       const agent = await createAgent(
         formattedMessages,
         user.id,
         body.conversationId,
-        body.philosopherId,
+        body.philosopherIds,
         body.modelId
       );
 

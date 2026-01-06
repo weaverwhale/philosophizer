@@ -3,25 +3,36 @@ import { Logo } from '../Logo';
 interface EmptyStateProps {
   starterQuestions: string[];
   onStarterQuestion: (question: string) => void;
-  selectedPhilosopher?: string | null;
-  philosopherName?: string | null;
+  selectedPhilosophers?: string[];
+  philosopherNames?: string[];
 }
 
 export function EmptyState({
   starterQuestions,
   onStarterQuestion,
-  selectedPhilosopher,
-  philosopherName,
+  philosopherNames = [],
 }: EmptyStateProps) {
+  const getTitle = () => {
+    if (philosopherNames.length === 0) {
+      return 'Ask anything about philosophy or theology';
+    }
+    if (philosopherNames.length === 1) {
+      return `Ask ${philosopherNames[0]}`;
+    }
+    if (philosopherNames.length === 2) {
+      return `Ask ${philosopherNames[0]} and ${philosopherNames[1]}`;
+    }
+    // For 3 or more
+    const lastPhil = philosopherNames[philosopherNames.length - 1];
+    const others = philosopherNames.slice(0, -1).join(', ');
+    return `Ask ${others}, and ${lastPhil}`;
+  };
+
   return (
     <div className="flex items-center justify-center h-full">
       <div className="text-center py-8">
         <Logo />
-        <h2 className="text-3xl font-semibold text-text">
-          {selectedPhilosopher && philosopherName
-            ? `Ask ${philosopherName}`
-            : 'Ask anything about philosophy or theology'}
-        </h2>
+        <h2 className="text-3xl font-semibold text-text">{getTitle()}</h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-8 mx-auto">
           {starterQuestions.map(question => (
             <button

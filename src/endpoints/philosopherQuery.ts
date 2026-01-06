@@ -383,7 +383,7 @@ async function executePhilosopherQuery(
 // ============================================================================
 
 /**
- * POST /ask-philosopher
+ * POST /ask
  *
  * Ask one or more philosophers a question and get the tool response
  * that would be returned to the agent pipeline.
@@ -483,8 +483,8 @@ export const philosopherQueryEndpoint = {
   },
 
   /**
-   * GET /ask-philosopher?philosopherId=plato&topic=What+is+justice?
-   * GET /ask-philosopher?philosopherId=plato,aristotle&topic=What+is+justice?
+   * GET /ask?philosopherId=plato&topic=What+is+justice?
+   * GET /ask?philosopherId=plato,aristotle&topic=What+is+justice?
    *
    * Alternative GET endpoint for simple queries
    * Supports comma-separated philosopher IDs for multiple philosophers
