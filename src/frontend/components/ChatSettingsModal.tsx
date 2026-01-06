@@ -79,7 +79,7 @@ export function ChatSettingsModal({
       {/* Modal - Tooltip Style */}
       <div
         ref={modalRef}
-        className="fixed w-80 bg-surface border border-border rounded-lg shadow-2xl z-50 max-h-[60vh] flex flex-col transition-opacity"
+        className="fixed w-90 bg-surface border border-border rounded-lg shadow-2xl z-50 max-h-[60vh] flex flex-col transition-opacity"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,

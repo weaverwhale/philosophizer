@@ -56,7 +56,7 @@ export function ModelSelector({
     modelsData?.models.map(model => ({
       id: model.id,
       name: model.costPerToken
-        ? `${model.name} ($${model.costPerToken.prompt}/$${model.costPerToken.completion} per 1M tokens)`
+        ? `${model.name} ($${model.costPerToken.prompt}/$${model.costPerToken.completion} per 1M)`
         : model.name,
     })) || [];
 
